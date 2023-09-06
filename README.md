@@ -1,6 +1,13 @@
-# pohja
+# Reseptien hallinta
 
-Pohja kevään 2020 harjoitustöiden GIT-repoille
+Ohjelmointi 2 -kurssin harjoitustyö.
 
-Lue käyttöohjeet TIMistä: <https://tim.jyu.fi/view/kurssit/tie/ohj2/tyokalut/git/ohj2git#fork>
+Tekijä: Karri Hakomäki
+
+## Sovellus ruoanlaittoreseptien hallitsemiseen.
+Reseptejä pystyy lisäämään, poistamaan ja muokkaamaan.
+Reseptejä voi selata sekä etsiä reseptihaulla, jossa tuloksia pystytään rajaamaan halutusti.
+Reseptinäkymässä valmistusvaiheita voi merkitä suoritetuksi ja sivun voi halutessaan tulostaa.
+
+Tarkempi kuvaus harjoitustyöstä: [TIMissä](https://tim.jyu.fi/view/kurssit/tie/ohj2/2023s/ht/hakokakr).
 
