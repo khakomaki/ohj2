@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import fi.jyu.mit.fxgui.ComboBoxChooser?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="900.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Tiedosto">
+            <items>
+                  <MenuItem text="_Tallenna">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem text="_Poista" />
+              <MenuItem text="_Sulje" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <bottom>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <HBox spacing="10.0">
+               <children>
+                  <TextField>
+                     <tooltip>
+                        <Tooltip text="Lisää uuden osion nimi" />
+                     </tooltip></TextField>
+                  <Button mnemonicParsing="false" text="Lisää osio +">
+                     <tooltip>
+                        <Tooltip text="Lisää uusi osio" />
+                     </tooltip></Button>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="TOP_RIGHT" spacing="10.0">
+               <children>
+                  <Button mnemonicParsing="false" text="Sulje" />
+                  <Button mnemonicParsing="false" text="Tallenna" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </bottom>
+   <center>
+      <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER">
+         <content>
+            <BorderPane>
+               <top>
+                  <HBox BorderPane.alignment="CENTER">
+                     <children>
+                        <GridPane minWidth="225.0" HBox.hgrow="ALWAYS">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="75.0" prefHeight="100.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Reseptin nimi">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <TextField text="Mustikkapiirakka" GridPane.columnIndex="1">
+                                 <tooltip>
+                                    <Tooltip text="Lisää reseptin nimi" />
+                                 </tooltip></TextField>
+                              <Label text="Kuvaus" GridPane.rowIndex="1">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <TextArea text="Halpa ja maukas." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <tooltip>
+                                    <Tooltip text="Lisää reseptin kuvaus" />
+                                 </tooltip></TextArea>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </GridPane>
+                        <GridPane HBox.hgrow="ALWAYS">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="100.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Hintaluokka">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <ComboBoxChooser rivit="€€" GridPane.columnIndex="1">
+                                 <tooltip>
+                                    <Tooltip text="Valitse hintaluokka" />
+                                 </tooltip></ComboBoxChooser>
+                              <Label text="Valmistusaika" GridPane.rowIndex="1">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Tähdet" GridPane.rowIndex="2">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <ComboBoxChooser rivit="★★★" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <tooltip>
+                                    <Tooltip text="Valitse tähdet" />
+                                 </tooltip></ComboBoxChooser>
+                              <Label text="Vaativuus" GridPane.rowIndex="3">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </Label>
+                              <ComboBoxChooser rivit="nopea" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <tooltip>
+                                    <Tooltip text="Valitse valmistusaika arvio" />
+                                 </tooltip></ComboBoxChooser>
+                              <ComboBoxChooser rivit="helppo" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <tooltip>
+                                    <Tooltip text="Valitse vaativuustaso" />
+                                 </tooltip></ComboBoxChooser>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </GridPane>
+                     </children>
+                  </HBox>
+               </top>
+               <center>
+                  <VBox BorderPane.alignment="CENTER">
+                     <children>
+                        <VBox>
+                           <children>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <TextField text="Muropohja">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                    <Button mnemonicParsing="false" text="x">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label text="Ainesosat">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </Label>
+                                          <GridPane gridLinesVisible="true">
+                                            <columnConstraints>
+                                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="100.0" />
+                                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="100.0" />
+                                                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="30.0" prefWidth="30.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <Label text="määrä">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label text="ainesosa" GridPane.columnIndex="1">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField alignment="CENTER" text="100g" GridPane.rowIndex="1">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="voita" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="1dl" GridPane.rowIndex="2">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="sokeria" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="1kpl" GridPane.rowIndex="3">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="kananmunia" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" promptText="määrä..." GridPane.rowIndex="6">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" promptText="ainesosa..." GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <Button mnemonicParsing="false" text="+" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <GridPane.margin>
+                                                      <Insets top="5.0" />
+                                                   </GridPane.margin>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <TextField alignment="CENTER" text="2,5dl" GridPane.rowIndex="4" />
+                                                <TextField alignment="CENTER" text="vehnäjauhoja" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <TextField alignment="CENTER" text="1tl" GridPane.rowIndex="5" />
+                                                <TextField alignment="CENTER" text="leivinjauhetta" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </GridPane>
+                                       </children>
+                                    </VBox>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label text="Ohjeet">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </Label>
+                                          <GridPane gridLinesVisible="true">
+                                            <columnConstraints>
+                                              <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="50.0" />
+                                              <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" />
+                                                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="30.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <Label text="vaihe">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label text="ohje" GridPane.columnIndex="1">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label text="1" GridPane.rowIndex="1">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                                <Label text="2" GridPane.rowIndex="2">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                                <Label text="3" GridPane.rowIndex="3">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="+" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Sekoita sokeri ja pehmeä voi" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Lisää kananmuna ja vaahdota" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Lisää leivinjauho vehnäjauhoihin" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Sekoita jauhot vaahtoon" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Painele taikina piirakkavuokaan" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <Label text="4" GridPane.rowIndex="4" />
+                                                <Label text="5" GridPane.rowIndex="5" />
+                                                <Label text="6" GridPane.rowIndex="6" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" promptText="ohje" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </GridPane>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox>
+                           <children>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <TextField text="Täyte">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                    <Button mnemonicParsing="false" text="x">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </HBox>
+                              <HBox>
+                                 <children>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label text="Ainesosat">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </Label>
+                                          <GridPane gridLinesVisible="true">
+                                             <columnConstraints>
+                                                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="100.0" />
+                                                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="100.0" />
+                                                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="30.0" prefWidth="30.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <children>
+                                                <Label text="määrä">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label text="ainesosa" GridPane.columnIndex="1">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField alignment="CENTER" text="300g" GridPane.rowIndex="1">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="mustikoita" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="200g" GridPane.rowIndex="2">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="kermaviiliä" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="0,75dl" GridPane.rowIndex="3">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" text="sokeria" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" promptText="määrä..." GridPane.rowIndex="6">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <TextField alignment="CENTER" promptText="ainesosa..." GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                                   <GridPane.margin>
+                                                      <Insets />
+                                                   </GridPane.margin>
+                                                </TextField>
+                                                <Button mnemonicParsing="false" text="+" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <GridPane.margin>
+                                                      <Insets top="5.0" />
+                                                   </GridPane.margin>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <TextField alignment="CENTER" text="1tl" GridPane.rowIndex="4" />
+                                                <TextField alignment="CENTER" text="vaniliinisokeria" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <TextField alignment="CENTER" text="1kpl" GridPane.rowIndex="5" />
+                                                <TextField alignment="CENTER" text="kananmunia" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </GridPane>
+                                       </children>
+                                    </VBox>
+                                    <VBox HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label text="Ohjeet">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </Label>
+                                          <GridPane gridLinesVisible="true">
+                                             <columnConstraints>
+                                                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="50.0" />
+                                                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" />
+                                                <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="30.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="50.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <children>
+                                                <Label text="vaihe">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label minWidth="250.0" text="ohje" GridPane.columnIndex="1">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label text="1" GridPane.rowIndex="1">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                                <Label text="2" GridPane.rowIndex="2">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                                <Label text="3" GridPane.rowIndex="3">
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="+" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Ripottele mustikat piirakkapohjan päälle" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Sekoita sokeri, kermaviili ja kananmuna" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Lisää vanilliinisokeri" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Kaada kermaviiliseos piirakkapohjan päälle" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" text="Paista uunin alatasolla 200C 30min, tai kunnes pohja saa kauniin ruskean värin" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <Label text="4" GridPane.rowIndex="4" />
+                                                <Label text="5" GridPane.rowIndex="5" />
+                                                <Label text="6" GridPane.rowIndex="6" />
+                                                <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" promptText="ohje" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Button>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </GridPane>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+               </center>
+            </BorderPane>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>

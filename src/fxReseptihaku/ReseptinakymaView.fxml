@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Tiedosto">
+            <items>
+              <MenuItem text="_Sulje">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="W" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Muokkaa">
+            <items>
+              <MenuItem text="_Muokkaa reseptiä">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem text="_Poista resepti" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Tulosta">
+            <items>
+              <MenuItem text="_Tulosta resepti...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="P" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER">
+         <content>
+            <BorderPane>
+               <left>
+                  <VBox fillWidth="false" spacing="10.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label text="Ainesosat">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </Label>
+                        <Label text="Muropohja" />
+                        <GridPane hgap="5.0" vgap="5.0">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="50.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="125.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="100g" />
+                              <Label text="voita" GridPane.columnIndex="1" />
+                              <Label text="1dl" GridPane.rowIndex="1" />
+                              <Label text="sokeria" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="1kpl" GridPane.rowIndex="2" />
+                              <Label text="kananmunia" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="2,5dl" GridPane.rowIndex="3" />
+                              <Label text="vehnäjauhoja" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="1tl" GridPane.rowIndex="4" />
+                              <Label text="leivinjauhetta" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                           </children>
+                        </GridPane>
+                        <Label text="Täyte" />
+                        <GridPane hgap="5.0" vgap="5.0">
+                           <columnConstraints>
+                              <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="50.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="125.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="300g" />
+                              <Label text="mustikoita" GridPane.columnIndex="1" />
+                              <Label text="200g" GridPane.rowIndex="1" />
+                              <Label text="kermaviiliä" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="0,75dl" GridPane.rowIndex="2" />
+                              <Label text="sokeria" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="1tl" GridPane.rowIndex="3" />
+                              <Label text="vanilliinisokeria" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="1kpl" GridPane.rowIndex="4" />
+                              <Label text="kananmunia" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </left>
+               <top>
+                  <VBox spacing="10.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label text="Mustikkapiirakka">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </Label>
+                        <Label text="Halpa ja maukas." />
+                        <GridPane gridLinesVisible="true">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="★★★" GridPane.columnIndex="2" />
+                              <Label text="€€">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label text="nopea" GridPane.columnIndex="1">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label text="helppo" GridPane.columnIndex="3">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </top>
+               <center>
+                  <VBox spacing="10.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label text="Valmistus">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </Label>
+                        <Label text="Muropohja" />
+                        <GridPane hgap="5.0" vgap="5.0">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="30.0" prefWidth="30.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="30.0" prefWidth="30.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="125.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <CheckBox mnemonicParsing="false" selected="true" />
+                              <CheckBox mnemonicParsing="false" selected="true" GridPane.rowIndex="1" />
+                              <CheckBox mnemonicParsing="false" GridPane.rowIndex="2" />
+                              <CheckBox mnemonicParsing="false" GridPane.rowIndex="3" />
+                              <Label text="1" GridPane.columnIndex="1" />
+                              <Label text="2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="3" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="4" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="Lisää leivinjauho vehnäjauhoihin" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <Label text="Sekoita jauhot vaahtoon" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                              <CheckBox mnemonicParsing="false" GridPane.rowIndex="4" />
+                              <Label text="5" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Label text="Painele taikina piirakkavuokaan" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                              <Label GridPane.columnIndex="2" />
+                              <Label GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                           </children>
+                        </GridPane>
+                        <Label text="Täyte" />
+                        <GridPane hgap="5.0" vgap="5.0">
+                           <columnConstraints>
+                              <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="30.0" prefWidth="30.0" />
+                              <ColumnConstraints halignment="CENTER" hgrow="NEVER" minWidth="30.0" prefWidth="30.0" />
+                              <ColumnConstraints hgrow="ALWAYS" minWidth="125.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <CheckBox mnemonicParsing="false" />
+                              <CheckBox mnemonicParsing="false" GridPane.rowIndex="1" />
+                              <CheckBox mnemonicParsing="false" GridPane.rowIndex="2" />
+                              <CheckBox mnemonicParsing="false" GridPane.rowIndex="3" />
+                              <Label text="1" GridPane.columnIndex="1" />
+                              <Label text="2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="3" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="4" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="Lisää vaniliinisokeri" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                              <Label text="Kaada kermaviiliseos piirakkapohjan päälle" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                              <CheckBox mnemonicParsing="false" GridPane.rowIndex="4" />
+                              <Label text="5" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <Label prefWidth="350.0" text="Paista uunin alatasolla 200°C 30min, tai kunnes pohja saa kauniin ruskean värin" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                              <Label text="Ripottele mustikat piirakkapohjan päälle" wrapText="true" GridPane.columnIndex="2" />
+                              <Label text="Sekoita sokeri, kermaviili ja kananmuna" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                              <CheckBox mnemonicParsing="false" GridPane.rowIndex="5" />
+                              <Label text="6" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <Label text="Anna jäähtyä ennen tarjoilua" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </center>
+            </BorderPane>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>
