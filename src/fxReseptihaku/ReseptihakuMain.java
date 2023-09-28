@@ -16,14 +16,16 @@ public class ReseptihakuMain extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            FXMLLoader ldr = new FXMLLoader(getClass().getResource("ReseptihakuGUIView.fxml"));
+            final FXMLLoader ldr = new FXMLLoader(getClass().getResource("ReseptihakuGUIView.fxml"));
             final Pane root = ldr.load();
-            //final ReseptihakuGUIController reseptihakuCtrl = (ReseptihakuGUIController) ldr.getController();
+            // final ReseptihakuGUIController reseptihakuCtrl = (ReseptihakuGUIController)ldr.getController();
+            
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("reseptihaku.css").toExternalForm());
             primaryStage.setScene(scene);
             primaryStage.setTitle("Reseptihaku");
             primaryStage.show();
+            
         } catch(Exception e) {
             e.printStackTrace();
         }
