@@ -15,13 +15,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxReseptihaku.ReseptinakymaGUIController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="Tiedosto">
             <items>
-              <MenuItem text="_Sulje">
+              <MenuItem text="_Sulje" onAction="#handleSulje">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="W" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
@@ -30,17 +30,17 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Muokkaa">
             <items>
-              <MenuItem text="_Muokkaa reseptiä">
+              <MenuItem text="_Muokkaa reseptiä" onAction="#handleMuokkaaResepti">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem text="_Poista resepti" />
+                  <MenuItem text="_Poista resepti" onAction="#handlePoistaResepti"/>
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Tulosta">
             <items>
-              <MenuItem text="_Tulosta resepti...">
+              <MenuItem text="_Tulosta resepti..." onAction="#handleTulosta">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="P" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
@@ -193,7 +193,7 @@
                               <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <CheckBox mnemonicParsing="false" selected="true" />
+                              <CheckBox mnemonicParsing="false" selected="true" fx:id="checkBox1"/>
                               <CheckBox mnemonicParsing="false" selected="true" GridPane.rowIndex="1" />
                               <CheckBox mnemonicParsing="false" GridPane.rowIndex="2" />
                               <CheckBox mnemonicParsing="false" GridPane.rowIndex="3" />

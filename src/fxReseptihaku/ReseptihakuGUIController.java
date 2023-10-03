@@ -1,34 +1,35 @@
 package fxReseptihaku;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
+import fi.jyu.mit.fxgui.StringGrid;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.TextField;
 
 /**
  * @author hakom
  * @version 13.9.2023
  *
  */
-public class ReseptihakuGUIController {
+public class ReseptihakuGUIController implements Initializable {
 
+      @FXML private TextField hakukentta;
+      @FXML private StringGrid<String> hakutulokset;
+    
       @FXML private void handleUusiResepti() { lisaaResepti(); }
-      
       @FXML private void handleMuokkaaResepti() { muokkaaResepti(); }
-      
       @FXML private void handleAvaaResepti() { avaaResepti(); }
-      
       @FXML private void handleAvaaSatunnainenResepti() { avaaSatunnainenResepti(); }
-      
       @FXML private void handleHaeReseptit() { haeReseptit(); }
-      
       @FXML private void handlePoistaResepti() { poistaResepti(); }
-      
       @FXML private void handleTyhjennaSuodattimet() { tyhjennaSuodattimet(); }
-      
       @FXML private void handleSulje() { sulje(); }
-      
-      @FXML private void handleTulosta() { tulosta();}
+      @FXML private void handleTulosta() { tulosta(); }
       
       // ====================================================================================================
       
@@ -38,31 +39,48 @@ public class ReseptihakuGUIController {
       
       
       private void haeReseptit() {
-          Dialogs.showMessageDialog("Ei osata hakea hakutuloksia vielä");
+          String hakusana = hakukentta.getText();
+          
+          if (hakusana.isEmpty()) {
+              Dialogs.showMessageDialog("Ei osata hakea kaikkia hakutuloksia vielä");
+              return;
+          }
+          Dialogs.showMessageDialog("Ei osata hakea hakutuloksia hakusanalla \"" + hakusana + "\" vielä");
       }
       
       
       private void lisaaResepti() {
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausView.fxml"), "Lisää resepti", null, null);
+          Dialogs.showMessageDialog("Ei osata vielä luoda uutta reseptipohjaa");
+          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Lisää resepti", null, "");
       }
       
       
       private void muokkaaResepti() {
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausView.fxml"), "Muokkaa reseptiä", null, null);
+          // haetaan mikä resepti on valittuna
+          int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
+          if (valittuResepti < 0) { return; }
+          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, "");
       }
       
       
       private void avaaResepti() {
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaView.fxml"), "Reseptinäkymä", null, null);
+          int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
+          if (valittuResepti < 0) { return; }
+          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, "");
       }
       
       
       private void avaaSatunnainenResepti() {
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaView.fxml"), "Reseptinäkymä", null, null);
+          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, "");
       }
       
       
       private void poistaResepti() {
+          // haetaan mikä resepti on valittuna
+          int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
+          if (valittuResepti < 0) { return; }
+          
+          // näytetään dialogi reseptin poistamisesta
           boolean vastaus = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
           if (vastaus) { Dialogs.showMessageDialog("Ei osata poistaa reseptiä vielä"); }
       }
@@ -74,7 +92,16 @@ public class ReseptihakuGUIController {
       
       
       private void tulosta() {
+          // haetaan mikä resepti on valittuna
+          int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
+          if (valittuResepti < 0) { return; }
+          
           Dialogs.showMessageDialog("Ei osata tulostaa vielä");
       }
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        //
+    }
       
 }

@@ -102,7 +102,7 @@
                      <center>
                         <HBox alignment="TOP_CENTER" spacing="10.0" BorderPane.alignment="CENTER">
                            <children>
-                              <TextField prefWidth="200.0" text="piirakka">
+                              <TextField prefWidth="200.0" text="piirakka" fx:id="hakukentta">
                                  <tooltip>
                                     <Tooltip text="Reseptin hakusana" />
                                  </tooltip></TextField>
@@ -131,7 +131,7 @@
                <center>
                   <ScrollPane fitToWidth="true" prefHeight="250.0" BorderPane.alignment="CENTER">
                      <content>
-                        <StringGrid prefWidth="600.0" rivit="reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso&#10;Mustikkapiirakka |€€ |nopea |★★★☆☆ |helppo&#10;Lihapiirakka |€ |keskiverto |★★★★★ | keskiverto">
+                        <StringGrid prefWidth="600.0" rivit="reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso&#10;Mustikkapiirakka |€€ |nopea |★★★☆☆ |helppo&#10;Lihapiirakka |€ |keskiverto |★★★★★ | keskiverto" fx:id="hakutulokset">
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
