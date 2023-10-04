@@ -3,6 +3,7 @@ package fxReseptihaku;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import fi.jyu.mit.fxgui.ComboBoxChooser;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.StringGrid;
@@ -30,6 +31,11 @@ public class ReseptihakuGUIController implements Initializable {
       @FXML private void handleTyhjennaSuodattimet() { tyhjennaSuodattimet(); }
       @FXML private void handleSulje() { sulje(); }
       @FXML private void handleTulosta() { tulosta(); }
+      
+      @Override
+      public void initialize(URL url, ResourceBundle rb) {
+          // alusta();
+      }
       
       // ====================================================================================================
       
@@ -98,10 +104,5 @@ public class ReseptihakuGUIController implements Initializable {
           
           Dialogs.showMessageDialog("Ei osata tulostaa vielä");
       }
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        //
-    }
       
 }

@@ -44,7 +44,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Stri
     }
     
     private void muokkaaResepti() {
-        ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausView.fxml"), "Muokkaa reseptiä", null, null);
+        ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, null);
     }
     
     private void poistaResepti() {
