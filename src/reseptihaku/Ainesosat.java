@@ -189,6 +189,7 @@ public class Ainesosat {
     
     /**
      * @param ainesosaNimi minkä niminen ainesosa lisätään
+     * @return luotu ainesosa
      * 
      * @example
      * <pre name="test">
@@ -205,7 +206,7 @@ public class Ainesosat {
      * ainesosat.anna("sinappia").toString() === "1|sinappia";
      * </pre>
      */
-    public void lisaaAinesosa(String ainesosaNimi) {
+    public Ainesosa lisaaAinesosa(String ainesosaNimi) {
         // varmistetaan että on tilaa lisätä
         if (!onkoTilaa()) { lisaaTilaa(); }
         
@@ -216,6 +217,8 @@ public class Ainesosat {
         // lisätään listaan ja kasvatetaan lukumäärää
         this.ainesosat[this.lkm] = ainesosa;
         this.lkm++;
+        
+        return ainesosa;
     }
     
     
