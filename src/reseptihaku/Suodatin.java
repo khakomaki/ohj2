@@ -71,6 +71,15 @@ public class Suodatin {
     
     
     /**
+     * @param avain minkä avaimen olemassaolosta halutaan tietää
+     * @return totuusarvo onko kyseistä avainta vastaavaa arvoa
+     */
+    public boolean onkoOlemassa(int avain) {
+        return (vaihtoehdot.get(avain) != null);
+    }
+    
+    
+    /**
      * @param luku vaihtoehdon avain
      * @param vaihtoehto lisättävä vaihtoehto
      */
