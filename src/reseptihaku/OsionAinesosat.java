@@ -1,5 +1,8 @@
 package reseptihaku;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+
 import kanta.TietueHallitsija;
 
 /**
@@ -71,6 +74,17 @@ public class OsionAinesosat extends TietueHallitsija {
     }
     
     
+    /**
+     * @param os tietovirta johon halutaan tulostaa
+     */
+    public void tulostaOsionAinesosat(OutputStream os) {
+        PrintStream out = new PrintStream(os);
+        for (int i = 0; i < getLkm(); i++) {
+            out.print(this.annaIndeksista(i));
+            out.print("\n");
+        }
+    }
+    
     
     @Override
     /**
@@ -118,8 +132,6 @@ public class OsionAinesosat extends TietueHallitsija {
         System.out.println(osionAinesosat.toString());
         
         System.out.println("\nAinesosa tunnukset ja määrät:");
-        for (int i = 0; i < osionAinesosat.getLkm(); i++) {
-            System.out.println(osionAinesosat.annaIndeksista(i));
-        }
+        osionAinesosat.tulostaOsionAinesosat(System.out);
     }
 }
