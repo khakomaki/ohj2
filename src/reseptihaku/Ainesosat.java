@@ -19,42 +19,43 @@ public class Ainesosat extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Ainesosat ainesosat = new Ainesosat();
-     * ainesosat.toString() === "null|0|1";
+     * ainesosat.toString() === "ainesosat.dat|0|1";
      * </pre>
      */
     public Ainesosat() {
         super();
         this.annettavaTunnusLuku = 0;
+        this.tiedostoNimi = "ainesosat.dat";
     }
     
     
     /**
      * Asettaa tiedosto nimen johon tallennetaan.
-     * Ei tee muutoksia jos annettu nimi on tyhjä, mutta sallii
-     * asettamisen null-viitteeseen.
+     * Ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
      * 
      * @param tiedostonimi tiedoston nimi johon kirjoitetaan tiedot
      * 
      * @example
      * <pre name="test">
      * Ainesosat ainesosat = new Ainesosat();
-     * ainesosat.toString() === "null|0|1";
-     * 
-     * ainesosat.setTiedostoNimi("ainesosat.dat");
      * ainesosat.toString() === "ainesosat.dat|0|1";
+     * 
+     * ainesosat.setTiedostoNimi("porkkanat.dat");
+     * ainesosat.toString() === "porkkanat.dat|0|1";
      * 
      * ainesosat.setTiedostoNimi("");
-     * ainesosat.toString() === "ainesosat.dat|0|1";
+     * ainesosat.toString() === "porkkanat.dat|0|1";
      * 
      * ainesosat.setTiedostoNimi("banaanit.txt");
      * ainesosat.toString() === "banaanit.txt|0|1";
      * 
      * ainesosat.setTiedostoNimi(null);
-     * ainesosat.toString() === "null|0|1";
+     * ainesosat.toString() === "banaanit.txt|0|1";
      * </pre>
      */
     public void setTiedostoNimi(String tiedostonimi) {
-        if (tiedostonimi == null) { this.tiedostoNimi = null; return; }
+        // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
+        if (tiedostonimi == null) { return; }
         if (tiedostonimi.length() < 1) { return; }
         this.tiedostoNimi = tiedostonimi;
     }
@@ -66,10 +67,10 @@ public class Ainesosat extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Ainesosat ainesosat = new Ainesosat();
-     * ainesosat.getTiedostonimi() === null;
-     * 
-     * ainesosat.setTiedostoNimi("ainesosat.dat");
      * ainesosat.getTiedostonimi() === "ainesosat.dat";
+     * 
+     * ainesosat.setTiedostoNimi("ostoslista.txt");
+     * ainesosat.getTiedostonimi() === "ostoslista.txt";
      * </pre>
      */
     public String getTiedostonimi() {
@@ -152,15 +153,15 @@ public class Ainesosat extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Ainesosat ainesosat = new Ainesosat();
-     * ainesosat.toString() === "null|0|1";
+     * ainesosat.toString() === "ainesosat.dat|0|1";
      * ainesosat.anna("ketsuppia") === null;
      * 
      * ainesosat.lisaaAinesosa("ketsuppia");
-     * ainesosat.toString() === "null|1|1";
+     * ainesosat.toString() === "ainesosat.dat|1|1";
      * ainesosat.anna("ketsuppia").toString() === "0|ketsuppia";
      * 
      * ainesosat.lisaaAinesosa("sinappia");
-     * ainesosat.toString() === "null|2|2";
+     * ainesosat.toString() === "ainesosat.dat|2|2";
      * ainesosat.anna("sinappia").toString() === "1|sinappia";
      * </pre>
      */
@@ -168,9 +169,7 @@ public class Ainesosat extends TietueHallitsija {
         // uusi ainesosa ja kasvatetaan tunnuslukua
         Ainesosa ainesosa = new Ainesosa(this.annettavaTunnusLuku, ainesosaNimi);
         this.annettavaTunnusLuku++;
-
         lisaa(ainesosa);
-        
         return ainesosa;
     }
     
@@ -182,19 +181,24 @@ public class Ainesosat extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Ainesosat ainesosat = new Ainesosat();
-     * ainesosat.toString() === "null|0|1";
+     * ainesosat.toString() === "ainesosat.dat|0|1";
      * 
      * ainesosat.lisaaAinesosa("punasipuli");
-     * ainesosat.toString() === "null|1|1";
+     * ainesosat.toString() === "ainesosat.dat|1|1";
      * 
-     * ainesosat.setTiedostoNimi("ainesosat.dat");
      * ainesosat.lisaaAinesosa("valkosipuli");
      * ainesosat.lisaaAinesosa("keltasipuli");
      * ainesosat.toString() === "ainesosat.dat|3|4";
      * </pre>
      */
     public String toString() {
-        return "" + this.tiedostoNimi + "|" + getLkm() + "|" + getMaxLkm();
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.tiedostoNimi);
+        sb.append('|');
+        sb.append(getLkm());
+        sb.append('|');
+        sb.append(getMaxLkm());
+        return sb.toString();
     }
     
     
