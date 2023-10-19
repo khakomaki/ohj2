@@ -1,0 +1,151 @@
+package reseptihaku;
+
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import kanta.TietueHallitsija;
+
+/**
+ * @author hakom
+ * @version 19 Oct 2023
+ *
+ */
+public class Reseptit extends TietueHallitsija {
+
+    private String tiedostoNimi;
+    private int juoksevaId;
+    
+    /**
+     * Reseptit.
+     * Hallitsee yksittäisiä reseptejä.
+     * 
+     * Alustaa tallennustiedoston nimellä "reseptit.dat".
+     * 
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * reseptit.toString() === "0|1|reseptit.dat";
+     * </pre>
+     */
+    public Reseptit() {
+        super();
+        this.tiedostoNimi = "reseptit.dat";
+    }
+    
+    
+    /**
+     * Asettaa tiedostonimen johon tallennetaan.
+     * Ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
+     * 
+     * @param tiedostonimi tiedostonimi johon kirjoitetaan tiedot
+     * 
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * reseptit.toString() === "0|1|reseptit.dat";
+     * 
+     * reseptit.setTiedostoNimi("");
+     * reseptit.toString() === "0|1|reseptit.dat";
+     * 
+     * reseptit.setTiedostoNimi("salaiset_reseptit.txt");
+     * reseptit.toString() === "0|1|salaiset_reseptit.txt";
+     * 
+     * reseptit.setTiedostoNimi(null);
+     * reseptit.toString() === "0|1|salaiset_reseptit.txt";
+     * </pre>
+     */
+    public void setTiedostoNimi(String tiedostonimi) {
+        // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
+        if (tiedostonimi == null) { return; }
+        if (tiedostonimi.length() < 1) { return; }
+        this.tiedostoNimi = tiedostonimi;
+    }
+    
+    
+    /**
+     * @param nimi reseptin nimi
+     * @return luotu resepti
+     */
+    public Resepti lisaaResepti(String nimi) {
+        Resepti resepti = new Resepti(this.juoksevaId, nimi);
+        lisaa(resepti);
+        this.juoksevaId++;
+        return resepti;
+    }
+    
+    
+    /**
+     * @param indeksi mistä indeksistä yritetään ottaa Resepti
+     * @return indeksissä ollut Resepti tai null
+     */
+    public Resepti annaIndeksista(int indeksi) {
+        // varmistetaan että olio on tyyppiä Ainesosa
+        Object olio = getOlio(indeksi);
+        if (olio.getClass() != Resepti.class) { return null; }
+        return (Resepti)olio;
+    }
+    
+    
+    /**
+     * @param os tietovirta johon halutaan tulostaa
+     * @param maara kuinka monta reseptia tulostetaan
+     */
+    public void tulostaReseptit(OutputStream os, int maara) {
+        int tulostettavaMaara = maara;
+        
+        // ei tulosta mitään jos annettu luku on negatiivinen
+        if (maara < 0) { return; }
+        
+        // tulostaa lukumäärän verran jos annettu määrä olisi enemmän
+        if (getLkm() < maara) { tulostettavaMaara = getLkm(); }
+        
+        PrintStream out = new PrintStream(os);
+        for (int i = 0; i < tulostettavaMaara; i++) {
+            out.print(this.annaIndeksista(i));
+            out.print("\n");
+        }
+    }
+    
+    
+    /**
+     * @param os tietovirta johon halutaan tulostaa
+     */
+    public void tulostaReseptit(OutputStream os) {
+        tulostaReseptit(os, getLkm());
+    }
+    
+    
+    @Override
+    /**
+     * Tiedot muodossa "lukumäärä|maksimi lukumäärä|tiedostonimi"
+     * 
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * reseptit.toString() === "0|1|reseptit.dat";
+     * </pre>
+     */
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getLkm());
+        sb.append('|');
+        sb.append(getMaxLkm());
+        sb.append('|');
+        sb.append(this.tiedostoNimi);
+        return sb.toString();
+    }
+    
+    
+    public static void main(String[] args) {
+        Reseptit reseptit = new Reseptit();
+        System.out.println(reseptit);
+        
+        reseptit.lisaaResepti("Mustikkapiirakka");
+        reseptit.lisaaResepti("Pizza");
+        reseptit.lisaaResepti("Lihapiirakka");
+        
+        System.out.println(reseptit + "\n");
+        
+        reseptit.tulostaReseptit(System.out);
+    }
+}
