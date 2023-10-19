@@ -121,16 +121,18 @@ public class Osio {
         Osio lattytaikina = new Osio(1, "Lättytaikina");
         System.out.println(lattytaikina.toString());
         
-        OsionAinesosat ainesosat = lattytaikina.annaOsionAinesosat();
-        ainesosat.lisaaOsionAinesosa("maitoa", "5dl");
-        ainesosat.lisaaOsionAinesosa("kananmunia", "3kpl");
-        ainesosat.lisaaOsionAinesosa("sokeria", "2rkl");
-        ainesosat.lisaaOsionAinesosa("vehnäjauhoja", "3dl");
-        ainesosat.lisaaOsionAinesosa("suolaa", "1tl");
-        ainesosat.lisaaOsionAinesosa("voi", "");
-        System.out.println(ainesosat.toString());
+        OsionAinesosat osionAinesosat = lattytaikina.annaOsionAinesosat();
+        osionAinesosat.lisaaOsionAinesosa("maitoa", "5dl");
+        osionAinesosat.lisaaOsionAinesosa("kananmunia", "3kpl");
+        osionAinesosat.lisaaOsionAinesosa("sokeria", "2rkl");
+        osionAinesosat.lisaaOsionAinesosa("vehnäjauhoja", "3dl");
+        osionAinesosat.lisaaOsionAinesosa("suolaa", "1tl");
+        osionAinesosat.lisaaOsionAinesosa("voi", "");
+        System.out.println(osionAinesosat.toString() + "\n");
+        
+        osionAinesosat.tulostaOsionAinesosat(System.out);
         
         lattytaikina.setUusiNimi("Lettutaikina");
-        System.out.println(lattytaikina.toString());
+        System.out.println("\n" + lattytaikina.toString());
     }
 }
