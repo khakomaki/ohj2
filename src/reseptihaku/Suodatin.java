@@ -17,26 +17,6 @@ public class Suodatin {
     
     /**
      * @param nimi suodattimen nimi
-     * @param vaihtoehdot suodattimen vaihtoehdot
-     * 
-     * @example
-     * <pre name="test">
-     * Suodatin hinta = new Suodatin("Hinta");
-     * hinta.lisaaVaihtoehto(1, "€");
-     * hinta.lisaaVaihtoehto(2, "€€");
-     * hinta.lisaaVaihtoehto(3, "€€€");
-     * 
-     * hinta.toString() === "Hinta|1:€|2:€€|3:€€€";
-     * </pre>
-     */
-    public Suodatin(String nimi, HashMap<Integer, String> vaihtoehdot) {
-        this.nimi = nimi;
-        this.vaihtoehdot = vaihtoehdot;
-    }
-    
-    
-    /**
-     * @param nimi suodattimen nimi
      * 
      * @example
      * <pre name="test">
@@ -59,7 +39,7 @@ public class Suodatin {
      */
     public void tulosta(PrintStream out) {
         out.println(this.nimi);
-        vaihtoehdot.forEach((avain, arvo) -> out.println(avain + ": " + arvo));
+        tulostaVaihtoehdot(out);
     }
     
     
@@ -122,6 +102,25 @@ public class Suodatin {
     }
     
     
+    /**
+     * @param out tietovirta johon halutaan tulostaa
+     */
+    public void tulostaVaihtoehdot(PrintStream out) {
+        for (String arvo: this.vaihtoehdot.values()) {
+            out.print(arvo);
+            out.print("\n");
+        }
+    }
+    
+    
+    /**
+     * @param os tietovirta johon tulostetaan
+     */
+    public void tulostaVaihtoehdot(OutputStream os) {
+        tulostaVaihtoehdot(new PrintStream(os));
+    }
+    
+    
     @Override
     /**
      * @example
@@ -154,28 +153,27 @@ public class Suodatin {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
-        HashMap<Integer, String> hinnat = new HashMap<Integer, String>();
-        hinnat.put(1, "€");
-        hinnat.put(2, "€€");
-        hinnat.put(3, "€€€");
-        Suodatin hinta = new Suodatin("Hinta", hinnat);
+        Suodatin hinnat = new Suodatin("Hinta");
+        hinnat.lisaaVaihtoehto(1, "€");
+        hinnat.lisaaVaihtoehto(2, "€€");
+        hinnat.lisaaVaihtoehto(3, "€€€");
+        hinnat.tulosta(System.out);
         
-        HashMap<Integer, String> vaativuustasot = new HashMap<Integer, String>();
-        vaativuustasot.put(1, "helppo");
-        vaativuustasot.put(2, "kohtalaisen helppo");
-        vaativuustasot.put(3, "keskiverto");
-        vaativuustasot.put(4, "kohtalaisen työläs");
-        vaativuustasot.put(5, "työläs");
-        Suodatin vaativuus = new Suodatin("Vaativuus", vaativuustasot);
+        System.out.println();
         
-        hinta.tulosta(System.out);
-        vaativuus.tulosta(System.out);
+        Suodatin vaativuus = new Suodatin("Vaativuus");
+        vaativuus.lisaaVaihtoehto(1, "helppo");
+        vaativuus.lisaaVaihtoehto(2, "kohtalaisen helppo");
+        vaativuus.lisaaVaihtoehto(3, "keskiverto");
+        vaativuus.lisaaVaihtoehto(4, "kohtalaisen työläs");
+        vaativuus.lisaaVaihtoehto(5, "työläs");
+        vaativuus.tulostaVaihtoehdot(System.out);
         
         System.out.println();
         System.out.println(vaativuus.getNimi());
-        System.out.println(hinta.getVastaavaVaihtoehto(3));
-        System.out.println(hinta.getVastaavaVaihtoehto(0));
-        System.out.println(hinta.toString());
+        System.out.println(hinnat.getVastaavaVaihtoehto(3));
+        System.out.println(hinnat.getVastaavaVaihtoehto(0));
+        System.out.println(hinnat.toString());
     }
 
 }
