@@ -13,6 +13,10 @@ public class Resepti {
     private int reseptiId;
     private String nimi;
     private String kuvaus;
+    private Suodatin hintaSuodatin;
+    private Suodatin valmistusaikaSuodatin;
+    private Suodatin tahdetSuodatin;
+    private Suodatin vaativuusSuodatin;
     private int hinta;
     private int valmistusaika;
     private int tahdet;
@@ -40,6 +44,10 @@ public class Resepti {
         this.valmistusaika = -1;
         this.tahdet = -1;
         this.vaativuus = -1;
+        this.hintaSuodatin = new Suodatin("Hinta");
+        this.valmistusaikaSuodatin = new Suodatin("Valmistusaika");
+        this.tahdetSuodatin = new Suodatin("Tähdet");
+        this.vaativuusSuodatin = new Suodatin("Vaativuus");
         setNimi(nimi);
         luoOsiot();
     }
@@ -130,6 +138,82 @@ public class Resepti {
     }
     
     
+    /**
+     * @param hintaSuodatin mihin hinta-Suodattimeen vaihdetaan
+     */
+    public void setHintaSuodatin(Suodatin hintaSuodatin) {
+        // ei tehdä mitään jos annettu suodatin on null
+        if (hintaSuodatin == null) { return; }
+        this.hintaSuodatin = hintaSuodatin;
+    }
+    
+    
+    /**
+     * @param valmistusaikaSuodatin mihin valmistusaika-Suodattimeen vaihdetaan
+     */
+    public void setValmistusaikaSuodatin(Suodatin valmistusaikaSuodatin) {
+        // ei tehdä mitään jos annettu suodatin on null
+        if (valmistusaikaSuodatin == null) { return; }
+        this.valmistusaikaSuodatin = valmistusaikaSuodatin;
+    }
+    
+    
+    /**
+     * @param tahdetSuodatin mihin tähdet-Suodattimeen vaihdetaan
+     */
+    public void setTahdetSuodatin(Suodatin tahdetSuodatin) {
+        // ei tehdä mitään jos annettu suodatin on null
+        if (tahdetSuodatin == null) { return; }
+        this.tahdetSuodatin = tahdetSuodatin;
+    }
+    
+    
+    /**
+     * @param vaativuusSuodatin mihin vaativuus-Suodattimeen vaihdetaan
+     */
+    public void setVaativuusSuodatin(Suodatin vaativuusSuodatin) {
+        // ei tehdä mitään jos annettu suodatin on null
+        if (vaativuusSuodatin == null) { return; }
+        this.vaativuusSuodatin = vaativuusSuodatin;
+    }
+    
+    
+    /**
+     * @param hinta mikä hinta-Suodattimen vaihtoehto halutaan asettaa
+     */
+    public void setHinta(int hinta) {
+        if (hinta == -1) { this.hinta = -1; }
+        if (this.hintaSuodatin.onkoOlemassa(hinta)) { this.hinta = hinta; }
+    }
+    
+    
+    /**
+     * @param valmistusaika mikä valmistusaika-Suodattimen vaihtoehto halutaan asettaa
+     */
+    public void setValmistusaika(int valmistusaika) {
+        if (valmistusaika == -1) { this.valmistusaika = -1; }
+        if (this.valmistusaikaSuodatin.onkoOlemassa(valmistusaika)) { this.valmistusaika = valmistusaika; }
+    }
+    
+    
+    /**
+     * @param tahdet mikä tahdet-Suodattimen vaihtoehto halutaan asettaa
+     */
+    public void setTahdet(int tahdet) {
+        if (tahdet == -1) { this.tahdet = -1; }
+        if (this.tahdetSuodatin.onkoOlemassa(tahdet)) { this.tahdet = tahdet; }
+    }
+    
+    
+    /**
+     * @param vaativuus mikä vaativuus-Suodattimen vaihtoehto halutaan asettaa
+     */
+    public void setVaativuus(int vaativuus) {
+        if (vaativuus == -1) { this.vaativuus = -1; }
+        if (this.vaativuusSuodatin.onkoOlemassa(vaativuus)) { this.vaativuus = vaativuus; }
+    }
+    
+    
     @Override
     /**
      * Reseptin tiedot muodossa "resepti id|nimi|hinta|valmistusaika|tähdet|vaativuus"
@@ -186,5 +270,14 @@ public class Resepti {
         System.out.println();
         taytteenAinesosat.tulostaOsionAinesosat(System.out);
         
+        mustikkapiirakka.setTahdet(1);
+        System.out.println(mustikkapiirakka);
+        
+        Suodatin tahdetSuodatin = new Suodatin("Tähdet");
+        tahdetSuodatin.luoVaihtoehdot(new String[]{ "☆", "☆☆", "☆☆☆", "☆☆☆☆", "☆☆☆☆☆" });
+        mustikkapiirakka.setTahdetSuodatin(tahdetSuodatin);
+        mustikkapiirakka.setTahdet(2);
+        
+        System.out.println(mustikkapiirakka);
     }
 }
