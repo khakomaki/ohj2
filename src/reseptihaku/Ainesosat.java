@@ -1,16 +1,15 @@
 package reseptihaku;
 
+import kanta.TietueHallitsija;
+
 /**
  * @author hakom
  * @version 15 Oct 2023
  *
  */
-public class Ainesosat {
-    
-    private Ainesosa[] ainesosat;
+public class Ainesosat extends TietueHallitsija {
+
     private String tiedostoNimi;
-    private int maxLkm;
-    private int lkm;
     private int annettavaTunnusLuku;
     
     /**
@@ -24,9 +23,7 @@ public class Ainesosat {
      * </pre>
      */
     public Ainesosat() {
-        this.ainesosat = new Ainesosa[1];
-        this.maxLkm = 1;
-        this.lkm = 0;
+        super();
         this.annettavaTunnusLuku = 0;
     }
     
@@ -81,66 +78,7 @@ public class Ainesosat {
     
     
     /**
-     * @return totuusarvo mahtuuko ainesosat listaan lisää ainesosia
-     * 
-     * @example
-     * <pre name="test">
-     * Ainesosat ainesosat = new Ainesosat();
-     * ainesosat.toString() === "null|0|1";
-     * ainesosat.onkoTilaa() === true;
-     * 
-     * ainesosat.lisaaAinesosa("appelsiinin kuorta");
-     * ainesosat.toString() === "null|1|1";
-     * ainesosat.onkoTilaa() === false;
-     * 
-     * ainesosat.lisaaAinesosa("sokeria");
-     * ainesosat.toString() === "null|2|2";
-     * ainesosat.onkoTilaa() === false;
-     * 
-     * ainesosat.lisaaAinesosa("valkosipulia");
-     * ainesosat.toString() === "null|3|4";
-     * ainesosat.onkoTilaa() === true;
-     * </pre>
-     */
-    public boolean onkoTilaa() {
-        return (this.lkm < this.maxLkm);
-    }
-    
-    
-    /**
-     * Kasvattaa ainesosat taulukkoa 2x
-     * @return uusi maximi lukumäärä, eli uusi tila
-     * 
-     * @example
-     * <pre name="test">
-     * Ainesosat ainesosat = new Ainesosat();
-     * ainesosat.toString() === "null|0|1";
-     * 
-     * ainesosat.lisaaAinesosa("appelsiinin kuorta");
-     * ainesosat.toString() === "null|1|1";
-     * 
-     * ainesosat.lisaaAinesosa("sokeria");
-     * ainesosat.toString() === "null|2|2";
-     * 
-     * ainesosat.lisaaAinesosa("valkosipulia");
-     * ainesosat.toString() === "null|3|4";
-     * </pre>
-     */
-    private int lisaaTilaa() {
-        // kasvatetaan listaa 2x
-        this.maxLkm = 2 * this.maxLkm;
-        
-        // luodaan uusi lista uudella koolla, lisätään olemassaolevat olioviitteet ja käännetään viite siihen
-        Ainesosa[] uudetAinesosat = new Ainesosa[this.maxLkm];
-        for (int i = 0; i < this.lkm; i++) { uudetAinesosat[i] = this.ainesosat[i]; }
-        this.ainesosat = uudetAinesosat;
-        
-        return this.maxLkm;
-    }
-    
-    
-    /**
-     * @param ainesosa minkä niminen ainesosa halutaan
+     * @param ainesosanNimi minkä niminen ainesosa halutaan
      * @return haluttu ainesosa, tai jos ei löytynyt niin null-viite
      * 
      * @example
@@ -153,9 +91,13 @@ public class Ainesosat {
      * 
      * </pre>
      */
-    public Ainesosa anna(String ainesosa) {
-        for (int i = 0; i < this.lkm; i++) {
-            if (ainesosat[i].oletko(ainesosa)) { return ainesosat[i]; }
+    public Ainesosa anna(String ainesosanNimi) {
+        for (int i = 0; i < getLkm(); i++) {
+            Ainesosa ainesosa = annaIndeksista(i);
+            
+            // varmistetaan ettei null ja verrataan nimiä
+            if (ainesosa == null) { continue; }
+            if (ainesosa.getNimi().equals(ainesosanNimi)) { return ainesosa; }
         }
         
         // jos ei löytynyt palautetaan null
@@ -178,12 +120,28 @@ public class Ainesosat {
      * </pre>
      */
     public Ainesosa anna(int tunnus) {
-        for (int i = 0; i < this.lkm; i++) {
-            if (ainesosat[i].oletko(tunnus)) { return ainesosat[i]; }
+        for (int i = 0; i < getLkm(); i++) {
+            Ainesosa ainesosa = annaIndeksista(i);
+            
+            // varmistetaan ettei null ja verrataan tunnuksia
+            if (ainesosa == null) { continue; }
+            if (ainesosa.getId() == tunnus) { return ainesosa; }
         }
         
-        // jos ei löytynyt palautetaan null
+        // jos ei löytynyt niin palautetaan null
         return null;
+    }
+    
+    
+    /**
+     * @param indeksi mistä indeksistä halutaan olio
+     * @return indeksissä ollut olio tai null
+     */
+    public Ainesosa annaIndeksista(int indeksi) {
+        // varmistetaan että olio on tyyppiä Ainesosa
+        Object olio = this.getOlio(indeksi);
+        if (olio.getClass() != Ainesosa.class) { return null; }
+        return (Ainesosa)olio;
     }
     
     
@@ -207,16 +165,11 @@ public class Ainesosat {
      * </pre>
      */
     public Ainesosa lisaaAinesosa(String ainesosaNimi) {
-        // varmistetaan että on tilaa lisätä
-        if (!onkoTilaa()) { lisaaTilaa(); }
-        
         // uusi ainesosa ja kasvatetaan tunnuslukua
         Ainesosa ainesosa = new Ainesosa(this.annettavaTunnusLuku, ainesosaNimi);
         this.annettavaTunnusLuku++;
-        
-        // lisätään listaan ja kasvatetaan lukumäärää
-        this.ainesosat[this.lkm] = ainesosa;
-        this.lkm++;
+
+        lisaa(ainesosa);
         
         return ainesosa;
     }
@@ -241,7 +194,7 @@ public class Ainesosat {
      * </pre>
      */
     public String toString() {
-        return "" + this.tiedostoNimi + "|" + this.lkm + "|" + this.maxLkm;
+        return "" + this.tiedostoNimi + "|" + getLkm() + "|" + getMaxLkm();
     }
     
     
