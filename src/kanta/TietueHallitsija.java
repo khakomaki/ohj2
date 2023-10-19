@@ -87,6 +87,33 @@ public class TietueHallitsija {
     
     
     /**
+     * @param indeksi mistä indeksistä halutaan olio
+     * @return indeksissä oleva olio, tai muuten null
+     */
+    public Object getOlio(int indeksi) {
+        // palautetaan null jos yritetään ottaa määrittelemättömästä paikasta
+        if (this.lkm < indeksi || indeksi < 0) { return null; }
+        return this.oliot[indeksi];
+    }
+    
+    
+    /**
+     * @return olioiden lukumäärä
+     */
+    public int getLkm() {
+        return this.lkm;
+    }
+    
+    
+    /**
+     * @return olioiden maksimi lukumäärä
+     */
+    public int getMaxLkm() {
+        return this.maxLkm;
+    }
+    
+    
+    /**
      * Kasvattaa taulukkoa kertoimen ja vakion avulla.
      * 
      * Noudattaa kaavaa: maxLkm + maxLkm * ( kerroin - 1 ) + vakio
