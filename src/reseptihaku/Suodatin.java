@@ -13,6 +13,7 @@ public class Suodatin {
     
     private String nimi = "";
     private HashMap<Integer, String> vaihtoehdot;
+    private int juoksevaNumero;
     
     
     /**
@@ -22,15 +23,13 @@ public class Suodatin {
      * <pre name="test">
      * Suodatin vaativuustaso = new Suodatin("Vaativuustaso");
      * vaativuustaso.toString() === "Vaativuustaso";
-     * 
-     * vaativuustaso.lisaaVaihtoehto(5, "työläs");
-     * vaativuustaso.toString() === "Vaativuustaso|5:työläs"
      * </pre>
      * 
      */
     public Suodatin(String nimi) {
         this.nimi = nimi;
         this.vaihtoehdot = new HashMap<Integer, String>();
+        this.juoksevaNumero = 0;
     }
     
     
@@ -58,14 +57,12 @@ public class Suodatin {
      * @example
      * <pre name="test">
      * Suodatin hinta = new Suodatin("Hinta");
-     * hinta.lisaaVaihtoehto(1, "€");
-     * hinta.lisaaVaihtoehto(2, "€€");
-     * hinta.lisaaVaihtoehto(3, "€€€");
+     * hinta.luoVaihtoehdot(new String[]{ "€", "€€", "€€€" });
      * 
-     * hinta.getVastaavaVaihtoehto(2) === "€€";
-     * hinta.getVastaavaVaihtoehto(3) === "€€€";
+     * hinta.getVastaavaVaihtoehto(1) === "€€";
+     * hinta.getVastaavaVaihtoehto(2) === "€€€";
      * hinta.getVastaavaVaihtoehto(5) === null;
-     * hinta.getVastaavaVaihtoehto(0) === null;
+     * hinta.getVastaavaVaihtoehto(-1) === null;
      * </pre>
      */
     public String getVastaavaVaihtoehto(int avain) {
@@ -76,21 +73,26 @@ public class Suodatin {
     /**
      * @param luku vaihtoehdon avain
      * @param vaihtoehto lisättävä vaihtoehto
-     * 
-     * @example
-     * <pre name="test">
-     * Suodatin hinta = new Suodatin("Hinta");
-     * hinta.toString() === "Hinta";
-     * 
-     * hinta.lisaaVaihtoehto(1, "€");
-     * hinta.toString() === "Hinta|1:€";
-     * 
-     * hinta.lisaaVaihtoehto(2, "€€");
-     * hinta.toString() === "Hinta|1:€|2:€€";
-     * </pre>
      */
-    public void lisaaVaihtoehto(int luku, String vaihtoehto) {
+    private void lisaaVaihtoehto(int luku, String vaihtoehto) {
         this.vaihtoehdot.put(luku, vaihtoehto);
+    }
+    
+    
+    /**
+     * Luo mahdolliset vaihtoehdot suodattimelle. Tyhjentää edelliset vaihtoehdot.
+     * 
+     * @param vaihtoehdotTaulukko mahdolliset vaihtoehdot "pienimmästä" "suurimpaan"
+     */
+    public void luoVaihtoehdot(String[] vaihtoehdotTaulukko) {
+        this.vaihtoehdot.clear();
+        
+        for (int i = 0; i < vaihtoehdotTaulukko.length; i++) {
+            // skippaa jos annettu vaihtoehto on null, tyhjämerkkijono tai pelkkää whitespacea
+            if (vaihtoehdotTaulukko[i].isBlank()) { continue; }
+            lisaaVaihtoehto(this.juoksevaNumero, vaihtoehdotTaulukko[i]);
+            this.juoksevaNumero++;
+        }
     }
     
     
@@ -128,22 +130,20 @@ public class Suodatin {
      * Suodatin hinta = new Suodatin("Hinta");
      * hinta.toString() === "Hinta";
      * 
-     * hinta.lisaaVaihtoehto(1, "€");
-     * hinta.toString() === "Hinta|1:€";
-     * 
-     * hinta.lisaaVaihtoehto(2, "€€");
-     * hinta.toString() === "Hinta|1:€|2:€€";
-     * 
-     * hinta = new Suodatin("");
-     * hinta.toString() === "";
-     * 
-     * hinta.lisaaVaihtoehto(-5, "☆");
-     * hinta.toString() === "|-5:☆";
+     * hinta.luoVaihtoehdot(new String[]{ "☆", "☆☆", "☆☆☆", "☆☆☆☆", "☆☆☆☆☆" });
+     * hinta.toString() === "Hinta|0:☆|1:☆☆|2:☆☆☆|3:☆☆☆☆|4:☆☆☆☆☆";
      * </pre>
      */
     public String toString() {
-        StringBuilder merkkijono = new StringBuilder(this.nimi + "|");
-        vaihtoehdot.forEach((avain, arvo) -> merkkijono.append(avain + ":" + arvo + "|"));
+        StringBuilder merkkijono = new StringBuilder();
+        merkkijono.append(this.nimi);
+        merkkijono.append('|');
+        for (Integer avain: this.vaihtoehdot.keySet()) {
+            merkkijono.append(avain);
+            merkkijono.append(":");
+            merkkijono.append(this.vaihtoehdot.get(avain));
+            merkkijono.append('|');
+        }
         merkkijono.deleteCharAt(merkkijono.length() - 1);
         return merkkijono.toString();
     }
@@ -154,19 +154,19 @@ public class Suodatin {
      */
     public static void main(String[] args) {
         Suodatin hinnat = new Suodatin("Hinta");
-        hinnat.lisaaVaihtoehto(1, "€");
-        hinnat.lisaaVaihtoehto(2, "€€");
-        hinnat.lisaaVaihtoehto(3, "€€€");
+        hinnat.luoVaihtoehdot(new String[]{ "€", "€€", "€€€" });
         hinnat.tulosta(System.out);
         
         System.out.println();
         
         Suodatin vaativuus = new Suodatin("Vaativuus");
-        vaativuus.lisaaVaihtoehto(1, "helppo");
-        vaativuus.lisaaVaihtoehto(2, "kohtalaisen helppo");
-        vaativuus.lisaaVaihtoehto(3, "keskiverto");
-        vaativuus.lisaaVaihtoehto(4, "kohtalaisen työläs");
-        vaativuus.lisaaVaihtoehto(5, "työläs");
+        vaativuus.luoVaihtoehdot(new String[]{ 
+                "helppo",
+                "kohtalaisen helppo",
+                "keskiverto",
+                "kohtalaisen työläs",
+                "työläs"
+        });
         vaativuus.tulostaVaihtoehdot(System.out);
         
         System.out.println();
