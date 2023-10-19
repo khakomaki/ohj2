@@ -12,6 +12,11 @@ import kanta.TietueHallitsija;
  */
 public class Reseptit extends TietueHallitsija {
 
+    private Suodattimet suodattimet;
+    private Suodatin hintaSuodatin;
+    private Suodatin valmistusaikaSuodatin;
+    private Suodatin tahdetSuodatin;
+    private Suodatin vaativuusSuodatin;
     private String tiedostoNimi;
     private int juoksevaId;
     
@@ -30,6 +35,7 @@ public class Reseptit extends TietueHallitsija {
     public Reseptit() {
         super();
         this.tiedostoNimi = "reseptit.dat";
+        luoSuodattimet();
     }
     
     
@@ -63,11 +69,45 @@ public class Reseptit extends TietueHallitsija {
     
     
     /**
+     * Luo Resepteille Suodattimet
+     */
+    public void luoSuodattimet() {
+        Suodattimet reseptienSuodattimet = new Suodattimet();
+        this.suodattimet = reseptienSuodattimet;
+        
+        this.hintaSuodatin = reseptienSuodattimet.lisaaSuodatin("Hinta");
+        this.hintaSuodatin.luoVaihtoehdot(new String[]{ "€", "€€", "€€€" });
+        
+        this.valmistusaikaSuodatin = reseptienSuodattimet.lisaaSuodatin("Valmistusaika");
+        this.valmistusaikaSuodatin.luoVaihtoehdot(new String[]{ "välitön", "nopea", "keskimääräinen", "pitkä", "extra pitkä" });
+        
+        this.tahdetSuodatin = reseptienSuodattimet.lisaaSuodatin("Tähdet");
+        this.tahdetSuodatin.luoVaihtoehdot(new String[]{ "☆", "☆☆", "☆☆☆", "☆☆☆☆", "☆☆☆☆☆" });
+        
+        this.vaativuusSuodatin = reseptienSuodattimet.lisaaSuodatin("Vaativuus");
+        this.vaativuusSuodatin.luoVaihtoehdot(new String[]{ "helppo", "kohtalaisen helppo", "keskimääräinen", "kohtalaisen työläs", "työläs" });
+    }
+    
+    
+    /**
+     * @param indeksi mistä indeksistä annetaan Suodatin
+     * @return Suodatin halutusta indeksistä tai null
+     */
+    public Suodatin annaSuodatinIndeksista(int indeksi) {
+        return this.suodattimet.annaIndeksista(indeksi);
+    }
+    
+    
+    /**
      * @param nimi reseptin nimi
      * @return luotu resepti
      */
     public Resepti lisaaResepti(String nimi) {
         Resepti resepti = new Resepti(this.juoksevaId, nimi);
+        resepti.setHintaSuodatin(this.hintaSuodatin);
+        resepti.setValmistusaikaSuodatin(this.valmistusaikaSuodatin);
+        resepti.setTahdetSuodatin(this.tahdetSuodatin);
+        resepti.setVaativuusSuodatin(this.vaativuusSuodatin);
         lisaa(resepti);
         this.juoksevaId++;
         return resepti;
