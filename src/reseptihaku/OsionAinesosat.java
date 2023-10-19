@@ -1,30 +1,36 @@
 package reseptihaku;
 
+import kanta.TietueHallitsija;
+
 /**
  * @author hakom
  * @version 15 Oct 2023
  *
  */
-public class OsionAinesosat {
+public class OsionAinesosat extends TietueHallitsija {
     
-    private OsionAinesosa[] osionAinesosat;
     private Ainesosat ainesosat;
     private String tiedostoNimi;
     private int osioId;
-    private int maxLkm;
-    private int lkm;
     
     
     /**
      * @param osioTunnus osion tunnus
      * @param ainesosat viite ainesosiin
+     * 
+     * @example
+     * <pre name="test">
+     * Ainesosat ainesosat = new Ainesosat();
+     * OsionAinesosat oa = new OsionAinesosat(1, ainesosat);
+     * 
+     * oa.toString() === "1|osion_ainesosat.dat|0|1";
+     * </pre>
      */
     public OsionAinesosat(int osioTunnus, Ainesosat ainesosat) {
-        this.osionAinesosat = new OsionAinesosa[1];
+        super();
         this.ainesosat = ainesosat;
+        this.tiedostoNimi = "osion_ainesosat.dat";
         this.osioId = osioTunnus;
-        this.maxLkm = 1;
-        this.lkm = 0;
     }
     
     
@@ -32,34 +38,10 @@ public class OsionAinesosat {
      * @param tiedostonimi tiedoston nimi johon tallennetaan
      */
     public void setTiedostoNimi(String tiedostonimi) {
-        if (tiedostonimi == null) { this.tiedostoNimi = tiedostonimi; return; }
+        // varmistetaan ettei annettu nimi ole null tai tyhjä merkkijono
+        if (tiedostonimi == null) { return; }
         if (tiedostonimi.length() < 1) { return; }
         this.tiedostoNimi = tiedostonimi;
-    }
-    
-    
-    /**
-     * @return totuusarvo mahtuuko listaan lisää
-     */
-    public boolean onkoTilaa() {
-        return (this.lkm < this.maxLkm);
-    }
-    
-    
-    /**
-     * Kasvattaa taulukkoa 2x
-     * @return uusi maximi lukumäärä, eli uusi tila
-     */
-    private int lisaaTilaa() {
-        // kasvatetaan listaa 2x
-        this.maxLkm = 2 * this.maxLkm;
-        
-        // luodaan uusi lista uudella koolla, lisätään olemassaolevat olioviitteet ja käännetään viite siihen
-        OsionAinesosa[] uudetOsionAinesosat = new OsionAinesosa[this.maxLkm];
-        for (int i = 0; i < this.lkm; i++) { uudetOsionAinesosat[i] = this.osionAinesosat[i]; }
-        this.osionAinesosat = uudetOsionAinesosat;
-        
-        return this.maxLkm;
     }
     
     
@@ -68,43 +50,50 @@ public class OsionAinesosat {
      * @param maara ainesosan määrä
      */
     public void lisaaOsionAinesosa(String ainesosaNimi, String maara) {
-        // varmistetaan että on tilaa lisätä
-        if (!onkoTilaa()) { lisaaTilaa(); }
-        
         // koitetaan onko ainesosissa olemassa jo vastaava ainesosa, jos ei ole niin käsketään lisäämään
         Ainesosa lisattavaAinesosa = this.ainesosat.anna(ainesosaNimi);
         if (lisattavaAinesosa == null) { lisattavaAinesosa = ainesosat.lisaaAinesosa(ainesosaNimi); }
         
         // luodaan osion ainesosa ainesosilta saadulla tiedolla ja määrällä
         OsionAinesosa osionAinesosa = new OsionAinesosa(lisattavaAinesosa.getId(), maara);
-        
-        // lisätään listaan ja kasvatetaan lukumäärää
-        this.osionAinesosat[this.lkm] = osionAinesosa;
-        this.lkm++;
+        this.lisaa(osionAinesosa);
     }
     
     
     /**
-     * @return osion ainesosien lukumäärä
+     * @param indeksi mistä indeksistä halutaan osion ainesosa
+     * @return osion ainesosa halutusta indeksistä tai null
      */
-    public int getLkm() {
-        return this.lkm;
+    public OsionAinesosa annaIndeksista(int indeksi) {
+        Object olio = getOlio(indeksi);
+        if (olio.getClass() != OsionAinesosa.class) { return null; }
+        return (OsionAinesosa)olio;
     }
     
-    
-    /**
-     * @param indeksi mistä indeksistä yritetään antaa 
-     * @return viite osion ainesosa -olioon
-     */
-    private OsionAinesosa anna(int indeksi) {
-        if (this.lkm < indeksi) { return null; }
-        return this.osionAinesosat[indeksi];
-    }
     
     
     @Override
+    /**
+     * Palauttaa tiedot muodossa:
+     * "osion id|tiedostonimi|lukumäärä|maksimi lukumäärä"
+     * 
+     * @example
+     * <pre name="test">
+     * Ainesosat ainesosat = new Ainesosat();
+     * OsionAinesosat oa = new OsionAinesosat(1, ainesosat);
+     * oa.toString() === "1|osion_ainesosat.dat|0|1";
+     * </pre>
+     */
     public String toString() {
-        return "" + this.osioId + "|" + this.tiedostoNimi + "|" + this.lkm + "|" + this.maxLkm;
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.osioId);
+        sb.append('|');
+        sb.append(this.tiedostoNimi);
+        sb.append('|');
+        sb.append(getLkm());
+        sb.append('|');
+        sb.append(getMaxLkm());
+        return sb.toString();
     }
     
     
@@ -120,7 +109,7 @@ public class OsionAinesosat {
         
         System.out.println("Osion ainesosat -oliot:\n" + osionAinesosat.toString());
         
-        osionAinesosat.setTiedostoNimi("osion_ainesosat.dat");
+        osionAinesosat.setTiedostoNimi("soppa.txt");
         osionAinesosat.lisaaOsionAinesosa("perunoita", "500g");
         osionAinesosat.lisaaOsionAinesosa("porkkanoita", "2kpl");
         osionAinesosat.lisaaOsionAinesosa("sipulia", "1kpl");
@@ -130,7 +119,7 @@ public class OsionAinesosat {
         
         System.out.println("\nAinesosa tunnukset ja määrät:");
         for (int i = 0; i < osionAinesosat.getLkm(); i++) {
-            System.out.println(osionAinesosat.anna(i));
+            System.out.println(osionAinesosat.annaIndeksista(i));
         }
     }
 }
