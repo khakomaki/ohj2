@@ -1,5 +1,8 @@
 package reseptihaku;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+
 import kanta.TietueHallitsija;
 
 /**
@@ -174,6 +177,18 @@ public class Ainesosat extends TietueHallitsija {
     }
     
     
+    /**
+     * @param os tietovirta johon halutaan tulostaa
+     */
+    public void tulostaAinesosat(OutputStream os) {
+        PrintStream out = new PrintStream(os);
+        for (int i = 0; i < getLkm(); i++) {
+            out.print(this.annaIndeksista(i));
+            out.print("\n");
+        }
+    }
+    
+    
     @Override
     /**
      * Palauttaa olennaisia tietoja luokan oliosta muodossa "tiedostonimi|lukumäärä|maximilukumäärä".
@@ -209,22 +224,19 @@ public class Ainesosat extends TietueHallitsija {
         Ainesosat ainesosat = new Ainesosat();
         ainesosat.setTiedostoNimi("ainesosat.dat");
         System.out.println("Tallennus tiedosto: " + ainesosat.getTiedostonimi());
-        
         System.out.println(ainesosat.toString() );
-        
         ainesosat.lisaaAinesosa("maitoa");
         System.out.println(ainesosat.toString() );
-        
         ainesosat.lisaaAinesosa("perunoita");
         System.out.println(ainesosat.toString() );
-        
         ainesosat.lisaaAinesosa("porkkanoita");
         System.out.println(ainesosat.toString() );
-        
         Ainesosa maito = ainesosat.anna("PERUNOITA");
         System.out.println(maito);
         
         int tunnus = 2;
         System.out.println("Ainesosa jonka tunnus on  " + tunnus + ": " + ainesosat.anna(tunnus).getNimi());
+        
+        ainesosat.tulostaAinesosat(System.out);
     }
 }
