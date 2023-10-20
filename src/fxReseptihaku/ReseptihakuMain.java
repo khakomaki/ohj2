@@ -2,6 +2,7 @@ package fxReseptihaku;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import reseptihaku.Reseptit;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.fxml.FXMLLoader;
@@ -18,13 +19,16 @@ public class ReseptihakuMain extends Application {
         try {
             final FXMLLoader ldr = new FXMLLoader(getClass().getResource("ReseptihakuGUIView.fxml"));
             final Pane root = ldr.load();
-            // final ReseptihakuGUIController reseptihakuCtrl = (ReseptihakuGUIController)ldr.getController();
+            final ReseptihakuGUIController reseptihakuCtrl = (ReseptihakuGUIController)ldr.getController();
             
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("reseptihaku.css").toExternalForm());
             primaryStage.setScene(scene);
             primaryStage.setTitle("Reseptihaku");
             primaryStage.show();
+            
+            Reseptit reseptit = new Reseptit();
+            reseptihakuCtrl.setReseptit(reseptit);
             
         } catch(Exception e) {
             e.printStackTrace();

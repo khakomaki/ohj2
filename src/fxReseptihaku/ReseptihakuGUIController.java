@@ -11,6 +11,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
+import reseptihaku.Resepti;
+import reseptihaku.Reseptit;
 
 /**
  * @author hakom
@@ -34,24 +36,53 @@ public class ReseptihakuGUIController implements Initializable {
       
       @Override
       public void initialize(URL url, ResourceBundle rb) {
-          // alusta();
+          alusta();
       }
       
       // ====================================================================================================
+      
+      private Reseptit reseptit;
       
       private void sulje() {
           Platform.exit();
       }
       
       
+      /**
+       * Hoitaa alustukset, joita FXMLLoader ei hoida
+       */
+      public void alusta() {
+          hakutulokset.clear();
+      }
+      
+      
       private void haeReseptit() {
           String hakusana = hakukentta.getText();
+          hakutulokset.clear();
+          
+          StringBuilder sb = new StringBuilder(hakutulokset.getRivit());
           
           if (hakusana.isEmpty()) {
-              Dialogs.showMessageDialog("Ei osata hakea kaikkia hakutuloksia vielä");
-              return;
+              // haetaan kaikki reseptit jos haetaan ilman hakusanaa
+              for (int i = 0; i < reseptit.getLkm(); i++) {
+                  Resepti resepti = reseptit.annaIndeksista(i);
+                  if (resepti == null) { continue; }
+                  sb.append(resepti.getTaulukkoMuodossa());
+                  sb.append("\n");
+              }
+          } else {
+              // käydään reseptit läpi ja lisätään hakusanaa vastaavat
+              for (int i = 0; i < reseptit.getLkm(); i++) {
+                  Resepti resepti = reseptit.annaIndeksista(i);
+                  if (resepti == null) { continue; }
+                  if (resepti.getNimi().equals(hakusana)) {
+                      sb.append(resepti.getTaulukkoMuodossa());
+                      sb.append("\n");
+                  }
+              }
           }
-          Dialogs.showMessageDialog("Ei osata hakea hakutuloksia hakusanalla \"" + hakusana + "\" vielä");
+          
+          hakutulokset.setRivit(sb.toString());
       }
       
       
@@ -104,5 +135,19 @@ public class ReseptihakuGUIController implements Initializable {
           
           Dialogs.showMessageDialog("Ei osata tulostaa vielä");
       }
+      
+      
+      /**
+      * @param reseptit käytettävät Reseptit
+      */
+      public void setReseptit(Reseptit reseptit) {
+          this.reseptit = reseptit;
+          // TODO: ota nämä pois kun ei enää tarvitse
+          reseptit.lisaaMustikkapiirakka();
+          reseptit.lisaaMustikkapiirakka();
+          reseptit.lisaa(new Resepti(15, "Juustokakku"));
+      }
+      
+      
       
 }
