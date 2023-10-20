@@ -92,6 +92,19 @@ public class Osiot extends TietueHallitsija {
     }
     
     
+    /**
+     * Luo mustikkapiiran osiot, muropohjan ja täytteen testaamista varten
+     * TODO: poista kun ei enää tarvita
+     */
+    public void luoMustikkapiirakanOsiot() {
+        Osio muropohja = lisaaOsio("Muropohja");
+        muropohja.luoMuropohja();
+        
+        Osio tayte = lisaaOsio("Täyte");
+        tayte.luoTayte();
+    }
+    
+    
     @Override
     /**
      * Palauttaa tiedot muodossa lukumäärä|maksimi lukumäärä|tiedostonimi
