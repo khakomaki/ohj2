@@ -216,15 +216,17 @@ public class Resepti {
     
     /**
      * TODO: poista kun ei enää tarvita
+     * @param id mustikkapiirakan id
      * 
      * @example
      * <pre name="test">
      * Resepti mustikkapiirakka = new Resepti(1, "");
-     * mustikkapiirakka.luoMustikkapiirakka();
-     * mustikkapiirakka.toString() === "1|Mustikkapiirakka|2|2|3|1";
+     * mustikkapiirakka.luoMustikkapiirakka(5);
+     * mustikkapiirakka.toString() === "5|Mustikkapiirakka|2|2|3|1";
      * </pre>
      */
-    public void luoMustikkapiirakka() {
+    public void luoMustikkapiirakka(int id) {
+        this.reseptiId = id;
         this.nimi = "Mustikkapiirakka";
         this.hinta = 2;
         this.valmistusaika = 2;
@@ -276,7 +278,7 @@ public class Resepti {
         System.out.println(lihapiirakka.getKuvaus());
         
         Resepti mustikkapiirakka = new Resepti(1, "");
-        mustikkapiirakka.luoMustikkapiirakka();
+        mustikkapiirakka.luoMustikkapiirakka(1);
         System.out.println(mustikkapiirakka);
         System.out.println(mustikkapiirakka.getKuvaus());
     }
