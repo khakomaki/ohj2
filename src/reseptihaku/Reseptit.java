@@ -155,6 +155,18 @@ public class Reseptit extends TietueHallitsija {
     }
     
     
+    /**
+     * Luo lisää mustikkapiirakan resepteihin testaamista varten.
+     * TODO: poista kun ei enää tarvita
+     */
+    public void lisaaMustikkapiirakka() {
+        Resepti mustikkapiirakka = new Resepti(1, "");
+        mustikkapiirakka.luoMustikkapiirakka(this.juoksevaId);
+        this.lisaa(mustikkapiirakka);
+        this.juoksevaId++;
+    }
+    
+    
     @Override
     /**
      * Tiedot muodossa "lukumäärä|maksimi lukumäärä|tiedostonimi"
@@ -180,12 +192,19 @@ public class Reseptit extends TietueHallitsija {
         Reseptit reseptit = new Reseptit();
         System.out.println(reseptit);
         
-        reseptit.lisaaResepti("Mustikkapiirakka");
+        Resepti mustikkapiirakka = reseptit.lisaaResepti("Mustikkapiirakka");
         reseptit.lisaaResepti("Pizza");
         reseptit.lisaaResepti("Lihapiirakka");
         
         System.out.println(reseptit + "\n");
         
         reseptit.tulostaReseptit(System.out);
+        
+        mustikkapiirakka.setHinta(2);
+        mustikkapiirakka.setValmistusaika(2);
+        mustikkapiirakka.setTahdet(3);
+        mustikkapiirakka.setVaativuus(1);
+        System.out.println(mustikkapiirakka);
+        
     }
 }
