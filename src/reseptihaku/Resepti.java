@@ -106,6 +106,14 @@ public class Resepti {
     
     
     /**
+     * @return reseptin nimi
+     */
+    public String getNimi() {
+        return this.nimi;
+    }
+    
+    
+    /**
      * Luo reseptille Osiot
      */
     public void luoOsiot() {
@@ -211,6 +219,100 @@ public class Resepti {
     public void setVaativuus(int vaativuus) {
         if (vaativuus == -1) { this.vaativuus = -1; }
         if (this.vaativuusSuodatin.onkoOlemassa(vaativuus)) { this.vaativuus = vaativuus; }
+    }
+    
+    
+    /**
+     * @return reseptin hinta
+     */
+    public int getHinta() {
+        return this.hinta;
+    }
+    
+    
+    /**
+     * @return reseptin hinta suodattimen muotoiltuna
+     */
+    public String getHintaString() {
+        return this.hintaSuodatin.getVastaavaVaihtoehto(this.hinta);
+    }
+    
+    
+    /**
+     * @return reseptin valmistusaika
+     */
+    public int getValmistusaika() {
+        return this.valmistusaika;
+    }
+    
+    
+    /**
+     * @return reseptin valmistusaika suodattimen muotoiltuna
+     */
+    public String getValmistusaikaString() {
+        return this.valmistusaikaSuodatin.getVastaavaVaihtoehto(this.valmistusaika);
+    }
+    
+    
+    /**
+     * @return reseptin tähdet
+     */
+    public int getTahdet() {
+        return this.tahdet;
+    }
+    
+    
+    /**
+     * @return reseptin tähdet suodattimen muotoiltuna
+     */
+    public String getTahdetString() {
+        return this.tahdetSuodatin.getVastaavaVaihtoehto(this.tahdet);
+    }
+    
+    
+    /**
+     * @return reseptin vaativuus
+     */
+    public int getVaativuus() {
+        return vaativuus;
+    }
+    
+    
+    /**
+     * @return reseptin vaativuus suodattimen muotoiltuna
+     */
+    public String getVaativuusString() {
+        return this.vaativuusSuodatin.getVastaavaVaihtoehto(this.vaativuus);
+    }
+    
+    
+    /**
+     * @return reseptin tiedot muodossa nimi|hinta|valmistusaika|tähdet|vaativuus
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti resepti = new Resepti(15, "Kakku");
+     * resepti.getTaulukkoMuodossa() === "Kakku||||";
+     * </pre>
+     */
+    public String getTaulukkoMuodossa() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.nimi);
+        sb.append('|');
+        sb.append(vaihdaNull(this.hintaSuodatin.getVastaavaVaihtoehto(this.hinta)));
+        sb.append('|');
+        sb.append(vaihdaNull(this.valmistusaikaSuodatin.getVastaavaVaihtoehto(this.valmistusaika)));
+        sb.append('|');
+        sb.append(vaihdaNull(this.tahdetSuodatin.getVastaavaVaihtoehto(this.tahdet)));
+        sb.append('|');
+        sb.append(vaihdaNull(this.vaativuusSuodatin.getVastaavaVaihtoehto(this.vaativuus)));
+        return sb.toString();
+    }
+    
+    
+    private String vaihdaNull(String s) {
+        if (s == null ) { return ""; }
+        return s;
     }
     
     
