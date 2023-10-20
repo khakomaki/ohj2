@@ -100,6 +100,36 @@ public class Osio {
     }
     
     
+    /**
+     * Luo muropohja osion testaamista varten
+     * TODO: poista kun ei enää tarvita
+     */
+    public void luoMuropohja() {
+        this.osioId = 1;
+        this.nimi = "Muropohja";
+        this.osionAinesosat.lisaaOsionAinesosa("voita", "100g");
+        this.osionAinesosat.lisaaOsionAinesosa("sokeria", "1dl");
+        this.osionAinesosat.lisaaOsionAinesosa("kananmunia", "1kpl");
+        this.osionAinesosat.lisaaOsionAinesosa("vehnäjauhoja", "2,5dl");
+        this.osionAinesosat.lisaaOsionAinesosa("leivinjauhetta", "1tl");
+    }
+    
+    
+    /**
+     * Luo muropohja osion testaamista varten
+     * TODO: poista kun ei enää tarvita
+     */
+    public void luoTayte() {
+        this.osioId = 1;
+        this.nimi = "Täyte";
+        this.osionAinesosat.lisaaOsionAinesosa("sokeria", "0,75dl");
+        this.osionAinesosat.lisaaOsionAinesosa("kananmunia", "1kpl");
+        this.osionAinesosat.lisaaOsionAinesosa("mustikoita", "300g");
+        this.osionAinesosat.lisaaOsionAinesosa("kermaviiliä", "200g");
+        this.osionAinesosat.lisaaOsionAinesosa("vanilliinisokeria", "1tl");
+    }
+    
+    
     @Override
     /**
      * Osio pizzapohja = new Osio(13, "Hampurilaissämpylät");
