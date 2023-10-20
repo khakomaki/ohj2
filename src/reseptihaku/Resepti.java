@@ -214,6 +214,27 @@ public class Resepti {
     }
     
     
+    /**
+     * TODO: poista kun ei enää tarvita
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti mustikkapiirakka = new Resepti(1, "");
+     * mustikkapiirakka.luoMustikkapiirakka();
+     * mustikkapiirakka.toString() === "1|Mustikkapiirakka|2|2|3|1";
+     * </pre>
+     */
+    public void luoMustikkapiirakka() {
+        this.nimi = "Mustikkapiirakka";
+        this.hinta = 2;
+        this.valmistusaika = 2;
+        this.tahdet = 3;
+        this.vaativuus = 1;
+        this.kuvaus = "Halpa ja maukas.";
+        this.osiot.luoMustikkapiirakanOsiot();
+    }
+    
+    
     @Override
     /**
      * Reseptin tiedot muodossa "resepti id|nimi|hinta|valmistusaika|tähdet|vaativuus"
@@ -245,39 +266,18 @@ public class Resepti {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
-        Resepti mustikkapiirakka = new Resepti(1, "Mustikkapiirakka");
-        System.out.println(mustikkapiirakka);
-        
-        Osiot mustikkapiirakkaOsiot = mustikkapiirakka.getOsiot();
-        Osio muropohja = mustikkapiirakkaOsiot.lisaaOsio("Muropohja");
-        OsionAinesosat muropohjanAinesosat = muropohja.annaOsionAinesosat();
-        muropohjanAinesosat.lisaaOsionAinesosa("Voita", "100g");
-        muropohjanAinesosat.lisaaOsionAinesosa("Sokeria", "1dl");
-        muropohjanAinesosat.lisaaOsionAinesosa("Kananmunia", "1kpl");
-        
-        Osio tayte = mustikkapiirakkaOsiot.lisaaOsio("Täyte");
-        OsionAinesosat taytteenAinesosat = tayte.annaOsionAinesosat();
-        taytteenAinesosat.lisaaOsionAinesosa("Sokeria", "0,75dl");
-        taytteenAinesosat.lisaaOsionAinesosa("Kananmunia", "1kpl");
-        taytteenAinesosat.lisaaOsionAinesosa("Mustikoita", "300g");
-        
-        mustikkapiirakka.setKuvaus("Halpa ja maukas.");
-        
-        System.out.println(mustikkapiirakka.getKuvaus());
-        System.out.println(mustikkapiirakkaOsiot);
-        System.out.println();
-        muropohjanAinesosat.tulostaOsionAinesosat(System.out);
-        System.out.println();
-        taytteenAinesosat.tulostaOsionAinesosat(System.out);
-        
-        mustikkapiirakka.setTahdet(1);
-        System.out.println(mustikkapiirakka);
-        
+        Resepti lihapiirakka = new Resepti(1, "Lihapiirakka");
         Suodatin tahdetSuodatin = new Suodatin("Tähdet");
         tahdetSuodatin.luoVaihtoehdot(new String[]{ "☆", "☆☆", "☆☆☆", "☆☆☆☆", "☆☆☆☆☆" });
-        mustikkapiirakka.setTahdetSuodatin(tahdetSuodatin);
-        mustikkapiirakka.setTahdet(2);
+        lihapiirakka.setTahdetSuodatin(tahdetSuodatin);
+        lihapiirakka.setTahdet(2);
+        lihapiirakka.setKuvaus("Helppo ja hyvä");
+        System.out.println(lihapiirakka);
+        System.out.println(lihapiirakka.getKuvaus());
         
+        Resepti mustikkapiirakka = new Resepti(1, "");
+        mustikkapiirakka.luoMustikkapiirakka();
         System.out.println(mustikkapiirakka);
+        System.out.println(mustikkapiirakka.getKuvaus());
     }
 }
