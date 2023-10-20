@@ -2,6 +2,7 @@ package reseptihaku;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 
 import kanta.TietueHallitsija;
 
@@ -156,11 +157,39 @@ public class Reseptit extends TietueHallitsija {
     
     
     /**
+     * @param hakusana millä hakusanalla haetaan kaikki reseptit jotka sisältävät kyseisen sanan
+     * @return kaikki reseptit jotka sisältävät hakusanan
+     */
+    public ArrayList<Resepti> etsiNimella(String hakusana) {
+        ArrayList<Resepti> loydetyt = new ArrayList<Resepti>();
+        
+        StringBuilder regexLause = new StringBuilder();
+        regexLause.append(".*");
+        regexLause.append(hakusana);
+        regexLause.append(".*");
+        
+        // käydään reseptien nimet läpi regex lauseella
+        for (int i = 0; i < getLkm(); i++) {
+            Resepti resepti = annaIndeksista(i);
+            if (resepti.getNimi().matches(regexLause.toString())) {
+                loydetyt.add(resepti);
+            }
+        }
+        
+        return loydetyt;
+    }
+    
+    
+    /**
      * Luo lisää mustikkapiirakan resepteihin testaamista varten.
      * TODO: poista kun ei enää tarvita
      */
     public void lisaaMustikkapiirakka() {
         Resepti mustikkapiirakka = new Resepti(1, "");
+        mustikkapiirakka.setHintaSuodatin(this.hintaSuodatin);
+        mustikkapiirakka.setValmistusaikaSuodatin(this.valmistusaikaSuodatin);
+        mustikkapiirakka.setTahdetSuodatin(this.tahdetSuodatin);
+        mustikkapiirakka.setVaativuusSuodatin(this.vaativuusSuodatin);
         mustikkapiirakka.luoMustikkapiirakka(this.juoksevaId);
         this.lisaa(mustikkapiirakka);
         this.juoksevaId++;
