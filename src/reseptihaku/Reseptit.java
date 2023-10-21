@@ -163,15 +163,10 @@ public class Reseptit extends TietueHallitsija {
     public ArrayList<Resepti> etsiNimella(String hakusana) {
         ArrayList<Resepti> loydetyt = new ArrayList<Resepti>();
         
-        StringBuilder regexLause = new StringBuilder();
-        regexLause.append(".*");
-        regexLause.append(hakusana);
-        regexLause.append(".*");
-        
-        // käydään reseptien nimet läpi regex lauseella
+        // käydään reseptien nimet läpi
         for (int i = 0; i < getLkm(); i++) {
             Resepti resepti = annaIndeksista(i);
-            if (resepti.getNimi().matches(regexLause.toString())) {
+            if (resepti.onkoNimessa(hakusana)) {
                 loydetyt.add(resepti);
             }
         }

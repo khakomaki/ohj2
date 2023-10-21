@@ -317,6 +317,40 @@ public class Resepti {
     
     
     /**
+     * Tarkistaa onko reseptin nimessä annettua merkkijonoa.
+     * Kirjainten koolla ei ole väliä.
+     * Poistaa tyhjät haettavan merkkijonon alusta ja lopusta.
+     * 
+     * @param merkkijono merkkijono jota etsitään nimestä
+     * @return totuusarvo löytyykö merkkijonoa nimestä
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti resepti = new Resepti(1, "Juustokakku");
+     * resepti.onkoNimessa("kakku") === true;
+     * resepti.onkoNimessa("KAKKU") === true;
+     * resepti.onkoNimessa("Juustokakku") === true;
+     * resepti.onkoNimessa("   kakku ") === true;
+     * resepti.onkoNimessa("Voileipäkakku") === false;
+     * resepti.onkoNimessa("juusto kakku") === false;
+     * resepti.onkoNimessa("") === true;
+     * resepti.onkoNimessa(null) === true;
+     * </pre>
+     */
+    public boolean onkoNimessa(String merkkijono) {
+        if (merkkijono == null) { return true; }
+        // luo regex lauseen joka etsii merkkijonon sisältävää merkkijonoa
+        StringBuilder regexLause = new StringBuilder();
+        regexLause.append(".*");
+        regexLause.append(merkkijono.strip().toLowerCase());
+        regexLause.append(".*");
+        
+        // vertaa regex lausetta pienellä kirjoitettuun nimeen
+        return (this.nimi.toLowerCase().matches(regexLause.toString()));
+    }
+    
+    
+    /**
      * TODO: poista kun ei enää tarvita
      * @param id mustikkapiirakan id
      * 
