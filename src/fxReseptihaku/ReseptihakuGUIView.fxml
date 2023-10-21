@@ -140,7 +140,7 @@
                   </ScrollPane>
                </center>
                <top>
-                  <Label text="tulokset haulle &quot;piirakka&quot;" BorderPane.alignment="TOP_LEFT" />
+                  <Label text="Tulokset hakusanalle &quot;&quot;" BorderPane.alignment="TOP_LEFT" fx:id="tuloksetTeksti" />
                </top>
             </BorderPane>
          </center>

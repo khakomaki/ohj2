@@ -10,6 +10,7 @@ import fi.jyu.mit.fxgui.StringGrid;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import reseptihaku.Resepti;
 import reseptihaku.Reseptit;
@@ -22,6 +23,7 @@ import reseptihaku.Reseptit;
 public class ReseptihakuGUIController implements Initializable {
 
       @FXML private TextField hakukentta;
+      @FXML private Label tuloksetTeksti;
       @FXML private StringGrid<String> hakutulokset;
     
       @FXML private void handleUusiResepti() { lisaaResepti(); }
@@ -63,6 +65,7 @@ public class ReseptihakuGUIController implements Initializable {
           StringBuilder sb = new StringBuilder(hakutulokset.getRivit());
           
           if (hakusana.isEmpty()) {
+              hakusana = "*";
               // haetaan kaikki reseptit jos haetaan ilman hakusanaa
               for (int i = 0; i < reseptit.getLkm(); i++) {
                   Resepti resepti = reseptit.annaIndeksista(i);
@@ -75,7 +78,7 @@ public class ReseptihakuGUIController implements Initializable {
               for (int i = 0; i < reseptit.getLkm(); i++) {
                   Resepti resepti = reseptit.annaIndeksista(i);
                   if (resepti == null) { continue; }
-                  if (resepti.getNimi().equals(hakusana)) {
+                  if (resepti.onkoNimessa(hakusana)) {
                       sb.append(resepti.getTaulukkoMuodossa());
                       sb.append("\n");
                   }
@@ -83,6 +86,16 @@ public class ReseptihakuGUIController implements Initializable {
           }
           
           hakutulokset.setRivit(sb.toString());
+          asetaTuloksetTeksti(hakusana);
+      }
+      
+      
+      private void asetaTuloksetTeksti(String hakusana) {
+          StringBuilder sb = new StringBuilder();
+          sb.append("Tulokset hakusanalle \"");
+          sb.append(hakusana);
+          sb.append("\"");
+          this.tuloksetTeksti.setText(sb.toString());
       }
       
       
