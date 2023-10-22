@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import reseptihaku.Resepti;
 import reseptihaku.Reseptit;
@@ -39,10 +40,12 @@ public class ReseptihakuGUIController implements Initializable {
       @Override
       public void initialize(URL url, ResourceBundle rb) {
           alusta();
+          hakutulokset.setColumnWidth(-1, 120);
       }
       
       // ====================================================================================================
       
+      private final String hakutuloksetOtsikko = "reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso\n";
       private Reseptit reseptit;
       private ArrayList<Resepti> hakuReseptit = new ArrayList<Resepti>();
       
@@ -56,6 +59,9 @@ public class ReseptihakuGUIController implements Initializable {
        */
       public void alusta() {
           hakutulokset.clear();
+          
+          // asetetaan sama kuin hakiessa reseptejä
+          hakutulokset.setColumnWidth(-1, 120);
       }
       
       
@@ -63,7 +69,7 @@ public class ReseptihakuGUIController implements Initializable {
           String hakusana = hakukentta.getText();
           hakutulokset.clear();
           
-          StringBuilder sb = new StringBuilder(hakutulokset.getRivit());
+          StringBuilder sb = new StringBuilder(hakutuloksetOtsikko);
           
           // haetaan hakusanaa vastanneet reseptit
           this.hakuReseptit = reseptit.etsiNimella(hakusana);
@@ -75,6 +81,10 @@ public class ReseptihakuGUIController implements Initializable {
           }
           
           hakutulokset.setRivit(sb.toString());
+          
+          // asettaa muuten väärän kokoiseksi
+          hakutulokset.setColumnWidth(-1, 120);
+          
           asetaTuloksetTeksti(hakusana);
       }
       
