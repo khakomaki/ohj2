@@ -17,19 +17,24 @@ public class Suodatin {
     
     
     /**
+     * Suodatin johon voi tallettaa suodattimelle kelpaavat vaihtoehdot.
+     * 
      * @param nimi suodattimen nimi
      * 
      * @example
      * <pre name="test">
      * Suodatin vaativuustaso = new Suodatin("Vaativuustaso");
      * vaativuustaso.toString() === "Vaativuustaso";
+     * 
+     * vaativuustaso.luoVaihtoehdot(new String[]{ "helppo", "keskimääräinen", "työläs" });
+     * vaativuustaso.toString() === "Vaativuustaso|1:helppo|2:keskimääräinen|3:työläs";
      * </pre>
      * 
      */
     public Suodatin(String nimi) {
         this.nimi = nimi;
         this.vaihtoehdot = new HashMap<Integer, String>();
-        this.juoksevaNumero = 0;
+        this.juoksevaNumero = 1;
     }
     
     
@@ -51,6 +56,8 @@ public class Suodatin {
     
     
     /**
+     * Palauttaa avainta vastaavan arvon tai null jos ei ole olemassa.
+     * 
      * @param avain vaihtoehtoa vastaava luku
      * @return lukua vastaava vaihtoehto
      * 
@@ -59,8 +66,8 @@ public class Suodatin {
      * Suodatin hinta = new Suodatin("Hinta");
      * hinta.luoVaihtoehdot(new String[]{ "€", "€€", "€€€" });
      * 
-     * hinta.getVastaavaVaihtoehto(1) === "€€";
-     * hinta.getVastaavaVaihtoehto(2) === "€€€";
+     * hinta.getVastaavaVaihtoehto(1) === "€";
+     * hinta.getVastaavaVaihtoehto(2) === "€€";
      * hinta.getVastaavaVaihtoehto(5) === null;
      * hinta.getVastaavaVaihtoehto(-1) === null;
      * </pre>
@@ -71,8 +78,29 @@ public class Suodatin {
     
     
     /**
+     * Palauttaa onko kyseistä avainta vastaavaa arvoa.
+     * 
      * @param avain minkä avaimen olemassaolosta halutaan tietää
      * @return totuusarvo onko kyseistä avainta vastaavaa arvoa
+     * 
+     * @example
+     * <pre name="test">
+     * Suodatin vaativuusSuodatin = new Suodatin("Vaativuus");
+     * 
+     * vaativuusSuodatin.onkoOlemassa(-1) === false;
+     * vaativuusSuodatin.onkoOlemassa(1) === false;
+     * vaativuusSuodatin.onkoOlemassa(3) === false;
+     * 
+     * vaativuusSuodatin.luoVaihtoehdot(new String[]{ "helppo", "keskimääräinen", "vaikea" });
+     * 
+     * vaativuusSuodatin.onkoOlemassa(-1) === false;
+     * vaativuusSuodatin.onkoOlemassa(0) === false;
+     * vaativuusSuodatin.onkoOlemassa(1) === true;
+     * vaativuusSuodatin.onkoOlemassa(2) === true;
+     * vaativuusSuodatin.onkoOlemassa(3) === true;
+     * vaativuusSuodatin.onkoOlemassa(4) === false;
+     * 
+     * </pre>
      */
     public boolean onkoOlemassa(int avain) {
         return (vaihtoehdot.get(avain) != null);
@@ -80,21 +108,57 @@ public class Suodatin {
     
     
     /**
+     * Lisää vaihtoehdon suodattimeen.
+     * Kirjoittaa mahdollisen aiemman avaimen yli.
+     * 
      * @param luku vaihtoehdon avain
      * @param vaihtoehto lisättävä vaihtoehto
+     * 
+     * @example
+     * <pre name="test">
+     * Suodatin suodatin = new Suodatin("Esimerkki");
+     * suodatin.toString() === "Esimerkki";
+     * 
+     * suodatin.lisaaVaihtoehto(2, "pieni");
+     * suodatin.toString() === "Esimerkki|2:pieni";
+     * 
+     * suodatin.lisaaVaihtoehto(15, "suuri");
+     * suodatin.toString() === "Esimerkki|2:pieni|15:suuri";
+     * 
+     * suodatin.lisaaVaihtoehto(2, "heikko");
+     * suodatin.toString() === "Esimerkki|2:heikko|15:suuri";
+     * 
+     * suodatin.lisaaVaihtoehto(-1, "epämääräinen");
+     * suodatin.toString() === "Esimerkki|-1:epämääräinen|2:heikko|15:suuri";
+     * </pre>
      */
-    private void lisaaVaihtoehto(int luku, String vaihtoehto) {
+    public void lisaaVaihtoehto(int luku, String vaihtoehto) {
         this.vaihtoehdot.put(luku, vaihtoehto);
     }
     
     
     /**
      * Luo mahdolliset vaihtoehdot suodattimelle. Tyhjentää edelliset vaihtoehdot.
+     * Aloittaa vaihtoehdot yhdestä.
      * 
      * @param vaihtoehdotTaulukko mahdolliset vaihtoehdot "pienimmästä" "suurimpaan"
+     * 
+     * @example
+     * <pre name="test">
+     * Suodatin tahtiSuodatin = new Suodatin("Tähdet");
+     * tahtiSuodatin.luoVaihtoehdot(new String[]{ "*", "**", "***", "****", "*****" });
+     * tahtiSuodatin.toString() === "Tähdet|1:*|2:**|3:***|4:****|5:*****";
+     * 
+     * tahtiSuodatin.luoVaihtoehdot(new String[]{ "*", "**" });
+     * tahtiSuodatin.toString() === "Tähdet|1:*|2:**";
+     * 
+     * tahtiSuodatin.luoVaihtoehdot(new String[]{ });
+     * tahtiSuodatin.toString() === "Tähdet";
+     * </pre>
      */
     public void luoVaihtoehdot(String[] vaihtoehdotTaulukko) {
         this.vaihtoehdot.clear();
+        this.juoksevaNumero = 1;
         
         for (int i = 0; i < vaihtoehdotTaulukko.length; i++) {
             // skippaa jos annettu vaihtoehto on null, tyhjämerkkijono tai pelkkää whitespacea
@@ -134,13 +198,15 @@ public class Suodatin {
     
     @Override
     /**
+     * Suodattimen tiedot.
+     * 
      * @example
      * <pre name="test">
      * Suodatin hinta = new Suodatin("Hinta");
      * hinta.toString() === "Hinta";
      * 
      * hinta.luoVaihtoehdot(new String[]{ "☆", "☆☆", "☆☆☆", "☆☆☆☆", "☆☆☆☆☆" });
-     * hinta.toString() === "Hinta|0:☆|1:☆☆|2:☆☆☆|3:☆☆☆☆|4:☆☆☆☆☆";
+     * hinta.toString() === "Hinta|1:☆|2:☆☆|3:☆☆☆|4:☆☆☆☆|5:☆☆☆☆☆";
      * </pre>
      */
     public String toString() {
@@ -159,6 +225,8 @@ public class Suodatin {
     
     
     /**
+     * Testaamista varten tehty pääohjelma.
+     * 
      * @param args ei käytössä
      */
     public static void main(String[] args) {

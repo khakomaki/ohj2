@@ -44,6 +44,7 @@ public class ReseptihakuGUIController implements Initializable {
       // ====================================================================================================
       
       private Reseptit reseptit;
+      private ArrayList<Resepti> hakuReseptit = new ArrayList<Resepti>();
       
       private void sulje() {
           Platform.exit();
@@ -65,11 +66,11 @@ public class ReseptihakuGUIController implements Initializable {
           StringBuilder sb = new StringBuilder(hakutulokset.getRivit());
           
           // haetaan hakusanaa vastanneet reseptit
-          ArrayList<Resepti> hakuaVastanneetReseptit = reseptit.etsiNimella(hakusana);
+          this.hakuReseptit = reseptit.etsiNimella(hakusana);
           
-          for (int i = 0; i < hakuaVastanneetReseptit.size(); i++) {
+          for (int i = 0; i < this.hakuReseptit.size(); i++) {
               // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
-              sb.append(hakuaVastanneetReseptit.get(i).getTaulukkoMuodossa());
+              sb.append(this.hakuReseptit.get(i).getTaulukkoMuodossa());
               sb.append("\n");
           }
           
@@ -103,7 +104,9 @@ public class ReseptihakuGUIController implements Initializable {
       
       private void avaaResepti() {
           int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
-          if (valittuResepti < 0) { return; }
+          
+          // poistutaan jos indeksi ei ole mieluisa
+          if (valittuResepti < 0 || hakuReseptit.size() < valittuResepti) { return; }
           ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, "");
       }
       
