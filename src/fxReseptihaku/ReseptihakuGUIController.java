@@ -1,9 +1,9 @@
 package fxReseptihaku;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import fi.jyu.mit.fxgui.ComboBoxChooser;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.StringGrid;
@@ -64,25 +64,13 @@ public class ReseptihakuGUIController implements Initializable {
           
           StringBuilder sb = new StringBuilder(hakutulokset.getRivit());
           
-          if (hakusana.isEmpty()) {
-              hakusana = "*";
-              // haetaan kaikki reseptit jos haetaan ilman hakusanaa
-              for (int i = 0; i < reseptit.getLkm(); i++) {
-                  Resepti resepti = reseptit.annaIndeksista(i);
-                  if (resepti == null) { continue; }
-                  sb.append(resepti.getTaulukkoMuodossa());
-                  sb.append("\n");
-              }
-          } else {
-              // käydään reseptit läpi ja lisätään hakusanaa vastaavat
-              for (int i = 0; i < reseptit.getLkm(); i++) {
-                  Resepti resepti = reseptit.annaIndeksista(i);
-                  if (resepti == null) { continue; }
-                  if (resepti.onkoNimessa(hakusana)) {
-                      sb.append(resepti.getTaulukkoMuodossa());
-                      sb.append("\n");
-                  }
-              }
+          // haetaan hakusanaa vastanneet reseptit
+          ArrayList<Resepti> hakuaVastanneetReseptit = reseptit.etsiNimella(hakusana);
+          
+          for (int i = 0; i < hakuaVastanneetReseptit.size(); i++) {
+              // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
+              sb.append(hakuaVastanneetReseptit.get(i).getTaulukkoMuodossa());
+              sb.append("\n");
           }
           
           hakutulokset.setRivit(sb.toString());

@@ -100,6 +100,14 @@ public class Reseptit extends TietueHallitsija {
     
     
     /**
+     * @return Reseptien suodattimet
+     */
+    public Suodattimet annaSuodattimet() {
+        return this.suodattimet;
+    }
+    
+    
+    /**
      * @param nimi reseptin nimi
      * @return luotu resepti
      */
@@ -157,21 +165,30 @@ public class Reseptit extends TietueHallitsija {
     
     
     /**
+     * Palauttaa hakusanaa vastaavat reseptit.
+     * Jos hakusana on tyhjä, palauttaa kaikki reseptit.
+     * 
      * @param hakusana millä hakusanalla haetaan kaikki reseptit jotka sisältävät kyseisen sanan
      * @return kaikki reseptit jotka sisältävät hakusanan
      */
     public ArrayList<Resepti> etsiNimella(String hakusana) {
-        ArrayList<Resepti> loydetyt = new ArrayList<Resepti>();
+        ArrayList<Resepti> loydetytReseptit = new ArrayList<Resepti>();
         
-        // käydään reseptien nimet läpi
-        for (int i = 0; i < getLkm(); i++) {
-            Resepti resepti = annaIndeksista(i);
-            if (resepti.onkoNimessa(hakusana)) {
-                loydetyt.add(resepti);
+        String kaytettavaHakusana = hakusana.strip();
+        if (kaytettavaHakusana.isBlank()) {
+            // tyhjällä hakusanalla lisätään kaikki reseptit
+            for (int i = 0; i < getLkm(); i++) {
+                loydetytReseptit.add(annaIndeksista(i));
+            }
+        } else {
+            // lisää kaikki hakusanaan täsmäävät reseptit
+            for (int i = 0; i < getLkm(); i++) {
+                Resepti resepti = annaIndeksista(i);
+                if (resepti.onkoNimessa(kaytettavaHakusana)) { loydetytReseptit.add(resepti); } 
             }
         }
         
-        return loydetyt;
+        return loydetytReseptit;
     }
     
     
