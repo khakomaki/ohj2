@@ -11,7 +11,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import reseptihaku.Resepti;
 import reseptihaku.Reseptit;
@@ -117,7 +116,7 @@ public class ReseptihakuGUIController implements Initializable {
           
           // poistutaan jos indeksi ei ole mieluisa
           if (valittuResepti < 0 || hakuReseptit.size() < valittuResepti) { return; }
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, "");
+          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, reseptit.annaIndeksista(valittuResepti));
       }
       
       

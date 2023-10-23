@@ -126,12 +126,12 @@
                <top>
                   <VBox spacing="10.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label text="Mustikkapiirakka">
+                        <Label text="Mustikkapiirakka" fx:id="reseptinNimi" >
                            <font>
                               <Font name="System Bold" size="16.0" />
                            </font>
                         </Label>
-                        <Label text="Halpa ja maukas." />
+                        <Label text="Halpa ja maukas." fx:id="reseptinKuvaus" />
                         <GridPane gridLinesVisible="true">
                           <columnConstraints>
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -143,18 +143,18 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Label text="★★★" GridPane.columnIndex="2" />
-                              <Label text="€€">
+                              <Label text="★★★" GridPane.columnIndex="2" fx:id="reseptinTahdet" />
+                              <Label text="€€" fx:id="reseptinHinta" >
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <Label text="nopea" GridPane.columnIndex="1">
+                              <Label text="nopea" GridPane.columnIndex="1" fx:id="reseptinValmistusaika" >
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <Label text="helppo" GridPane.columnIndex="3">
+                              <Label text="helppo" GridPane.columnIndex="3" fx:id="reseptinVaativuus" >
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
