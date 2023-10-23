@@ -93,6 +93,20 @@ public class Osio {
     
     
     /**
+     * @return osion nimi
+     * 
+     * @example
+     * <pre name="test">
+     * Osio kakkupohja = new Osio(8, "Kakkupohja");
+     * kakkupohja.getNimi() === "Kakkupohja";
+     * </pre>
+     */
+    public String getNimi() {
+        return this.nimi;
+    }
+    
+    
+    /**
      * @return osion ainesosat -olio
      */
     public OsionAinesosat annaOsionAinesosat() {

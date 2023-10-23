@@ -55,7 +55,7 @@
          <content>
             <BorderPane>
                <left>
-                  <VBox fillWidth="false" spacing="10.0" BorderPane.alignment="CENTER">
+                  <VBox fillWidth="false" spacing="10.0" BorderPane.alignment="CENTER" fx:id="ainesosatVBox" >
                      <children>
                         <Label text="Ainesosat">
                            <font>
@@ -168,7 +168,7 @@
                   </VBox>
                </top>
                <center>
-                  <VBox spacing="10.0" BorderPane.alignment="CENTER">
+                  <VBox spacing="10.0" BorderPane.alignment="CENTER" fx:id="ohjeetVBox" >
                      <children>
                         <Label text="Valmistus">
                            <font>

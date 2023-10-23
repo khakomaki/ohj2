@@ -1,11 +1,17 @@
 package fxReseptihaku;
 
+import java.io.PrintStream;
+
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
+import fi.jyu.mit.fxgui.TextAreaOutputStream;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import reseptihaku.Osio;
 import reseptihaku.Resepti;
 
 /**
@@ -22,6 +28,8 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     @FXML private Label reseptinValmistusaika;
     @FXML private Label reseptinTahdet;
     @FXML private Label reseptinVaativuus;
+    @FXML private VBox ainesosatVBox;
+    @FXML private VBox ohjeetVBox;
     
     @FXML private void handleSulje() { sulje(); }
     @FXML private void handleTulosta() { tulosta(); }
@@ -53,6 +61,27 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         this.reseptinValmistusaika.setText(this.valittuResepti.getValmistusaikaString());
         this.reseptinTahdet.setText(this.valittuResepti.getTahdetString());
         this.reseptinVaativuus.setText(this.valittuResepti.getVaativuusString());
+        
+        // tyhjennetään ainesosat ja ohjeet
+        this.ainesosatVBox.getChildren().clear();
+        this.ohjeetVBox.getChildren().clear();
+        
+        // lisää tekstiin osioiden nimet ja niiden ainesosat
+        for (int i = 0; i < this.valittuResepti.getOsiot().getLkm(); i++) {
+            Osio osio = this.valittuResepti.getOsiot().annaIndeksista(i);
+            
+            // lisätään osion nimi -Label
+            Label OsionNimi = new Label(osio.getNimi());
+            ainesosatVBox.getChildren().add(OsionNimi);
+            
+            // lisätään osion ainesosat -TextArea "tulostamalla" ne sen tietovirtaan
+            TextArea ainesosatTextArea = new TextArea();
+            try (PrintStream os = TextAreaOutputStream.getTextPrintStream(ainesosatTextArea)) {
+                osio.annaOsionAinesosat().tulostaOsionAinesosat(os);
+            }
+            ainesosatTextArea.setEditable(false);
+            ainesosatVBox.getChildren().add(ainesosatTextArea);
+        }
     }
     
     private void sulje() {

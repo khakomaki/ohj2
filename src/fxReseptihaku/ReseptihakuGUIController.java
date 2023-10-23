@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import kanta.Satunnaisluku;
 import reseptihaku.Resepti;
 import reseptihaku.Reseptit;
 
@@ -66,12 +67,12 @@ public class ReseptihakuGUIController implements Initializable {
       
       private void haeReseptit() {
           String hakusana = hakukentta.getText();
-          hakutulokset.clear();
+          this.hakutulokset.clear();
           
           StringBuilder sb = new StringBuilder(hakutuloksetOtsikko);
           
           // haetaan hakusanaa vastanneet reseptit
-          this.hakuReseptit = reseptit.etsiNimella(hakusana);
+          this.hakuReseptit = this.reseptit.etsiNimella(hakusana);
           
           for (int i = 0; i < this.hakuReseptit.size(); i++) {
               // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
@@ -79,10 +80,10 @@ public class ReseptihakuGUIController implements Initializable {
               sb.append("\n");
           }
           
-          hakutulokset.setRivit(sb.toString());
+          this.hakutulokset.setRivit(sb.toString());
           
           // asettaa muuten väärän kokoiseksi
-          hakutulokset.setColumnWidth(-1, 120);
+          this.hakutulokset.setColumnWidth(-1, 120);
           
           asetaTuloksetTeksti(hakusana);
       }
@@ -105,7 +106,7 @@ public class ReseptihakuGUIController implements Initializable {
       
       private void muokkaaResepti() {
           // haetaan mikä resepti on valittuna
-          int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
+          int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
           if (valittuResepti < 0) { return; }
           ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, "");
       }
@@ -115,19 +116,24 @@ public class ReseptihakuGUIController implements Initializable {
           int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
           
           // poistutaan jos indeksi ei ole mieluisa
-          if (valittuResepti < 0 || hakuReseptit.size() < valittuResepti) { return; }
+          if (valittuResepti < 0 || this.hakuReseptit.size() < valittuResepti) { return; }
           ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, reseptit.annaIndeksista(valittuResepti));
       }
       
       
       private void avaaSatunnainenResepti() {
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, "");
+          // poistutaan jos ei ole reseptejä
+          if (this.hakuReseptit.size() < 1) { return; }
+          
+          // arpoo hakutuloksista satunnaisen reseptin ja avaa sen
+          Resepti satunnainenResepti = this.hakuReseptit.get(Satunnaisluku.rand(0, this.hakuReseptit.size() - 1));
+          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, satunnainenResepti);
       }
       
       
       private void poistaResepti() {
           // haetaan mikä resepti on valittuna
-          int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
+          int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
           if (valittuResepti < 0) { return; }
           
           // näytetään dialogi reseptin poistamisesta
@@ -143,7 +149,7 @@ public class ReseptihakuGUIController implements Initializable {
       
       private void tulosta() {
           // haetaan mikä resepti on valittuna
-          int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
+          int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
           if (valittuResepti < 0) { return; }
           
           Dialogs.showMessageDialog("Ei osata tulostaa vielä");
@@ -157,7 +163,7 @@ public class ReseptihakuGUIController implements Initializable {
           this.reseptit = reseptit;
           // TODO: ota nämä pois kun ei enää tarvitse
           for (int i = 0; i < 10; i++) {
-              Resepti uusiResepti = reseptit.lisaaMustikkapiirakka();
+              Resepti uusiResepti = this.reseptit.lisaaMustikkapiirakka();
               uusiResepti.satunnaisetAttribuutit();
           }
           
