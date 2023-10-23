@@ -1,5 +1,7 @@
 package reseptihaku;
 
+import kanta.Satunnaisluku;
+
 /**
  * @author hakom
  * @version 19 Oct 2023
@@ -467,6 +469,19 @@ public class Resepti {
         this.vaativuus = 1;
         this.kuvaus = "Halpa ja maukas.";
         this.osiot.luoMustikkapiirakanOsiot();
+    }
+    
+    
+    /**
+     * Arpoo attribuutit id, hinta, valmistusaika, tähdet ja vaativuus reseptille testaamista varten.
+     * TODO: poista kun ei enää tarvita
+     */
+    public void satunnaisetAttribuutit() {
+        this.reseptiId = Satunnaisluku.rand(1, 999);
+        this.hinta = Satunnaisluku.rand(1, 3);
+        this.valmistusaika = Satunnaisluku.rand(1, 5);
+        this.tahdet = Satunnaisluku.rand(1, 5);
+        this.vaativuus = Satunnaisluku.rand(1, 5);
     }
     
     

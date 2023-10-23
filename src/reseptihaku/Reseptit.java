@@ -195,8 +195,9 @@ public class Reseptit extends TietueHallitsija {
     /**
      * Luo lisää mustikkapiirakan resepteihin testaamista varten.
      * TODO: poista kun ei enää tarvita
+     * @return mustikkapiirakka resepti
      */
-    public void lisaaMustikkapiirakka() {
+    public Resepti lisaaMustikkapiirakka() {
         Resepti mustikkapiirakka = new Resepti(1, "");
         mustikkapiirakka.setHintaSuodatin(this.hintaSuodatin);
         mustikkapiirakka.setValmistusaikaSuodatin(this.valmistusaikaSuodatin);
@@ -205,6 +206,7 @@ public class Reseptit extends TietueHallitsija {
         mustikkapiirakka.luoMustikkapiirakka(this.juoksevaId);
         this.lisaa(mustikkapiirakka);
         this.juoksevaId++;
+        return mustikkapiirakka;
     }
     
     

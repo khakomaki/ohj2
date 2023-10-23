@@ -156,8 +156,11 @@ public class ReseptihakuGUIController implements Initializable {
       public void setReseptit(Reseptit reseptit) {
           this.reseptit = reseptit;
           // TODO: ota nämä pois kun ei enää tarvitse
-          reseptit.lisaaMustikkapiirakka();
-          reseptit.lisaaMustikkapiirakka();
+          for (int i = 0; i < 10; i++) {
+              Resepti uusiResepti = reseptit.lisaaMustikkapiirakka();
+              uusiResepti.satunnaisetAttribuutit();
+          }
+          
           reseptit.lisaa(new Resepti(15, "Juustokakku"));
       }
       
