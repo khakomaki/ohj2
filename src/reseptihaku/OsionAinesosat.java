@@ -80,7 +80,17 @@ public class OsionAinesosat extends TietueHallitsija {
     public void tulostaOsionAinesosat(OutputStream os) {
         PrintStream out = new PrintStream(os);
         for (int i = 0; i < getLkm(); i++) {
-            out.print(this.annaIndeksista(i));
+            OsionAinesosa osionAinesosa = this.annaIndeksista(i);
+            
+            // ei tulosteta mitään jos OsionAinesosa on null
+            if (osionAinesosa == null) return;
+            
+            // tulostaa ainesosista tunnusta vastaavan ainesosan nimen
+            out.print(ainesosat.anna(osionAinesosa.getId()).getNimi());
+            out.print(" : ");
+            
+            // tulostaa ainesosan määrän ja rivin vaihdon
+            out.print(osionAinesosa.getMaara());
             out.print("\n");
         }
     }

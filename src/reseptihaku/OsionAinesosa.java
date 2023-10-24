@@ -41,6 +41,22 @@ public class OsionAinesosa {
     }
     
     
+    /**
+     * @return ainesosan tunnus
+     */
+    public int getId() {
+        return this.ainesosa_id;
+    }
+    
+    
+    /**
+     * @return ainesosan määrä
+     */
+    public String getMaara() {
+        return this.maara;
+    }
+    
+    
     @Override
     public String toString() {
         return "" + this.ainesosa_id + "|" + this.maara;
