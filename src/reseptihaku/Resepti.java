@@ -1,5 +1,9 @@
 package reseptihaku;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import kanta.Satunnaisluku;
 
 /**
@@ -14,16 +18,53 @@ public class Resepti {
     private int reseptiId;
     private String nimi;
     private Osiot osiot =                       new Osiot();
-    private Suodatin hintaSuodatin =            new Suodatin("Hinta");;
-    private Suodatin valmistusaikaSuodatin =    new Suodatin("Valmistusaika");
-    private Suodatin tahdetSuodatin =           new Suodatin("Tähdet");
-    private Suodatin vaativuusSuodatin =        new Suodatin("Vaativuus");
     private String kuvaus =                     "";
     private int hinta =                         -1;
     private int valmistusaika =                 -1;
     private int tahdet =                        -1;
     private int vaativuus =                     -1;
     
+    private static final Map<Integer, String> hintaVaihtoehdot;
+    private static final Map<Integer, String> valmistusaikaVaihtoehdot;
+    private static final Map<Integer, String> tahdetVaihtoehdot;
+    private static final Map<Integer, String> vaativuusVaihtoehdot;
+    
+     /* alustetaan HashMapit attribuuttien vaihtoehdoista ensimmäisellä kertaa
+     * ei luoda erikseen joka oliolle
+     * luo Mapit muuttumattomiksi, esimerkiksi metodi
+     * Resepti.hintaVaihtoehdot.put(7, "€€€€€€€"); heittää virheilmoituksen
+     */
+    static {
+        Map<Integer, String> hinnat = new HashMap<>();
+        hinnat.put(1, "€");
+        hinnat.put(2, "€€");
+        hinnat.put(3, "€€€");
+        hintaVaihtoehdot = Collections.unmodifiableMap(hinnat);
+        
+        Map<Integer, String> valmistusajat = new HashMap<>();
+        valmistusajat.put(1, "välitön");
+        valmistusajat.put(2, "nopea");
+        valmistusajat.put(3, "keskimääräinen");
+        valmistusajat.put(4, "pitkä");
+        valmistusajat.put(5, "extra pitkä");
+        valmistusaikaVaihtoehdot = Collections.unmodifiableMap(valmistusajat);
+        
+        Map<Integer, String> tahtia = new HashMap<>();
+        tahtia.put(1, "☆");
+        tahtia.put(2, "☆☆");
+        tahtia.put(3, "☆☆☆");
+        tahtia.put(4, "☆☆☆☆");
+        tahtia.put(5, "☆☆☆☆☆");
+        tahdetVaihtoehdot = Collections.unmodifiableMap(tahtia);
+        
+        Map<Integer, String> vaativuudet = new HashMap<>();
+        vaativuudet.put(1, "helppo");
+        vaativuudet.put(2, "kohtalaisen helppo");
+        vaativuudet.put(3, "keskimääräinen");
+        vaativuudet.put(4, "kohtalaisen työläs");
+        vaativuudet.put(5, "työläs");
+        vaativuusVaihtoehdot = Collections.unmodifiableMap(vaativuudet);
+    }
     
     /**
      * Luo reseptin.
@@ -158,128 +199,55 @@ public class Resepti {
     
     
     /**
-     * Asettaa hintoja käsittelevän suodattimen.
-     * Ennen asettamista ei anna muuttaa Reseptin hintaa.
+     * Vaihtaa reseptin hinnan.
+     * Ei tee muutoksia jos hintaa ei löydy.
      * 
-     * @param hintaSuodatin mihin hinta-Suodattimeen vaihdetaan
+     * Resepti mokkapalat = new Resepti(2, "Mokkapalat");
      * 
      * @example
      * <pre name="test">
-     * Suodatin hintaSuodatin = new Suodatin("Hinta");
-     * hintaSuodatin.lisaaVaihtoehto(2, "€€");
-     * Resepti mokkapalat = new Resepti(2, "Mokkapalat");
-     * 
-     * mokkapalat.setHinta(2);
-     * mokkapalat.getHinta() === -1;
-     * 
-     * mokkapalat.setHintaSuodatin(hintaSuodatin);
      * mokkapalat.setHinta(2);
      * mokkapalat.getHinta() === 2;
-     * 
-     * mokkapalat.setHinta(3);
-     * mokkapalat.getHinta() === 2;
-     * 
-     * mokkapalat.setHinta(-1);
-     * mokkapalat.getHinta() === -1;
      * </pre>
-     */
-    public void setHintaSuodatin(Suodatin hintaSuodatin) {
-        // ei tehdä mitään jos annettu suodatin on null
-        if (hintaSuodatin == null) { return; }
-        this.hintaSuodatin = hintaSuodatin;
-    }
-    
-    
-    /**
-     * Asettaa valmistusaikaa käsittelevän suodattimen.
      * 
-     * @param valmistusaikaSuodatin mihin valmistusaika-Suodattimeen vaihdetaan
-     */
-    public void setValmistusaikaSuodatin(Suodatin valmistusaikaSuodatin) {
-        // ei tehdä mitään jos annettu suodatin on null
-        if (valmistusaikaSuodatin == null) { return; }
-        this.valmistusaikaSuodatin = valmistusaikaSuodatin;
-    }
-    
-    
-    /**
-     * Asettaa tähtiä käsittelevän suodattimen.
-     * 
-     * @param tahdetSuodatin mihin tähdet-Suodattimeen vaihdetaan
-     */
-    public void setTahdetSuodatin(Suodatin tahdetSuodatin) {
-        // ei tehdä mitään jos annettu suodatin on null
-        if (tahdetSuodatin == null) { return; }
-        this.tahdetSuodatin = tahdetSuodatin;
-    }
-    
-    
-    /**
-     * Asettaa vaativuutta käsittelevän suodattimen.
-     * 
-     * @param vaativuusSuodatin mihin vaativuus-Suodattimeen vaihdetaan
-     */
-    public void setVaativuusSuodatin(Suodatin vaativuusSuodatin) {
-        // ei tehdä mitään jos annettu suodatin on null
-        if (vaativuusSuodatin == null) { return; }
-        this.vaativuusSuodatin = vaativuusSuodatin;
-    }
-    
-    
-    /**
-     * Vaihtaa reseptin hinnan.
-     * Reseptille on pitänyt asettaa suodatin ja annetun hinnan pitää löytyä asetetusta suodattimesta.
-     * Ei tee muutoksia jos hintaa ei löydy.
-     * 
-     * Suodatin hintaSuodatin = new Suodatin("Hinta");
-     * hintaSuodatin.lisaaVaihtoehto(2, "€€");
-     * Resepti mokkapalat = new Resepti(2, "Mokkapalat");
-     * 
-     * mokkapalat.setHinta(2);
-     * mokkapalat.getHinta() === -1;
-     * 
-     * mokkapalat.setHintaSuodatin(hintaSuodatin);
-     * mokkapalat.setHinta(2);
-     * mokkapalat.getHinta() === 2;
-     * 
-     * @param hinta mikä hinta-Suodattimen vaihtoehto halutaan asettaa
+     * @param hinta mikä hinta vaihtoehto halutaan asettaa
      */
     public void setHinta(int hinta) {
         if (hinta == -1) { this.hinta = -1; }
-        if (this.hintaSuodatin.onkoOlemassa(hinta)) { this.hinta = hinta; }
+        if (Resepti.hintaVaihtoehdot.containsKey(hinta)) { this.hinta = hinta; }
     }
     
     
     /**
-     * Asettaa valmistusajan, mikäli löytyy suodattimesta.
+     * Asettaa valmistusajan, mikäli löytyy vaihtoehdoista.
      * 
-     * @param valmistusaika mikä valmistusaika-Suodattimen vaihtoehto halutaan asettaa
+     * @param valmistusaika mikä valmistusaika vaihtoehto halutaan asettaa
      */
     public void setValmistusaika(int valmistusaika) {
         if (valmistusaika == -1) { this.valmistusaika = -1; }
-        if (this.valmistusaikaSuodatin.onkoOlemassa(valmistusaika)) { this.valmistusaika = valmistusaika; }
+        if (Resepti.valmistusaikaVaihtoehdot.containsKey(valmistusaika)) { this.valmistusaika = valmistusaika; }
     }
     
     
     /**
-     * Asettaa tähdet, mikäli löytyy suodattimesta.
+     * Asettaa tähdet, mikäli löytyy vaihtoehdoista.
      * 
-     * @param tahdet mikä tahdet-Suodattimen vaihtoehto halutaan asettaa
+     * @param tahdet mikä tahdet vaihtoehto halutaan asettaa
      */
     public void setTahdet(int tahdet) {
         if (tahdet == -1) { this.tahdet = -1; }
-        if (this.tahdetSuodatin.onkoOlemassa(tahdet)) { this.tahdet = tahdet; }
+        if (Resepti.tahdetVaihtoehdot.containsKey(tahdet)) { this.tahdet = tahdet; }
     }
     
     
     /**
-     * Asettaa vaativuuden, mikäli löytyy suodattimesta.
+     * Asettaa vaativuuden, mikäli löytyy vaihtoehdoista.
      * 
-     * @param vaativuus mikä vaativuus-Suodattimen vaihtoehto halutaan asettaa
+     * @param vaativuus mikä vaativuus vaihtoehto halutaan asettaa
      */
     public void setVaativuus(int vaativuus) {
         if (vaativuus == -1) { this.vaativuus = -1; }
-        if (this.vaativuusSuodatin.onkoOlemassa(vaativuus)) { this.vaativuus = vaativuus; }
+        if (Resepti.vaativuusVaihtoehdot.containsKey(vaativuus)) { this.vaativuus = vaativuus; }
     }
     
     
@@ -294,28 +262,36 @@ public class Resepti {
     
     
     /**
-     * Antaa reseptin hinnan suodattimen vastaavana tekstinä.
+     * Antaa reseptin hinnan vaihtoehto vastaavana tekstinä.
      * 
-     * @return reseptin hinta suodattimen muotoiltuna
+     * @return reseptin hinta tekstimuodossa
      * 
      * @example
      * <pre name="test">
      * Resepti resepti = new Resepti();
-     * Suodatin hintaSuodatin = new Suodatin("Hinta");
-     * hintaSuodatin.lisaaVaihtoehto(1, "€");
-     * hintaSuodatin.lisaaVaihtoehto(2, "€€");
-     * hintaSuodatin.lisaaVaihtoehto(3, "€€€");
-     * resepti.setHintaSuodatin(hintaSuodatin);
-     * 
      * resepti.getHintaString() === null;
      * 
-     * resepti.setHinta(2);
+     * resepti.setHinta(0);
+     * resepti.getHintaString() === null;
      * 
+     * resepti.setHinta(1);
+     * resepti.getHintaString() === "€";
+     * 
+     * resepti.setHinta(2);
      * resepti.getHintaString() === "€€";
+     * 
+     * resepti.setHinta(3);
+     * resepti.getHintaString() === "€€€";
+     * 
+     * resepti.setHinta(4);
+     * resepti.getHintaString() === "€€€";
+     * 
+     * resepti.setHinta(-1);
+     * resepti.getHintaString() === null;
      * </pre>
      */
     public String getHintaString() {
-        return this.hintaSuodatin.getVastaavaVaihtoehto(this.hinta);
+        return Resepti.hintaVaihtoehdot.get(this.hinta);
     }
     
     
@@ -330,12 +306,12 @@ public class Resepti {
     
     
     /**
-     * Antaa reseptin valmistusajan suodattimen vastaavana tekstinä.
+     * Antaa reseptin valmistusajan vastaavana tekstinä.
      * 
-     * @return reseptin valmistusaika suodattimen muotoiltuna
+     * @return reseptin valmistusaika tekstinä
      */
     public String getValmistusaikaString() {
-        return this.valmistusaikaSuodatin.getVastaavaVaihtoehto(this.valmistusaika);
+        return Resepti.valmistusaikaVaihtoehdot.get(this.valmistusaika);
     }
     
     
@@ -350,12 +326,12 @@ public class Resepti {
     
     
     /**
-     * Antaa reseptin tähdet suodattimen vastaavana tekstinä.
+     * Antaa reseptin tähdet vastaavana tekstinä.
      * 
-     * @return reseptin tähdet suodattimen muotoiltuna
+     * @return reseptin tähdet tekstinä
      */
     public String getTahdetString() {
-        return this.tahdetSuodatin.getVastaavaVaihtoehto(this.tahdet);
+        return Resepti.tahdetVaihtoehdot.get(this.tahdet);
     }
     
     
@@ -370,12 +346,12 @@ public class Resepti {
     
     
     /**
-     * Antaa reseptin vaativuuden suodattimen vastaavana tekstinä.
+     * Antaa reseptin vaativuuden vastaavana tekstinä.
      * 
-     * @return reseptin vaativuus suodattimen muotoiltuna
+     * @return reseptin vaativuus tekstinä
      */
     public String getVaativuusString() {
-        return this.vaativuusSuodatin.getVastaavaVaihtoehto(this.vaativuus);
+        return Resepti.vaativuusVaihtoehdot.get(this.vaativuus);
     }
     
     
@@ -396,13 +372,13 @@ public class Resepti {
         StringBuilder sb = new StringBuilder();
         sb.append(this.nimi);
         sb.append('|');
-        sb.append(vaihdaNull(this.hintaSuodatin.getVastaavaVaihtoehto(this.hinta)));
+        sb.append(vaihdaNull(Resepti.hintaVaihtoehdot.get(this.hinta)));
         sb.append('|');
-        sb.append(vaihdaNull(this.valmistusaikaSuodatin.getVastaavaVaihtoehto(this.valmistusaika)));
+        sb.append(vaihdaNull(Resepti.valmistusaikaVaihtoehdot.get(this.valmistusaika)));
         sb.append('|');
-        sb.append(vaihdaNull(this.tahdetSuodatin.getVastaavaVaihtoehto(this.tahdet)));
+        sb.append(vaihdaNull(Resepti.tahdetVaihtoehdot.get(this.tahdet)));
         sb.append('|');
-        sb.append(vaihdaNull(this.vaativuusSuodatin.getVastaavaVaihtoehto(this.vaativuus)));
+        sb.append(vaihdaNull(Resepti.vaativuusVaihtoehdot.get(this.vaativuus)));
         return sb.toString();
     }
     
@@ -478,10 +454,11 @@ public class Resepti {
      */
     public void satunnaisetAttribuutit() {
         this.reseptiId = Satunnaisluku.rand(1, 999);
-        this.hinta = Satunnaisluku.rand(1, 3);
-        this.valmistusaika = Satunnaisluku.rand(1, 5);
-        this.tahdet = Satunnaisluku.rand(1, 5);
-        this.vaativuus = Satunnaisluku.rand(1, 5);
+        
+        setHinta(Satunnaisluku.rand(1, 3));
+        setValmistusaika(Satunnaisluku.rand(1, 5));
+        setTahdet(Satunnaisluku.rand(1, 5));
+        setVaativuus(Satunnaisluku.rand(1, 5));
     }
     
     
@@ -519,9 +496,6 @@ public class Resepti {
      */
     public static void main(String[] args) {
         Resepti lihapiirakka = new Resepti(1, "Lihapiirakka");
-        Suodatin tahdetSuodatin = new Suodatin("Tähdet");
-        tahdetSuodatin.luoVaihtoehdot(new String[]{ "☆", "☆☆", "☆☆☆", "☆☆☆☆", "☆☆☆☆☆" });
-        lihapiirakka.setTahdetSuodatin(tahdetSuodatin);
         lihapiirakka.setTahdet(2);
         lihapiirakka.setKuvaus("Helppo ja hyvä");
         System.out.println(lihapiirakka);
