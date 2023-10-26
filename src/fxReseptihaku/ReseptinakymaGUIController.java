@@ -85,7 +85,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     private void sulje() {
-        ModalController.closeStage(checkBox1);
+        ModalController.closeStage(reseptinNimi);
     }
     
     private void tulosta() {
