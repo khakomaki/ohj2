@@ -10,6 +10,7 @@ public class Osio {
     private int osioId;
     private String nimi;
     private OsionAinesosat osionAinesosat;
+    private Ohjeet ohjeet;
     private Ainesosat ainesosat;            // TODO kaikille viite yhteen ja samaan Ainesosat-olioon
     private final String oletusNimi = "Osion nimi";
     
@@ -26,6 +27,7 @@ public class Osio {
      */
     public Osio(int id, String nimi) {
         this.osioId = id;
+        this.ohjeet = new Ohjeet(this.osioId);
         setNimi(nimi);
         luoOsionAinesosat();
     }
@@ -115,17 +117,57 @@ public class Osio {
     
     
     /**
+     * @return osion ohjeet
+     */
+    public Ohjeet annaOsionOhjeet() {
+        return this.ohjeet;
+    }
+    
+    
+    /**
+     * @param ainesosa lisättävän ainesosan nimi
+     * @param maara lisättävän ainesosan määrä
+     */
+    public void lisaaAinesosa(String ainesosa, String maara) {
+        this.osionAinesosat.lisaaOsionAinesosa(ainesosa, maara);
+    }
+    
+    
+    /**
+     * @param ohje lisättävä ohje
+     */
+    public void lisaaOhje(Ohje ohje) {
+        this.ohjeet.lisaa(ohje);
+    }
+    
+    
+    /**
+     * @param ohjeistus lisättävän ohjeen ohjeistusteksti
+     */
+    public void lisaaOhje(String ohjeistus) {
+        Ohje ohje = new Ohje(ohjeistus);
+        this.ohjeet.lisaa(ohje);
+    }
+    
+    
+    /**
      * Luo muropohja osion testaamista varten
      * TODO: poista kun ei enää tarvita
      */
     public void luoMuropohja() {
         this.osioId = 1;
         this.nimi = "Muropohja";
-        this.osionAinesosat.lisaaOsionAinesosa("voita", "100g");
-        this.osionAinesosat.lisaaOsionAinesosa("sokeria", "1dl");
-        this.osionAinesosat.lisaaOsionAinesosa("kananmunia", "1kpl");
-        this.osionAinesosat.lisaaOsionAinesosa("vehnäjauhoja", "2,5dl");
-        this.osionAinesosat.lisaaOsionAinesosa("leivinjauhetta", "1tl");
+        lisaaAinesosa("voita", "100g");
+        lisaaAinesosa("sokeria", "1dl");
+        lisaaAinesosa("kananmunia", "1kpl");
+        lisaaAinesosa("vehnäjauhoja", "2,5dl");
+        lisaaAinesosa("leivinjauhetta", "1tl");
+        
+        lisaaOhje("Sekoita sokeri ja pehmeä voi");
+        lisaaOhje("Lisää kananmuna ja vaahdota");
+        lisaaOhje("Lisää leivinjauho vehnäjauhoihin");
+        lisaaOhje("Sekoita jauhot vaahtoon");
+        lisaaOhje("Painele taikina piirakkavuokaan");
     }
     
     
@@ -136,11 +178,16 @@ public class Osio {
     public void luoTayte() {
         this.osioId = 1;
         this.nimi = "Täyte";
-        this.osionAinesosat.lisaaOsionAinesosa("sokeria", "0,75dl");
-        this.osionAinesosat.lisaaOsionAinesosa("kananmunia", "1kpl");
-        this.osionAinesosat.lisaaOsionAinesosa("mustikoita", "300g");
-        this.osionAinesosat.lisaaOsionAinesosa("kermaviiliä", "200g");
-        this.osionAinesosat.lisaaOsionAinesosa("vanilliinisokeria", "1tl");
+        lisaaAinesosa("sokeria", "0,75dl");
+        lisaaAinesosa("kananmunia", "1kpl");
+        lisaaAinesosa("mustikoita", "300g");
+        lisaaAinesosa("kermaviiliä", "200g");
+        lisaaAinesosa("vanilliinisokeria", "1tl");
+        
+        lisaaOhje("Ripottele mustikat piirakkapohjan päälle");
+        lisaaOhje("Sekoita sokeri, kermaviili ja kananmuna");
+        lisaaOhje("Lisää vanilliinisokeri");
+        lisaaOhje("Kaada kermaviiliseos piirakkapohjan päälle");
     }
     
     

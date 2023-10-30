@@ -82,6 +82,25 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
             ainesosatTextArea.setEditable(false);
             ainesosatVBox.getChildren().add(ainesosatTextArea);
         }
+        
+        
+        // lisää tekstiin osioiden nimet ja niiden ohjeet
+        for (int i = 0; i < this.valittuResepti.getOsiot().getLkm(); i++) {
+            Osio osio = this.valittuResepti.getOsiot().annaIndeksista(i);
+            
+            // lisätään osion nimi -Label
+            Label OsionNimi = new Label(osio.getNimi());
+            ohjeetVBox.getChildren().add(OsionNimi);
+            
+            // lisätään osion ainesosat -TextArea "tulostamalla" ne sen tietovirtaan
+            TextArea ohjeetTextArea = new TextArea();
+            try (PrintStream os = TextAreaOutputStream.getTextPrintStream(ohjeetTextArea)) {
+                osio.annaOsionOhjeet().tulostaOhjeet(os);
+            }
+            ohjeetTextArea.setEditable(false);
+            ohjeetVBox.getChildren().add(ohjeetTextArea);
+        }
+        
     }
     
     private void sulje() {
