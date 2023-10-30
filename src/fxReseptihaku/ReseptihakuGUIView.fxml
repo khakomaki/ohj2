@@ -215,7 +215,7 @@
                         <Tooltip text="Ylin vaativuustaso" />
                      </tooltip></ComboBoxChooser>
                   <Label text="Lajittele tulokset" />
-                  <ComboBoxChooser rivit="valmistusaika" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+                  <ComboBoxChooser fx:id="lajitteluPeruste" rivit="valmistusaika" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <tooltip>
                         <Tooltip text="Lajittele tulokset valinnan perusteella" />
                      </tooltip></ComboBoxChooser>
@@ -224,12 +224,13 @@
                         <Tooltip text="Käännä tulosten lajittelun käänteiseksi" />
                      </tooltip></CheckBox>
                   <Label text="Valmistusaika" GridPane.rowIndex="5" />
-                  <ComboBoxChooser fx:id="alinvalmistusaika" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                  <ComboBoxChooser fx:id="alinValmistusaika" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
                      <tooltip>
                         <Tooltip text="Nopein valmistusaika" />
                      </tooltip>
                   </ComboBoxChooser>
-                  <ComboBoxChooser fx:id="ylinvalmistusaika" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                  <Label text="-" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <ComboBoxChooser fx:id="ylinValmistusaika" GridPane.columnIndex="2" GridPane.rowIndex="6">
                      <tooltip>
                         <Tooltip text="Hitain valmistusaika" />
                      </tooltip>

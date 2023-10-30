@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import fi.jyu.mit.fxgui.ComboBoxChooser;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.StringGrid;
@@ -26,6 +27,15 @@ public class ReseptihakuGUIController implements Initializable {
       @FXML private TextField hakukentta;
       @FXML private Label tuloksetTeksti;
       @FXML private StringGrid<String> hakutulokset;
+      @FXML private ComboBoxChooser<String> lajitteluPeruste;
+      @FXML private ComboBoxChooser<String> alinHinta;
+      @FXML private ComboBoxChooser<String> ylinHinta;
+      @FXML private ComboBoxChooser<String> alinValmistusaika;
+      @FXML private ComboBoxChooser<String> ylinValmistusaika;
+      @FXML private ComboBoxChooser<String> alinTahdet;
+      @FXML private ComboBoxChooser<String> ylinTahdet;
+      @FXML private ComboBoxChooser<String> alinVaativuus;
+      @FXML private ComboBoxChooser<String> ylinVaativuus;
     
       @FXML private void handleUusiResepti() { lisaaResepti(); }
       @FXML private void handleMuokkaaResepti() { muokkaaResepti(); }
@@ -47,6 +57,7 @@ public class ReseptihakuGUIController implements Initializable {
       
       private final String hakutuloksetOtsikko = "reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso\n";
       private Reseptit reseptit;
+      private ArrayList<ComboBoxChooser<String>> suodatinValinnat = new ArrayList<>();
       private ArrayList<Resepti> hakuReseptit = new ArrayList<Resepti>();
       
       private void sulje() {
@@ -58,10 +69,56 @@ public class ReseptihakuGUIController implements Initializable {
        * Hoitaa alustukset, joita FXMLLoader ei hoida
        */
       public void alusta() {
-          hakutulokset.clear();
+          alustaSuodattimet();
+          alustaHakutulokset();
+      }
+      
+      
+      private void alustaHakutulokset() {
+          this.hakutulokset.clear();
           
           // asetetaan sama kuin hakiessa reseptejä
-          hakutulokset.setColumnWidth(-1, 120);
+          this.hakutulokset.setColumnWidth(-1, 120);
+          
+          hakutulokset.setSortable(-1, false);
+      }
+      
+      
+      private void alustaSuodattimet() {
+          // TODO: varmistu ettei suodatin ole null
+          // TODO: hankkiudu eroon toistuvasta koodista
+          
+          // lisätään yksittäiset suodattimet listaan ja tyhjennetään fxml tiedoston esimerkki tiedot
+          this.suodatinValinnat.add(this.alinHinta);
+          this.suodatinValinnat.add(this.ylinHinta);
+          this.suodatinValinnat.add(this.alinValmistusaika);
+          this.suodatinValinnat.add(this.ylinValmistusaika);
+          this.suodatinValinnat.add(this.alinTahdet);
+          this.suodatinValinnat.add(this.ylinTahdet);
+          this.suodatinValinnat.add(this.alinVaativuus);
+          this.suodatinValinnat.add(this.ylinVaativuus);
+          for (ComboBoxChooser<String> suodatin : this.suodatinValinnat) {
+              suodatin.clear();
+              suodatin.setPrefWidth(145);
+          }
+          
+          // lisää suodattimien vaihtoehdot ja jättää nykyisen valinnan tyhjäksi
+          this.lajitteluPeruste.setRivit("Hinta\nValmistusaika\nTähdet\nVaativuus");
+          this.alinHinta.setRivit("\n" + Resepti.getHintaVaihtoehdot());
+          this.ylinHinta.setRivit("\n" + Resepti.getHintaVaihtoehdot());
+          this.alinValmistusaika.setRivit("\n" + Resepti.getValmistusaikaVaihtoehdot());
+          this.ylinValmistusaika.setRivit("\n" + Resepti.getValmistusaikaVaihtoehdot());
+          this.alinTahdet.setRivit("\n" + Resepti.getTahdetVaihtoehdot());
+          this.ylinTahdet.setRivit("\n" + Resepti.getTahdetVaihtoehdot());
+          this.alinVaativuus.setRivit("\n" + Resepti.getVaativuusVaihtoehdot());
+          this.ylinVaativuus.setRivit("\n" + Resepti.getVaativuusVaihtoehdot());
+          
+          // TODO: kuuntelijat suodattimien muuttumiselle
+          /*
+          this.alinHinta.valueProperty().addListener((havainnoitava, vanhaArvo, uusiArvo) -> {
+              //
+          });
+          */
       }
       
       
@@ -84,6 +141,7 @@ public class ReseptihakuGUIController implements Initializable {
           
           // asettaa muuten väärän kokoiseksi
           this.hakutulokset.setColumnWidth(-1, 120);
+          hakutulokset.setSortable(-1, false);
           
           asetaTuloksetTeksti(hakusana);
       }
@@ -143,7 +201,9 @@ public class ReseptihakuGUIController implements Initializable {
       
       
       private void tyhjennaSuodattimet() {
-          Dialogs.showMessageDialog("Ei osata tyhjentää suodattimia vielä");
+          for (ComboBoxChooser<String> suodatin : this.suodatinValinnat) { 
+              suodatin.setSelectedIndex(-1); 
+          }
       }
       
       

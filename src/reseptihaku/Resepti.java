@@ -196,8 +196,8 @@ public class Resepti {
     public Osiot getOsiot() {
          return this.osiot;
     }
-    
-    
+
+
     /**
      * Vaihtaa reseptin hinnan.
      * Ei tee muutoksia jos hintaa ei löydy.
@@ -485,6 +485,51 @@ public class Resepti {
         sb.append(this.tahdet);
         sb.append('|');
         sb.append(this.vaativuus);
+        return sb.toString();
+    }
+    
+    
+    /**
+     * @return kaikki mahdolliset hintavaihtoehdot
+     */
+    public static String getHintaVaihtoehdot() {
+        return getVaihtoehdot(hintaVaihtoehdot);
+    }
+    
+    
+    /**
+     * @return kaikki mahdolliset valmistusaikavaihtoehdot
+     */
+    public static String getValmistusaikaVaihtoehdot() {
+        return getVaihtoehdot(valmistusaikaVaihtoehdot);
+    }
+    
+    
+    /**
+     * @return kaikki mahdolliset tahdetvaihtoehdot
+     */
+    public static String getTahdetVaihtoehdot() {
+        return getVaihtoehdot(tahdetVaihtoehdot);
+    }
+    
+    
+    /**
+     * @return kaikki mahdolliset vaativuusvaihtoehdot
+     */
+    public static String getVaativuusVaihtoehdot() {
+        return getVaihtoehdot(vaativuusVaihtoehdot);
+    }
+    
+    
+    private static String getVaihtoehdot(Map<Integer, String> vaihtoehdotMap) {
+        StringBuilder sb = new StringBuilder();
+        
+        // lisää vaihtoehdot riviväleillä erotettuna StringBuilderiin
+        for (String vaihtoehto : vaihtoehdotMap.values()) {
+            sb.append(vaihtoehto);
+            sb.append("\n");
+        }
+        
         return sb.toString();
     }
     
