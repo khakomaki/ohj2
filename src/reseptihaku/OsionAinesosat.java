@@ -49,17 +49,30 @@ public class OsionAinesosat extends TietueHallitsija {
     
     
     /**
+     * @param ainesosa lisättävä ainesosa
+     * @param maara ainesosan määrä
+     */
+    public void lisaaOsionAinesosa(Ainesosa ainesosa, String maara) {
+        // ei lisätä nulleja
+        if (ainesosa == null) { return; }
+        
+        // koitetaan onko ainesosissa olemassa jo vastaava ainesosa, jos ei ole niin käsketään lisäämään
+        Ainesosa lisattavaAinesosa = this.ainesosat.anna(ainesosa.getNimi());
+        if (lisattavaAinesosa == null) { lisattavaAinesosa = this.ainesosat.lisaaAinesosa(ainesosa); }
+        
+        // luodaan osion ainesosa ainesosilta saadulla tiedolla ja määrällä
+        OsionAinesosa osionAinesosa = new OsionAinesosa(lisattavaAinesosa.getId(), maara);
+        lisaa(osionAinesosa);
+    }
+    
+    
+    /**
      * @param ainesosaNimi minkä niminen ainesosa lisätään
      * @param maara ainesosan määrä
      */
     public void lisaaOsionAinesosa(String ainesosaNimi, String maara) {
-        // koitetaan onko ainesosissa olemassa jo vastaava ainesosa, jos ei ole niin käsketään lisäämään
-        Ainesosa lisattavaAinesosa = this.ainesosat.anna(ainesosaNimi);
-        if (lisattavaAinesosa == null) { lisattavaAinesosa = ainesosat.lisaaAinesosa(ainesosaNimi); }
-        
-        // luodaan osion ainesosa ainesosilta saadulla tiedolla ja määrällä
-        OsionAinesosa osionAinesosa = new OsionAinesosa(lisattavaAinesosa.getId(), maara);
-        this.lisaa(osionAinesosa);
+        Ainesosa ainesosa = new Ainesosa(ainesosaNimi);
+        lisaaOsionAinesosa(ainesosa, maara);
     }
     
     

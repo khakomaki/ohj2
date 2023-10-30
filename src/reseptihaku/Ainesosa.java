@@ -7,8 +7,8 @@ package reseptihaku;
  */
 public class Ainesosa {
     
-    private String ainesosaNimi;
-    private int ainesosa_id;
+    private String ainesosaNimi = "ainesosa";
+    private int ainesosa_id     = 0;
     
     
     /**
@@ -22,8 +22,25 @@ public class Ainesosa {
      * </pre>
      */
     public Ainesosa(int id, String ainesosa) {
-        this.ainesosaNimi = ainesosa.toLowerCase();
+        asetaNimi(ainesosa);
         this.ainesosa_id = id;
+    }
+    
+    
+    /**
+     * @param ainesosa ainesosan nimi
+     */
+    public Ainesosa(String ainesosa) {
+        asetaNimi(ainesosa);
+    }
+    
+    
+    private void asetaNimi(String nimi) {
+        // ei tehdä muutoksia jos yritetään laittaa nimeksi null tai tyhjä merkkijono
+        if (nimi == null || nimi.length() < 1) { return; }
+        
+        // asetetaan nimi pienellä kirjoitettuna
+        this.ainesosaNimi = nimi.toLowerCase();
     }
     
     
@@ -82,6 +99,23 @@ public class Ainesosa {
      */
     public int getId() {
         return this.ainesosa_id;
+    }
+    
+    
+    /**
+     * @param id asetettava ainesosan tunnus
+     * 
+     * @example
+     * <pre name="test">
+     * Ainesosa ainesosa = new Ainesosa("paprika");
+     * ainesosa.getId() === 0;
+     * 
+     * ainesosa.setId(2);
+     * ainesosa.getId() === 2;
+     * </pre>
+     */
+    public void setId(int id) {
+        this.ainesosa_id = id;
     }
     
     

@@ -178,6 +178,16 @@ public class Ainesosat extends TietueHallitsija {
     
     
     /**
+     * @param ainesosa lisättävä ainesosa
+     * @return lisätty ainesosa
+     */
+    public Ainesosa lisaaAinesosa(Ainesosa ainesosa) {
+        Ainesosa lisattavaAinesosa = lisaaAinesosa(ainesosa.getNimi());
+        return lisattavaAinesosa;
+    }
+    
+    
+    /**
      * @param os tietovirta johon halutaan tulostaa
      */
     public void tulostaAinesosat(OutputStream os) {
