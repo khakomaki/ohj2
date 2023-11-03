@@ -34,6 +34,39 @@ public class Osio {
     
     
     /**
+     * Ohje valitulla nimellä
+     * 
+     * @param nimi osion nimi
+     * @example
+     * <pre name="test">
+     * Osio pizzapohja = new Osio("Pizzapohja");
+     * pizzapohja.toString() === "0|Pizzapohja";
+     * </pre>
+     */
+    public Osio(String nimi) {
+        this.ohjeet = new Ohjeet(this.osioId);
+        setNimi(nimi);
+        luoOsionAinesosat();
+    }
+    
+    
+    /**
+     * Oletus ohje
+     * 
+     * @example
+     * <pre name="test">
+     * Osio osio = new Osio();
+     * osio.toString() === "0|Osion nimi";
+     * </pre>
+     */
+    public Osio() {
+        setNimi(null);
+        luoOsionAinesosat();
+        this.ohjeet = new Ohjeet(this.osioId);
+    }
+    
+    
+    /**
      * Luo osion ainesosat
      */
     private void luoOsionAinesosat() {

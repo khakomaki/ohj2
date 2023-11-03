@@ -5,9 +5,14 @@ import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import reseptihaku.Osio;
+import reseptihaku.Osiot;
 import reseptihaku.Resepti;
 
 /**
@@ -30,7 +35,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     @FXML private void handleTallenna() { tallenna();}
     @FXML private void handleLisaaOsio() { lisaaOsio(); }
     @FXML private void handlePoistaResepti() { poistaResepti();}
-    @FXML private void handlePoistaOsio() { poistaOsio(); }
+    @FXML private void handlePoistaOsio() { poistaOsio(null); }
     @FXML private void handlePoistaAinesosa() { poistaAinesosa(); }
     @FXML private void handleLisaaAinesosa() { lisaaAinesosa(); }
     @FXML private void handlePoistaOhje() { poistaOhje(); }
@@ -60,6 +65,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // tyhjentää VBox sisällön
         this.ainesosaJaOhjeetVBox.getChildren().clear();
+        naytaOsiot();
     }
     
     private void naytaReseptinOminaisuudet() {
@@ -83,6 +89,37 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         this.vaativuusSuodatin.setRivit("\n" + Resepti.getVaativuusVaihtoehdot());
         this.vaativuusSuodatin.setSelectedIndex(this.valittuResepti.getVaativuus());
     }
+    
+    
+    private void naytaOsiot() {
+        Osiot osiot = this.valittuResepti.getOsiot();
+        for (int i = 0; i < osiot.getLkm(); i++) {
+            // luo osion HBoxin ja lisää sen käyttöliittymään
+            HBox osioHBox = naytaOsio(osiot.annaIndeksista(i));
+            ainesosaJaOhjeetVBox.getChildren().add(osioHBox);
+        }
+    }
+    
+    
+    private HBox naytaOsio(Osio osio) {
+        HBox osioHBox = new HBox();
+        Font kirjasin = new Font("System Bold", 16);
+        
+        // luo osion nimen tekstikentän
+        TextField osioNimi = new TextField(osio.getNimi());
+        osioNimi.setFont(kirjasin);
+        
+        // luo osion poisto-painikkeen
+        Button osioPoisto = new Button("x");
+        osioPoisto.setOnAction(e -> poistaOsio(osioHBox));
+        osioPoisto.setFont(kirjasin);
+        
+        osioHBox.getChildren().add(osioNimi);
+        osioHBox.getChildren().add(osioPoisto);
+        
+        return osioHBox;
+    }
+    
     
     private void sulje() {
         boolean tallennetaanko = false;
@@ -110,7 +147,10 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     private void lisaaOsio() {
         String osioTeksti = osioTekstiKentta.getText();
         if (osioTeksti.isEmpty()) { return; }
-        Dialogs.showMessageDialog("Ei osata vielä lisätä osiota \"" + osioTeksti + "\"");
+        
+        Osio osio = new Osio(osioTeksti);
+        HBox osioHBox = naytaOsio(osio);
+        ainesosaJaOhjeetVBox.getChildren().add(osioHBox);
     }
     
     
@@ -122,8 +162,12 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         }
     }
     
-    private void poistaOsio() {
-        Dialogs.showMessageDialog("Ei osata vielä poistaa osiota");
+    private void poistaOsio(HBox osioHBox) {
+        if (osioHBox == null) { return; }
+        if (osioHBox.getParent() instanceof VBox) {
+            VBox ylempiVBox = (VBox)osioHBox.getParent();
+            ylempiVBox.getChildren().remove(osioHBox);
+        }
     }
     
     

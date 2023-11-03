@@ -219,6 +219,63 @@ public class TietueHallitsija {
     }
     
     
+    /**
+     * Poistaa olion annetusta indeksistä
+     * 
+     * @param indeksi mistä indeksistä poistetaan olio
+     * @return olioiden lukumäärä mahdollisen poiston jälkeen
+     * 
+     * @example
+     * <pre name="test">
+     * TietueHallitsija th = new TietueHallitsija();
+     * th.lisaa(new Object());
+     * th.lisaa(new Object());
+     * 
+     * th.toString() === "2|2|2.0|0";
+     * th.poista(5) === 2;
+     * th.poista(-1) === 2;
+     * th.poista(1) === 1;
+     * th.poista(1) === 1;
+     * th.poista(0) === 0;
+     * th.poista(0) === 0;
+     * th.toString() === "0|2|2.0|0";
+     * 
+     * th = new TietueHallitsija(1);
+     * th.toString() === "0|1|2.0|0";
+     * th.poista(0);
+     * th.toString() === "0|1|2.0|0";
+     * </pre>
+     */
+    public int poista(int indeksi) {
+        // poistutaan jos indeksi ei ole mieluisa
+        if (indeksi < 0 || this.lkm <= indeksi) { return this.lkm; }
+        
+        // siirretään indeksistä eteenpäin kaikkia taaksepäin
+        for (int i = indeksi + 1; i < this.lkm; i++ ) {
+            this.oliot[i - 1] = this.oliot[i];
+        }
+        
+        // vähennetään ennen kuin palautetaan
+        return --this.lkm;
+    }
+    
+    
+    /**
+     * Poistaa listasta ensimmäisen vastaan, annettua oliota vastaavan olion
+     * 
+     * @param olio poistettava olio
+     * @return olioiden lukumäärä mahdollisen poiston jälkeen
+     */
+    public int poista(Object olio) {
+        for (int i = 0; i < this.lkm; i++) {
+            if (oliot[i].equals(olio)) { 
+                return poista(i);
+            }
+        }
+        return this.lkm;
+    }
+    
+    
     @Override
     /**
      * Palauttaa TietueHallitsijan tiedot muodossa:
@@ -280,5 +337,14 @@ public class TietueHallitsija {
             tietueet.lisaa(new Object());
             System.out.println(tietueet.toString());
         }
+        
+        Object obj = new Object();
+        tietueet.lisaa(obj);
+        System.out.println(tietueet);
+        tietueet.poista(obj);
+        System.out.println(tietueet);
+        
+        tietueet.poista(5);
+        System.out.println(tietueet);
     }
 }

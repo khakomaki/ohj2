@@ -81,6 +81,50 @@ public class Osiot extends TietueHallitsija {
     
     
     /**
+     * @param osio lisättävä osio
+     * 
+     * @example
+     * <pre name="test">
+     * Osiot osiot = new Osiot();
+     * osiot.toString() === "0|1|resepti_osiot.dat";
+     * 
+     * Osio kastike = new Osio("Kastike");
+     * osiot.lisaa(kastike);
+     * osiot.toString() === "1|1|resepti_osiot.dat";
+     * </pre>
+     */
+    public void lisaaOsio(Osio osio) {
+        lisaa(osio);
+    }
+    
+    
+    /**
+     * Poistaa annetun osion
+     * 
+     * @param osio poistettava osio
+     * 
+     * @example
+     * <pre name="test">
+     * Osiot osiot = new Osiot();
+     * osiot.lisaaOsio("Pohja");
+     * Osio tayte = new Osio("Täyte");
+     * osiot.lisaaOsio(tayte);
+     * osiot.lisaaOsio("Kuorrute");
+     * osiot.toString() === "3|4|resepti_osiot.dat";
+     * 
+     * osiot.poistaOsio(tayte);
+     * osiot.toString() === "2|4|resepti_osiot.dat";
+     * 
+     * osiot.poistaOsio(tayte);
+     * osiot.toString() === "2|4|resepti_osiot.dat";
+     * </pre>
+     */
+    public void poistaOsio(Osio osio) {
+        poista(osio);
+    }
+    
+    
+    /**
      * @param indeksi mistä indeksistä halutaan Osio
      * @return indeksissä ollut Osio tai null
      */
