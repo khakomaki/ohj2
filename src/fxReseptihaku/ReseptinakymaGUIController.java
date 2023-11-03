@@ -53,7 +53,12 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     @Override
     public void setDefault(Resepti oletus) {
         this.valittuResepti = oletus;
-        
+        naytaReseptinOminaisuudet();
+        naytaReseptinAinesosat();
+        naytaReseptinOhjeet();        
+    }
+    
+    private void naytaReseptinOminaisuudet() {
         // asetetaan reseptin tiedot näkymään
         this.reseptinNimi.setText(this.valittuResepti.getNimi());
         this.reseptinKuvaus.setText(this.valittuResepti.getKuvaus());
@@ -61,10 +66,11 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         this.reseptinValmistusaika.setText(this.valittuResepti.getValmistusaikaString());
         this.reseptinTahdet.setText(this.valittuResepti.getTahdetString());
         this.reseptinVaativuus.setText(this.valittuResepti.getVaativuusString());
-        
-        // tyhjennetään ainesosat ja ohjeet
+    }
+    
+    private void naytaReseptinAinesosat() {
+        // tyhjennetään VBox sisältö
         this.ainesosatVBox.getChildren().clear();
-        this.ohjeetVBox.getChildren().clear();
         
         // lisää tekstiin osioiden nimet ja niiden ainesosat
         for (int i = 0; i < this.valittuResepti.getOsiot().getLkm(); i++) {
@@ -82,7 +88,11 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
             ainesosatTextArea.setEditable(false);
             ainesosatVBox.getChildren().add(ainesosatTextArea);
         }
-        
+    }
+    
+    private void naytaReseptinOhjeet() {
+        // tyhjennetään VBox sisältö
+        this.ohjeetVBox.getChildren().clear();
         
         // lisää tekstiin osioiden nimet ja niiden ohjeet
         for (int i = 0; i < this.valittuResepti.getOsiot().getLkm(); i++) {
@@ -100,7 +110,6 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
             ohjeetTextArea.setEditable(false);
             ohjeetVBox.getChildren().add(ohjeetTextArea);
         }
-        
     }
     
     private void sulje() {
@@ -112,7 +121,8 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     private void muokkaaResepti() {
-        ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, null);
+        ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, this.valittuResepti);
+        // TODO ota huomioon päivittää näkymä muokatun mukaiseksi, varaudu että resepti on poistettu
     }
     
     private void poistaResepti() {

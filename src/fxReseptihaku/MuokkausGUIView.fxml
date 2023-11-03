@@ -90,7 +90,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </padding>
                               </Label>
-                              <TextField text="Mustikkapiirakka" GridPane.columnIndex="1">
+                              <TextField text="Mustikkapiirakka" GridPane.columnIndex="1" fx:id="reseptinNimiTextField" >
                                  <tooltip>
                                     <Tooltip text="Lisää reseptin nimi" />
                                  </tooltip></TextField>
@@ -99,7 +99,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </padding>
                               </Label>
-                              <TextArea text="Halpa ja maukas." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <TextArea text="Halpa ja maukas." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" fx:id="kuvausTextArea">
                                  <tooltip>
                                     <Tooltip text="Lisää reseptin kuvaus" />
                                  </tooltip></TextArea>
@@ -125,7 +125,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </padding>
                               </Label>
-                              <ComboBoxChooser rivit="€€" GridPane.columnIndex="1">
+                              <ComboBoxChooser rivit="€€" GridPane.columnIndex="1" fx:id="hintaSuodatin">
                                  <tooltip>
                                     <Tooltip text="Valitse hintaluokka" />
                                  </tooltip></ComboBoxChooser>
@@ -139,7 +139,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </padding>
                               </Label>
-                              <ComboBoxChooser rivit="★★★" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                              <ComboBoxChooser rivit="★★★" GridPane.columnIndex="1" GridPane.rowIndex="2" fx:id="tahdetSuodatin">
                                  <tooltip>
                                     <Tooltip text="Valitse tähdet" />
                                  </tooltip></ComboBoxChooser>
@@ -148,11 +148,11 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </padding>
                               </Label>
-                              <ComboBoxChooser rivit="nopea" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <ComboBoxChooser rivit="nopea" GridPane.columnIndex="1" GridPane.rowIndex="1" fx:id="valmistusaikaSuodatin">
                                  <tooltip>
                                     <Tooltip text="Valitse valmistusaika arvio" />
                                  </tooltip></ComboBoxChooser>
-                              <ComboBoxChooser rivit="helppo" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                              <ComboBoxChooser rivit="helppo" GridPane.columnIndex="1" GridPane.rowIndex="3" fx:id="vaativuusSuodatin">
                                  <tooltip>
                                     <Tooltip text="Valitse vaativuustaso" />
                                  </tooltip></ComboBoxChooser>
@@ -165,7 +165,7 @@
                   </HBox>
                </top>
                <center>
-                  <VBox BorderPane.alignment="CENTER">
+                  <VBox BorderPane.alignment="CENTER" fx:id="ainesosaJaOhjeetVBox" >
                      <children>
                         <VBox>
                            <children>

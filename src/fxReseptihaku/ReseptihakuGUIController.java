@@ -157,8 +157,7 @@ public class ReseptihakuGUIController implements Initializable {
       
       
       private void lisaaResepti() {
-          Dialogs.showMessageDialog("Ei osata vielä luoda uutta reseptipohjaa");
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Lisää resepti", null, "");
+          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Lisää resepti", null, null);
       }
       
       
@@ -166,7 +165,7 @@ public class ReseptihakuGUIController implements Initializable {
           // haetaan mikä resepti on valittuna
           int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
           if (valittuResepti < 0) { return; }
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, "");
+          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, reseptit.annaIndeksista(valittuResepti));
       }
       
       
