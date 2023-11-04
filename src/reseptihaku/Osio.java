@@ -1,5 +1,7 @@
 package reseptihaku;
 
+import kanta.Hajautus;
+
 /**
  * @author hakom
  * @version 19 Oct 2023
@@ -221,6 +223,73 @@ public class Osio {
         lisaaOhje("Sekoita sokeri, kermaviili ja kananmuna");
         lisaaOhje("Lisää vanilliinisokeri");
         lisaaOhje("Kaada kermaviiliseos piirakkapohjan päälle");
+    }
+    
+    
+    @Override
+    /**
+     * Osio sampylat = new Osio("Sämpylät");
+     * Osio sampylaKopio = sampylat.clone();
+     * 
+     * sampylaKopio.toString().equals(sampylat.toString()) === true;
+     * 
+     * sampylat.setUusiNimi("Sämpylä");
+     * sampylaKopio.toString().equals(sampylat.toString()) === false;
+     */
+    public Osio clone() {
+        Osio kopio = new Osio();
+        kopio.nimi = this.nimi;
+        kopio.osioId = this.osioId;
+        
+        return kopio;
+    }
+    
+    
+    @Override
+    /**
+     * Osio pohja1 = new Osio(1, "Kakkupohja");
+     * Osio pohja2 = new Osio(1, "Kakkupohj");
+     * Osio pohja3 = new Osio(2, "Kakkupohja");
+     * 
+     * pohja1.equals(pohja2) === false;
+     * pohja1.equals(pohja3) === false;
+     * pohja2.equals(pohja3) === false;
+     * 
+     * pohja2.setUusiNimi("Kakkupohja");
+     * pohja1.equals(pohja2) === true;
+     * pohja2.equals(pohja3) === false;
+     * pohja2.equals(pohja1) === true;
+     */
+    public boolean equals(Object verrattava) {
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        Osio verrattavaOsio = (Osio)verrattava;
+        if (!verrattavaOsio.nimi.equals(this.nimi)) { return false; }
+        if (verrattavaOsio.osioId != this.osioId) { return false; }
+        
+        return true;
+    }
+    
+    
+    @Override
+    /**
+     * Osio pohja1 = new Osio(1, "Kakkupohja");
+     * Osio pohja2 = new Osio(1, "Kakkupohj");
+     * Osio pohja3 = new Osio(2, "Kakkupohja");
+     * 
+     * pohja1.hashCode() == pohja2.hashCode() === false;
+     * pohja1.hashCode() == pohja3.hashCode() === false;
+     * pohja2.hashCode() == pohja3.hashCode() === false;
+     * 
+     * pohja2.setUusiNimi("Kakkupohja");
+     * pohja1.hashCode() == pohja2.hashCode() === true;
+     * pohja1.hashCode() == pohja3.hashCode() === false;
+     */
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.osioId);
+        hash = Hajautus.hajautusString(hash, this.nimi);
+        
+        return hash;
     }
     
     

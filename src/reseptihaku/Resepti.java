@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import kanta.Hajautus;
 import kanta.Satunnaisluku;
 
 /**
@@ -15,8 +16,8 @@ public class Resepti {
     
     private final String oletusNimi = "Reseptin nimi";
     
-    private int reseptiId;
-    private String nimi;
+    private int reseptiId =                     -1;
+    private String nimi =                       "";
     private Osiot osiot =                       new Osiot();
     private String kuvaus =                     "";
     private int hinta =                         -1;
@@ -202,10 +203,9 @@ public class Resepti {
      * Vaihtaa reseptin hinnan.
      * Ei tee muutoksia jos hintaa ei löydy.
      * 
-     * Resepti mokkapalat = new Resepti(2, "Mokkapalat");
-     * 
      * @example
      * <pre name="test">
+     * Resepti mokkapalat = new Resepti(2, "Mokkapalat");
      * mokkapalat.setHinta(2);
      * mokkapalat.getHinta() === 2;
      * </pre>
@@ -424,6 +424,136 @@ public class Resepti {
     
     
     /**
+     * Palauttaa täydellisen kopion nykyisestä reseptistä
+     * 
+     * @return kopio nykyisestä reseptistä
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti pizza = new Resepti(20, "Pizza");
+     * pizza.setKuvaus("Itsetehdyllä tomaattikastikkeella.");
+     * pizza.setHinta(3);
+     * pizza.setVaativuus(4);
+     * pizza.toString() === "20|Pizza|3|-1|-1|4";
+     * 
+     * Resepti kopioPizza = pizza.clone();
+     * kopioPizza.toString() === "20|Pizza|3|-1|-1|4";
+     * 
+     * </pre>
+     */
+    @Override
+    public Resepti clone() {
+        Resepti kopio = new Resepti();
+        kopio.reseptiId = this.reseptiId;
+        kopio.nimi = this.nimi;
+        kopio.hinta = this.hinta;
+        kopio.valmistusaika = this.valmistusaika;
+        kopio.tahdet = this.tahdet;
+        kopio.kuvaus = this.kuvaus;
+        kopio.vaativuus = this.vaativuus;
+        
+        return kopio;
+    }
+    
+    
+    /**
+     * Palauttaa ovatko oliot samoja
+     * 
+     * @param verrattava mihin olioon verrataan
+     * @return onko verrattava olio sama kuin tämä olio
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti pizza1 = new Resepti(12, "Pizza");
+     * pizza1.setKuvaus("Pizzaa.");
+     * pizza1.setHinta(1);
+     * pizza1.setTahdet(2);
+     * 
+     * Resepti pizza2 = new Resepti(12, "Pizza2");
+     * pizza1.equals(pizza2) === false;
+     * 
+     * pizza2.setKuvaus("Pizzaa.");
+     * pizza2.setHinta(1);
+     * pizza2.setTahdet(2);
+     * pizza1.equals(pizza2) === false;
+     * pizza2.equals(pizza1) === false;
+     * 
+     * pizza2.setUusiNimi("Pizza");
+     * pizza1.equals(pizza2) === true;
+     * pizza2.equals(pizza1) === true;
+     * 
+     * pizza1.setVaativuus(2);
+     * pizza1.equals(pizza2) === false;
+     * pizza2.equals(pizza1) === false;
+     * 
+     * Resepti resepti1 = new Resepti();
+     * resepti1.equals(new Resepti()) === true;
+     * </pre>
+     */
+    @Override
+    public boolean equals(Object verrattava) {
+        // testataan onko samaa luokkaa, jonka jälkeen poistutaan (voidaan tehdä jäljellejääneille typecast)
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        Resepti verrattavaResepti = (Resepti)verrattava;
+        
+        if (!this.nimi.equals(verrattavaResepti.getNimi())) { return false; }
+        if (this.hinta != verrattavaResepti.hinta) { return false; }
+        if (this.valmistusaika != verrattavaResepti.valmistusaika) { return false; }
+        if (this.tahdet != verrattavaResepti.tahdet) { return false; }
+        if (this.vaativuus != verrattavaResepti.vaativuus) { return false; }
+        if (!this.kuvaus.equals(verrattavaResepti.getKuvaus())) { return false; }
+        
+        return true;
+    }
+    
+    
+    @Override
+    /**
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti mustikkapiirakka = new Resepti(2, "Mustikkapiirakka");
+     * Resepti piirakka = new Resepti(2, "Piirakka");
+     * mustikkapiirakka.hashCode() == piirakka.hashCode() === false;
+     * 
+     * piirakka.setUusiNimi("Mustikkapiirakka");
+     * mustikkapiirakka.hashCode() == piirakka.hashCode() === true;
+     * 
+     * mustikkapiirakka.setHinta(2);
+     * mustikkapiirakka.hashCode() == piirakka.hashCode() === false;
+     * 
+     * piirakka.setHinta(2);
+     * mustikkapiirakka.hashCode() == piirakka.hashCode() === true;
+     * 
+     * mustikkapiirakka.setValmistusaika(2);
+     * mustikkapiirakka.setTahdet(3);
+     * mustikkapiirakka.setVaativuus(1);
+     * mustikkapiirakka.hashCode() == piirakka.hashCode() === false;
+     * 
+     * piirakka.setValmistusaika(2);
+     * piirakka.setTahdet(3);
+     * piirakka.setVaativuus(1);
+     * mustikkapiirakka.hashCode() == piirakka.hashCode() === true;
+     * 
+     * piirakka.setValmistusaika(1);
+     * piirakka.setVaativuus(2);
+     * mustikkapiirakka.hashCode() == piirakka.hashCode() === false;
+     * </pre>
+     */
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusString(hash, this.nimi);
+        hash = Hajautus.hajautusString(hash, this.kuvaus);
+        hash = Hajautus.hajautusInt(hash, this.reseptiId);
+        hash = Hajautus.hajautusInt(hash, this.hinta);
+        hash = Hajautus.hajautusInt(hash, this.valmistusaika);
+        hash = Hajautus.hajautusInt(hash, this.tahdet);;
+        hash = Hajautus.hajautusInt(hash, this.vaativuus);
+        return hash;
+    }
+    
+    
+    /**
      * Testaamista varten luo mustikkapiirakan reseptin.
      * 
      * TODO: poista kun ei enää tarvita
@@ -487,8 +617,8 @@ public class Resepti {
         sb.append(this.vaativuus);
         return sb.toString();
     }
-    
-    
+
+
     /**
      * @return kaikki mahdolliset hintavaihtoehdot
      */

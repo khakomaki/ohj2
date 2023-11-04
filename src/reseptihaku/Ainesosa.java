@@ -1,5 +1,7 @@
 package reseptihaku;
 
+import kanta.Hajautus;
+
 /**
  * @author hakom
  * @version 15 Oct 2023
@@ -116,6 +118,97 @@ public class Ainesosa {
      */
     public void setId(int id) {
         this.ainesosa_id = id;
+    }
+    
+    
+    @Override
+    /**
+     * Palauttaa kopion nykyisestä ainesosasta
+     * 
+     * 
+     * @example
+     * <pre name="test">
+     * Ainesosa sokeri = new Ainesosa(15, "Sokeri");
+     * sokeri.toString() === "15|sokeri";
+     * 
+     * Ainesosa sokeriKopio = sokeri.clone();
+     * sokeriKopio.toString().equals(sokeri.toString()) === true;
+     * 
+     * sokeri.setId(20);
+     * sokeriKopio.toString().equals(sokeri.toString()) === false;
+     * 
+     * sokeriKopio.setId(20);
+     * sokeriKopio.toString().equals(sokeri.toString()) === true;
+     * </pre>
+     */
+    public Ainesosa clone() {
+        Ainesosa kopio = new Ainesosa("");
+        kopio.ainesosa_id = this.ainesosa_id;
+        kopio.ainesosaNimi = this.ainesosaNimi;
+        return kopio;
+    }
+    
+    
+    @Override
+    /**
+     * @param verrattava mihin olioon verrataan nykyistä
+     * @return ovatko verratava ja tämä Ainesosa samoja
+     * 
+     * @example
+     * <pre name="test">
+     * Ainesosa paaryna = new Ainesosa(15, "Päärynä");
+     * paaryna.equals(new Ainesosa("Päärynä")) === false;
+     * paaryna.equals(new Ainesosa(14, "Päärynä")) === false;
+     * paaryna.equals(new Ainesosa(15, "Päärynä")) === true;
+     * paaryna.equals(new Ainesosa(15, "Pääryna")) === false;
+     * 
+     * paaryna.setId(2);
+     * paaryna.equals(new Ainesosa(15, "Päärynä")) === false;
+     * </pre>
+     */
+    public boolean equals(Object verrattava) {
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        
+        Ainesosa verrattavaAinesosa = (Ainesosa)verrattava;
+        if (!verrattavaAinesosa.ainesosaNimi.equals(this.ainesosaNimi)) { return false; }
+        if (verrattavaAinesosa.ainesosa_id != this.ainesosa_id) { return false; }
+        
+        return true;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Ainesosa ainesosa1 = new Ainesosa("Banaani");
+     * Ainesosa ainesosa2 = new Ainesosa("Banaani");
+     * Ainesosa ainesosa3 = new Ainesosa("Mango");
+     * ainesosa1.hashCode() == ainesosa2.hashCode() === true;
+     * ainesosa1.hashCode() == ainesosa3.hashCode() === false;
+     * 
+     * ainesosa1 = new Ainesosa(0, "banaani");
+     * ainesosa2 = new Ainesosa(0, "BANAANI");
+     * ainesosa1.hashCode() == ainesosa2.hashCode() === true;
+     * 
+     * ainesosa1 = new Ainesosa(0, "banaani");
+     * ainesosa2 = new Ainesosa(1, "BANAANI");
+     * ainesosa1.hashCode() == ainesosa2.hashCode() === false;
+     * 
+     * ainesosa1 = new Ainesosa(0, "banaani");
+     * ainesosa2 = new Ainesosa(0, "bänaani");
+     * ainesosa1.hashCode() == ainesosa2.hashCode() === false;
+     * 
+     * ainesosa1 = new Ainesosa(0, null);
+     * ainesosa2 = new Ainesosa(0, "");
+     * ainesosa1.hashCode() == ainesosa2.hashCode() === true;
+     * </pre>
+     */
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.ainesosa_id);
+        hash = Hajautus.hajautusString(hash, this.ainesosaNimi);
+        return hash;
     }
     
     

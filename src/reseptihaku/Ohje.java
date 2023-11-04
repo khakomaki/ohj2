@@ -1,5 +1,7 @@
 package reseptihaku;
 
+import kanta.Hajautus;
+
 /**
  * @author hakom
  * @version 30 Oct 2023
@@ -76,6 +78,29 @@ public class Ohje {
      */
     public String getOhjeistus() {
         return this.ohjeistus;
+    }
+    
+    
+    @Override
+    public Ohje clone() {
+        Ohje kopio = new Ohje();
+        kopio.ohjeistus = this.ohjeistus;
+        return kopio;
+    }
+    
+    
+    @Override
+    public boolean equals(Object verrattava) {
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        
+        Ohje verrattavaOhje = (Ohje)verrattava;
+        return verrattavaOhje.ohjeistus.equals(this.ohjeistus);
+    }
+    
+
+    @Override
+    public int hashCode() {
+        return Hajautus.hajautusString(1, ohjeistus);
     }
     
     
