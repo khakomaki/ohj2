@@ -144,6 +144,17 @@ public class Osio {
     
     
     /**
+     * @param ainesosaId minkä aineosan nimi halutaan
+     * @return ainesosan nimi
+     */
+    public String getAinesosanNimi(int ainesosaId) {
+        Ainesosa ainesosa = this.ainesosat.anna(ainesosaId);
+        if (ainesosa == null) { return ""; }
+        return ainesosa.getNimi();
+    }
+    
+    
+    /**
      * @return osion ainesosat -olio
      */
     public OsionAinesosat annaOsionAinesosat() {

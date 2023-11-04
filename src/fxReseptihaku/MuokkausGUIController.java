@@ -6,12 +6,16 @@ import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import reseptihaku.Osio;
+import reseptihaku.OsionAinesosa;
+import reseptihaku.OsionAinesosat;
 import reseptihaku.Osiot;
 import reseptihaku.Resepti;
 
@@ -36,8 +40,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     @FXML private void handleLisaaOsio() { lisaaOsio(); }
     @FXML private void handlePoistaResepti() { poistaResepti();}
     @FXML private void handlePoistaOsio() { poistaOsio(null); }
-    @FXML private void handlePoistaAinesosa() { poistaAinesosa(); }
-    @FXML private void handleLisaaAinesosa() { lisaaAinesosa(); }
+    @FXML private void handlePoistaAinesosa() { poistaAinesosa(null, 0); }
+    @FXML private void handleLisaaAinesosa() { lisaaAinesosa(null); }
     @FXML private void handlePoistaOhje() { poistaOhje(); }
     @FXML private void handleLisaaOhje() { lisaaOhje();}
     
@@ -95,29 +99,74 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         Osiot osiot = this.valittuResepti.getOsiot();
         for (int i = 0; i < osiot.getLkm(); i++) {
             // luo osion HBoxin ja lisää sen käyttöliittymään
-            HBox osioHBox = naytaOsio(osiot.annaIndeksista(i));
-            ainesosaJaOhjeetVBox.getChildren().add(osioHBox);
+            VBox osioVBox = naytaOsio(osiot.annaIndeksista(i));
+            ainesosaJaOhjeetVBox.getChildren().add(osioVBox);
         }
     }
     
     
-    private HBox naytaOsio(Osio osio) {
-        HBox osioHBox = new HBox();
-        Font kirjasin = new Font("System Bold", 16);
+    private VBox naytaOsio(Osio osio) {
+        // luodaan käytettävät fontit
+        Font kirjasinB16 = new Font("System Bold", 16);
+        Font kirjasin14 = new Font(14);
+        
+        VBox osioVBox = new VBox(); // koko osio
+        
+        HBox osioOstikkoHBox = new HBox();
         
         // luo osion nimen tekstikentän
         TextField osioNimi = new TextField(osio.getNimi());
-        osioNimi.setFont(kirjasin);
+        osioNimi.setFont(kirjasinB16);
         
         // luo osion poisto-painikkeen
         Button osioPoisto = new Button("x");
-        osioPoisto.setOnAction(e -> poistaOsio(osioHBox));
-        osioPoisto.setFont(kirjasin);
+        osioPoisto.setOnAction(e -> poistaOsio(osioVBox)); // poistaa VBox-elementin
+        osioPoisto.setFont(kirjasinB16);
         
-        osioHBox.getChildren().add(osioNimi);
-        osioHBox.getChildren().add(osioPoisto);
+        // lisätään teksti ja painike HBox-elementtiin
+        osioOstikkoHBox.getChildren().add(osioNimi);
+        osioOstikkoHBox.getChildren().add(osioPoisto);
         
-        return osioHBox;
+        HBox osionSisaltoHBox = new HBox();
+        VBox ainesosatVBox = new VBox();
+        //VBox ohjeetVBox = new VBox();
+        
+        Label ainesosatLabel = new Label("Ainesosat");
+        ainesosatLabel.setFont(kirjasin14);
+        
+        GridPane ainesosatGridPane = new GridPane();
+        ainesosatGridPane.add(new Label("määrä"), 0, 0);
+        ainesosatGridPane.add(new Label("ainesosa"), 1, 0);
+        
+        OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
+        for (int i = 0; i < osionAinesosat.getLkm(); i++) {
+            int ainesosanRivi = i + 1;
+            
+            // luo ja lisää TextField-elementit GridPaneen
+            OsionAinesosa oa = osionAinesosat.annaIndeksista(i);
+            ainesosatGridPane.add(new TextField(oa.getMaara()), 0, ainesosanRivi);
+            ainesosatGridPane.add(new TextField(osio.getAinesosanNimi(oa.getId())), 1, ainesosanRivi);
+            
+            Button ainesosaPoisto = new Button("x");
+            ainesosaPoisto.setOnAction(e -> poistaAinesosa(ainesosatGridPane, ainesosanRivi));
+            ainesosatGridPane.add(ainesosaPoisto, 2, ainesosanRivi);
+        }
+        
+        ainesosatGridPane.add(new Label(), 0, ainesosatGridPane.getRowCount() + 1);
+        lisaaAinesosa(ainesosatGridPane);
+        
+        // lisätään GridPane ainesosien VBox-elementtiin
+        ainesosatVBox.getChildren().add(ainesosatGridPane);
+        
+        // lisätään ainesosatVBox osion sisältöön
+        osionSisaltoHBox.getChildren().add(ainesosatVBox);
+        
+        
+        // lisätään HBox-elementit VBox elementtiin
+        osioVBox.getChildren().add(osioOstikkoHBox);
+        osioVBox.getChildren().add(osionSisaltoHBox);
+        
+        return osioVBox;
     }
     
     
@@ -148,9 +197,13 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         String osioTeksti = osioTekstiKentta.getText();
         if (osioTeksti.isEmpty()) { return; }
         
+        // Luodaan uusi osio ja näytetään se käyttöliittymään
         Osio osio = new Osio(osioTeksti);
-        HBox osioHBox = naytaOsio(osio);
+        VBox osioHBox = naytaOsio(osio);
         ainesosaJaOhjeetVBox.getChildren().add(osioHBox);
+        
+        // tyhjennetään tekstikenttä
+        osioTekstiKentta.clear();
     }
     
     
@@ -162,22 +215,46 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         }
     }
     
-    private void poistaOsio(HBox osioHBox) {
-        if (osioHBox == null) { return; }
-        if (osioHBox.getParent() instanceof VBox) {
-            VBox ylempiVBox = (VBox)osioHBox.getParent();
-            ylempiVBox.getChildren().remove(osioHBox);
+    private void poistaOsio(VBox osioVBox) {
+        if (osioVBox == null) { return; }
+        if (osioVBox.getParent() instanceof VBox) {
+            VBox ylempiVBox = (VBox)osioVBox.getParent();
+            ylempiVBox.getChildren().remove(osioVBox);
         }
     }
     
     
-    private void poistaAinesosa() {
-        Dialogs.showMessageDialog("Ei osata vielä poistaa ainesosaa");
+    private void poistaAinesosa(GridPane paneeli, int rivi) {
+        // ei yritetä poistaa null paneelista
+        if (paneeli == null) { return; }
+        
+        // poistaa kaikki nodet kyseiseltä riviltä
+        paneeli.getChildren().removeIf(node -> GridPane.getRowIndex(node) == rivi);
     }
     
     
-    private void lisaaAinesosa() {
-        Dialogs.showMessageDialog("Ei osata vielä lisätä ainesosaa");
+    private void lisaaAinesosa(GridPane paneeli) {
+        if (paneeli == null) { return; }
+        
+        final int riviLkm = paneeli.getRowCount();
+        
+        // poistetaan kaikki viimeisteltä riviltä (lisäys painike)
+        poistaAinesosa(paneeli, riviLkm - 1);
+        
+        // lisätään syöttökentät
+        paneeli.add(new TextField(), 0, riviLkm);
+        paneeli.add(new TextField(), 1, riviLkm);
+        
+        // lisätään rivin poisto painike
+        Button ainesosaPoisto = new Button("x");
+        ainesosaPoisto.setOnAction(e -> poistaAinesosa(paneeli, riviLkm));
+        paneeli.add(ainesosaPoisto, 2, riviLkm);
+        
+        // lisätään rivien lisäys painike seuraavalle riville
+        Button ainesosaLisays = new Button("+");
+        ainesosaLisays.setOnAction(e -> lisaaAinesosa(paneeli));
+        paneeli.add(ainesosaLisays, 2, riviLkm + 1);
+        
     }
     
     
