@@ -4,17 +4,17 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import kanta.TietueHallitsija;
-
 /**
  * @author hakom
  * @version 19 Oct 2023
  *
  */
-public class Reseptit extends TietueHallitsija {
+public class Reseptit {
 
+    private ArrayList<Resepti> reseptit = new ArrayList<Resepti>();
     private String tiedostoNimi;
     private int juoksevaId;
+    private int lkm;
     
     /**
      * Reseptit.
@@ -25,11 +25,10 @@ public class Reseptit extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Reseptit reseptit = new Reseptit();
-     * reseptit.toString() === "0|1|reseptit.dat";
+     * reseptit.toString() === "0|reseptit.dat";
      * </pre>
      */
     public Reseptit() {
-        super();
         this.tiedostoNimi = "reseptit.dat";
     }
     
@@ -43,16 +42,16 @@ public class Reseptit extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Reseptit reseptit = new Reseptit();
-     * reseptit.toString() === "0|1|reseptit.dat";
+     * reseptit.toString() === "0|reseptit.dat";
      * 
      * reseptit.setTiedostoNimi("");
-     * reseptit.toString() === "0|1|reseptit.dat";
+     * reseptit.toString() === "0|reseptit.dat";
      * 
      * reseptit.setTiedostoNimi("salaiset_reseptit.txt");
-     * reseptit.toString() === "0|1|salaiset_reseptit.txt";
+     * reseptit.toString() === "0|salaiset_reseptit.txt";
      * 
      * reseptit.setTiedostoNimi(null);
-     * reseptit.toString() === "0|1|salaiset_reseptit.txt";
+     * reseptit.toString() === "0|salaiset_reseptit.txt";
      * </pre>
      */
     public void setTiedostoNimi(String tiedostonimi) {
@@ -69,9 +68,35 @@ public class Reseptit extends TietueHallitsija {
      */
     public Resepti lisaaResepti(String nimi) {
         Resepti resepti = new Resepti(this.juoksevaId, nimi);
-        lisaa(resepti);
+        reseptit.add(resepti);
         this.juoksevaId++;
+        this.lkm++;
         return resepti;
+    }
+    
+    
+    /**
+     * @param resepti lisättävä resepti
+     * 
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * reseptit.toString() === "0|reseptit.dat";
+     * 
+     * reseptit.lisaa(new Resepti());
+     * reseptit.toString() === "1|reseptit.dat";
+     * 
+     * reseptit.lisaa(new Resepti());
+     * reseptit.lisaa(new Resepti());
+     * reseptit.lisaa(new Resepti());
+     * reseptit.toString() === "4|reseptit.dat";
+     * </pre>
+     */
+    public void lisaa(Resepti resepti) {
+        if (resepti == null) { return; }
+        reseptit.add(resepti);
+        this.juoksevaId++;
+        this.lkm++;
     }
     
     
@@ -81,7 +106,7 @@ public class Reseptit extends TietueHallitsija {
      */
     public Resepti annaIndeksista(int indeksi) {
         // varmistetaan että olio on tyyppiä Ainesosa
-        Object olio = getOlio(indeksi);
+        Object olio = reseptit.get(indeksi);
         if (olio.getClass() != Resepti.class) { return null; }
         return (Resepti)olio;
     }
@@ -98,7 +123,7 @@ public class Reseptit extends TietueHallitsija {
         if (maara < 0) { return; }
         
         // tulostaa lukumäärän verran jos annettu määrä olisi enemmän
-        if (getLkm() < maara) { tulostettavaMaara = getLkm(); }
+        if (this.lkm < maara) { tulostettavaMaara = this.lkm; }
         
         PrintStream out = new PrintStream(os);
         for (int i = 0; i < tulostettavaMaara; i++) {
@@ -112,7 +137,7 @@ public class Reseptit extends TietueHallitsija {
      * @param os tietovirta johon halutaan tulostaa
      */
     public void tulostaReseptit(OutputStream os) {
-        tulostaReseptit(os, getLkm());
+        tulostaReseptit(os, this.lkm);
     }
     
     
@@ -129,12 +154,10 @@ public class Reseptit extends TietueHallitsija {
         String kaytettavaHakusana = hakusana.strip();
         if (kaytettavaHakusana.isBlank()) {
             // tyhjällä hakusanalla lisätään kaikki reseptit
-            for (int i = 0; i < getLkm(); i++) {
-                loydetytReseptit.add(annaIndeksista(i));
-            }
+            loydetytReseptit = this.reseptit;
         } else {
             // lisää kaikki hakusanaan täsmäävät reseptit
-            for (int i = 0; i < getLkm(); i++) {
+            for (int i = 0; i < this.lkm; i++) {
                 Resepti resepti = annaIndeksista(i);
                 if (resepti.onkoNimessa(kaytettavaHakusana)) { loydetytReseptit.add(resepti); } 
             }
@@ -152,33 +175,33 @@ public class Reseptit extends TietueHallitsija {
     public Resepti lisaaMustikkapiirakka() {
         Resepti mustikkapiirakka = new Resepti(1, "");
         mustikkapiirakka.luoMustikkapiirakka(this.juoksevaId);
-        this.lisaa(mustikkapiirakka);
-        this.juoksevaId++;
+        lisaa(mustikkapiirakka);
         return mustikkapiirakka;
     }
     
     
     @Override
     /**
-     * Tiedot muodossa "lukumäärä|maksimi lukumäärä|tiedostonimi"
+     * Tiedot muodossa "lukumäärä|tiedostonimi"
      * 
      * @example
      * <pre name="test">
      * Reseptit reseptit = new Reseptit();
-     * reseptit.toString() === "0|1|reseptit.dat";
+     * reseptit.toString() === "0|reseptit.dat";
      * </pre>
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getLkm());
-        sb.append('|');
-        sb.append(getMaxLkm());
+        sb.append(this.lkm);
         sb.append('|');
         sb.append(this.tiedostoNimi);
         return sb.toString();
     }
     
     
+    /**
+     * @param args ei käytössä
+     */
     public static void main(String[] args) {
         Reseptit reseptit = new Reseptit();
         System.out.println(reseptit);
