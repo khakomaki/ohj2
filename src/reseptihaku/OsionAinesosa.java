@@ -91,6 +91,8 @@ public class OsionAinesosa {
     
     @Override
     /**
+     * @example
+     * <pre name="test">
      * OsionAinesosa juusto1 = new OsionAinesosa(200, "2kg");
      * OsionAinesosa juusto2 = new OsionAinesosa(201, "2kg");
      * OsionAinesosa juusto3 = new OsionAinesosa(200, "3kg");
@@ -101,9 +103,11 @@ public class OsionAinesosa {
      * 
      * juusto3.setMaara("2kg");
      * juusto1.hashCode() == juusto3.hashCode() === true;
+     * </pre>
      */
     public int hashCode() {
         int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.ainesosa_id);
         hash = Hajautus.hajautusString(hash, this.maara);
         return hash;
     }
@@ -111,6 +115,8 @@ public class OsionAinesosa {
     
     @Override
     /**
+     * @example
+     * <pre name="test">
      * OsionAinesosa juusto1 = new OsionAinesosa(200, "2kg");
      * OsionAinesosa juusto2 = new OsionAinesosa(201, "2kg");
      * OsionAinesosa juusto3 = new OsionAinesosa(200, "3kg");
@@ -123,6 +129,7 @@ public class OsionAinesosa {
      * juusto1.equals(juusto3) === true;
      * juusto2.equals(juusto3) === false;
      * juusto3.equals(juusto1) === true;
+     * </pre>
      */
     public boolean equals(Object verrattava) {
         if (verrattava.getClass() != this.getClass()) { return false; }

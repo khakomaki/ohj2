@@ -3,6 +3,7 @@ package reseptihaku;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import kanta.Hajautus;
 import kanta.TietueHallitsija;
 
 /**
@@ -77,6 +78,14 @@ public class OsionAinesosat extends TietueHallitsija {
     
     
     /**
+     * @param ainesosa lisättävä ainesosa
+     */
+    public void lisaaOsionAinesosa(Ainesosa ainesosa) {
+        lisaaOsionAinesosa(ainesosa, "");
+    }
+    
+    
+    /**
      * @param indeksi mistä indeksistä halutaan osion ainesosa
      * @return osion ainesosa halutusta indeksistä tai null
      */
@@ -106,6 +115,86 @@ public class OsionAinesosat extends TietueHallitsija {
             out.print(osionAinesosa.getMaara());
             out.print("\n");
         }
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Ainesosat ainesosat1 = new Ainesosat();
+     * Ainesosat ainesosat2 = new Ainesosat();
+     * OsionAinesosat oa1 = new OsionAinesosat(1, ainesosat1);
+     * OsionAinesosat oa2 = new OsionAinesosat(1, ainesosat2);
+     * oa1.equals(oa2) === true;
+     * 
+     * oa1.setTiedostoNimi("oa.txt");
+     * oa1.equals(oa2) === false;
+     * 
+     * oa2.setTiedostoNimi("oa.txt");
+     * oa1.equals(oa2) === true;
+     * 
+     * oa1.lisaaOsionAinesosa(new Ainesosa("mustikka"));
+     * oa1.equals(oa2) === false;
+     * 
+     * oa2.lisaaOsionAinesosa(new Ainesosa("mustikka"));
+     * oa1.equals(oa2) === true;
+     * </pre>
+     */
+    public boolean equals(Object verrattava) {
+        if (verrattava == null) { return false; }
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        
+        OsionAinesosat verrattavaOA = (OsionAinesosat)verrattava;
+        if (verrattavaOA.osioId != this.osioId) { return false; }
+        if (!verrattavaOA.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
+        if (verrattavaOA.getLkm() != this.getLkm()) { return false; }
+        
+        // verrataan alkioita keskenään
+        for (int i = 0; i < this.getLkm(); i++) {
+            if (!verrattavaOA.annaIndeksista(i).equals(this.annaIndeksista(i))) { return false; }
+        }
+        if (!verrattavaOA.ainesosat.equals(this.ainesosat)) { return false; }
+        
+        return true;
+    }
+    
+    
+    @Override
+    /**
+     * @return hajautusluku
+     * 
+     * @example
+     * <pre name="test">
+     * Ainesosat ainesosat1 = new Ainesosat();
+     * Ainesosat ainesosat2 = new Ainesosat();
+     * OsionAinesosat oa1 = new OsionAinesosat(1, ainesosat1);
+     * OsionAinesosat oa2 = new OsionAinesosat(1, ainesosat2);
+     * oa1.hashCode() == oa2.hashCode() === true;
+     * 
+     * oa1.setTiedostoNimi("oa.txt");
+     * oa1.hashCode() == oa2.hashCode() === false;
+     * 
+     * oa2.setTiedostoNimi("oa.txt");
+     * oa1.hashCode() == oa2.hashCode() === true;
+     * 
+     * oa1.lisaaOsionAinesosa(new Ainesosa("mustikka"));
+     * oa1.hashCode() == oa2.hashCode() === false;
+     * 
+     * oa2.lisaaOsionAinesosa(new Ainesosa("mustikka"));
+     * oa1.hashCode() == oa2.hashCode() === true;
+     * </pre>
+     */
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.osioId);
+        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        
+        for (int i = 0; i < this.getLkm(); i++) {
+            hash = Hajautus.hajautusInt(hash, this.annaIndeksista(i).hashCode());
+        }
+        
+        return hash;
     }
     
     
