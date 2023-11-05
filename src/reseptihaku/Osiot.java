@@ -19,9 +19,6 @@ public class Osiot extends TietueHallitsija {
         super();
         this.tiedostoNimi = "resepti_osiot.dat";
         this.juoksevaId = 0;
-        // kasvatetaan osioiden tilaa yksi kerrallaan 2x sijasta
-        setKerroin(1);
-        setVakio(1);
     }
     
     
@@ -62,14 +59,14 @@ public class Osiot extends TietueHallitsija {
      * tomaattikastike.toString() === "1|Tomaattikastike";
      * 
      * Osio taytteet = osiot.lisaaOsio("Täytteet");
-     * osiot.toString() === "3|3|resepti_osiot.dat";
+     * osiot.toString() === "3|4|resepti_osiot.dat";
      * taytteet.toString() === "2|Täytteet";
      * 
      * osiot.lisaaOsio("Täytteet (vaihtoehto 2)");
      * osiot.toString() === "4|4|resepti_osiot.dat";
      * 
      * osiot.lisaaOsio("Täytteet (vaihtoehto 3)");
-     * osiot.toString() === "5|5|resepti_osiot.dat";
+     * osiot.toString() === "5|8|resepti_osiot.dat";
      * </pre>
      */
     public Osio lisaaOsio(String nimi) {

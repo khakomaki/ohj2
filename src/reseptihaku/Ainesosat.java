@@ -3,6 +3,7 @@ package reseptihaku;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import kanta.Hajautus;
 import kanta.TietueHallitsija;
 
 /**
@@ -224,6 +225,121 @@ public class Ainesosat extends TietueHallitsija {
         sb.append('|');
         sb.append(getMaxLkm());
         return sb.toString();
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Ainesosat ainesosat = new Ainesosat();
+     * ainesosat.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat.lisaaAinesosa(new Ainesosa("peruna"));
+     * ainesosat.lisaaAinesosa(new Ainesosa("sipuli"));
+     * 
+     * Ainesosat kopioAinesosat = ainesosat.clone();
+     * ainesosat.toString().equals(kopioAinesosat.toString()) === true;
+     * 
+     * kopioAinesosat.annaIndeksista(0).equals(new Ainesosa("porkkana")) === true;
+     * kopioAinesosat.annaIndeksista(1).equals(new Ainesosa("peruna")) === true;
+     * kopioAinesosat.annaIndeksista(2).equals(new Ainesosa("sipuli")) === true;
+     * 
+     * ainesosat.setTiedostoNimi("vihannekset.txt");
+     * kopioAinesosat.lisaa(new Ainesosa("valkosipuli"));
+     * ainesosat.toString() === "vihannekset.txt|3|4";
+     * kopioAinesosat.toString() === "ainesosat.dat|4|4";
+     * 
+     * ainesosat = new Ainesosat();
+     * kopioAinesosat = ainesosat.clone();
+     * ainesosat.toString().equals(kopioAinesosat.toString()) === true;
+     * </pre>
+     */
+    public Ainesosat clone() {
+        Ainesosat kopio = new Ainesosat();
+        
+        for (int i = 0; i < this.getLkm(); i++) {
+            Ainesosa kopioAinesosa = annaIndeksista(i).clone();
+            kopio.lisaa(kopioAinesosa);
+        }
+        kopio.annettavaTunnusLuku = this.annettavaTunnusLuku;
+        kopio.tiedostoNimi = this.tiedostoNimi;
+        
+        return kopio;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Ainesosat ainesosat1 = new Ainesosat();
+     * Ainesosat ainesosat2 = new Ainesosat();
+     * ainesosat1.equals(ainesosat2) === true;
+     * 
+     * ainesosat1.equals(null) === false;
+     * ainesosat1.equals(new Object()) === false;
+     * 
+     * ainesosat1.setTiedostoNimi("ainesosat.txt");
+     * ainesosat1.equals(ainesosat2) === false;
+     * 
+     * ainesosat2.setTiedostoNimi("ainesosat.txt");
+     * ainesosat1.equals(ainesosat2) === true;
+     * 
+     * ainesosat1.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat1.equals(ainesosat2) === false;
+     * 
+     * ainesosat2.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat1.equals(ainesosat2) === true;
+     * </pre>
+     */
+    public boolean equals(Object verrattava) {
+        if (verrattava == null) { return false; }
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        
+        Ainesosat verrattavaAinesosat = (Ainesosat)verrattava;
+        
+        if (verrattavaAinesosat.annettavaTunnusLuku != this.annettavaTunnusLuku) { return false; }
+        if (verrattavaAinesosat.tiedostoNimi != this.tiedostoNimi) { return false; }
+        if (verrattavaAinesosat.getLkm() != this.getLkm()) { return false; }
+        
+        // verrataan kaikki alkiot
+        for (int i = 0; i < this.getLkm(); i++) {
+            if (!verrattavaAinesosat.annaIndeksista(i).equals(this.annaIndeksista(i))) { return false; }
+        }
+        
+        return true;
+    }
+    
+    
+
+    @Override
+    /**
+     * Ainesosat ainesosat1 = new Ainesosat();
+     * Ainesosat ainesosat2 = new Ainesosat();
+     * ainesosat1.hashCode() == ainesosat2.hashCode() === true;
+     * 
+     * ainesosat1.setTiedostoNimi("ainesosat.txt");
+     * ainesosat1.hashCode() == ainesosat2.hashCode() === false;
+     * 
+     * ainesosat2.setTiedostoNimi("ainesosat.txt");
+     * ainesosat1.hashCode() == ainesosat2.hashCode() === true;
+     * 
+     * ainesosat1.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat1.hashCode() == ainesosat2.hashCode() === false;
+     * 
+     * ainesosat2.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat1.hashCode() == ainesosat2.hashCode() === true;
+     */
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.annettavaTunnusLuku);
+        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        
+        for (int i = 0; i < this.getLkm(); i++) {
+            hash = Hajautus.hajautusInt(hash, this.annaIndeksista(i).hashCode());
+        }
+        
+        return hash;
     }
     
     

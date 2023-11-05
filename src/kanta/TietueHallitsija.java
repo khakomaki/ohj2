@@ -10,8 +10,8 @@ public class TietueHallitsija {
     private Object[] oliot = new Object[1];
     private int maxLkm =        1;
     private int lkm =           0;
-    private int vakio =         0;
-    private double kerroin =    2;
+    private final int VAKIO =         0;
+    private final double KERROIN =    2;
     
     
     /**
@@ -71,22 +71,6 @@ public class TietueHallitsija {
     
     
     /**
-     * @param kerroin kerroin tietueen koon kasvattamiseksi
-     */
-    public void setKerroin(double kerroin) {
-        this.kerroin = kerroin;
-    }
-    
-    
-    /**
-     * @param vakio vakio tietueen koon kasvattamiseksi
-     */
-    public void setVakio(int vakio) {
-        this.vakio = vakio;
-    }
-    
-    
-    /**
      * @param indeksi mistä indeksistä halutaan olio
      * @return indeksissä oleva olio, tai muuten null
      */
@@ -116,7 +100,7 @@ public class TietueHallitsija {
     /**
      * Kasvattaa taulukkoa kertoimen ja vakion avulla.
      * 
-     * Noudattaa kaavaa: maxLkm + maxLkm * ( kerroin - 1 ) + vakio
+     * Noudattaa kaavaa: maxLkm + maxLkm * ( KERROIN - 1 ) + VAKIO
      * 
      * Mahdollisista kaavan tuottamista desimaaliluvuista jätetään desimaaliosa pois.
      * Varmistaa että taulukkoa kasvatetaan vähintään yhden yksikön verran.
@@ -131,51 +115,11 @@ public class TietueHallitsija {
      * tietueet.lisaaTilaa() === 16;
      * tietueet.lisaaTilaa() === 32;
      * tietueet.lisaaTilaa() === 64;
-     * 
-     * tietueet = new TietueHallitsija(); tietueet.setKerroin(1.0); tietueet.setVakio(2);
-     * tietueet.lisaaTilaa() === 3;
-     * tietueet.lisaaTilaa() === 5;
-     * tietueet.lisaaTilaa() === 7;
-     * tietueet.lisaaTilaa() === 9;
-     * tietueet.lisaaTilaa() === 11;
-     * tietueet.lisaaTilaa() === 13;
-     * 
-     * tietueet = new TietueHallitsija(); tietueet.setKerroin(1.5); tietueet.setVakio(3);
-     * tietueet.lisaaTilaa() === 4;
-     * tietueet.lisaaTilaa() === 9;
-     * tietueet.lisaaTilaa() === 16;
-     * tietueet.lisaaTilaa() === 27;
-     * tietueet.lisaaTilaa() === 43;
-     * tietueet.lisaaTilaa() === 67;
-     * tietueet.lisaaTilaa() === 103;
-     * tietueet.lisaaTilaa() === 157;
-     * 
-     * tietueet = new TietueHallitsija(); tietueet.setKerroin(2); tietueet.setVakio(-4);
-     * tietueet.lisaaTilaa() === 2;
-     * tietueet.lisaaTilaa() === 3;
-     * tietueet.lisaaTilaa() === 4;
-     * tietueet.lisaaTilaa() === 5;
-     * tietueet.lisaaTilaa() === 6;
-     * tietueet.lisaaTilaa() === 8;
-     * tietueet.lisaaTilaa() === 12;
-     * tietueet.lisaaTilaa() === 20;
-     * tietueet.lisaaTilaa() === 36;
-     * tietueet.lisaaTilaa() === 68;
-     * 
-     * tietueet = new TietueHallitsija(); tietueet.setKerroin(0); tietueet.setVakio(0);
-     * tietueet.lisaaTilaa() === 2;
-     * tietueet.lisaaTilaa() === 3;
-     * tietueet.lisaaTilaa() === 4;
-     * tietueet.lisaaTilaa() === 5;
-     * tietueet.lisaaTilaa() === 6;
-     * tietueet.lisaaTilaa() === 7;
-     * tietueet.lisaaTilaa() === 8;
-     * tietueet.lisaaTilaa() === 9;
      * </pre>
      */
     public int lisaaTilaa() {
         // kasvatetaan listaa kertoimen ja vakion avulla, palautetaan kokonaisluku
-        int uusiMaxLkm = this.maxLkm + (int)(this.maxLkm * (this.kerroin - 1) + this.vakio);
+        int uusiMaxLkm = this.maxLkm + (int)(this.maxLkm * (this.KERROIN - 1) + this.VAKIO);
         
         // vaihdetaan uuteen mnaksimi lukumäärään, jos se on vähintään yhden enemmän kuin alkuperäinen
         if (this.maxLkm + 1 <= uusiMaxLkm) { 
@@ -197,19 +141,17 @@ public class TietueHallitsija {
      * @example
      * <pre name="test">
      * TietueHallitsija olioHallitsija = new TietueHallitsija();
-     * olioHallitsija.setKerroin(1.0);
-     * olioHallitsija.setVakio(1);
-     * olioHallitsija.toString() === "0|1|1.0|1";
+     * olioHallitsija.toString() === "0|1|2.0|0";
      * 
      * Object olio = new Object();
      * olioHallitsija.lisaa(olio);
-     * olioHallitsija.toString() === "1|1|1.0|1";
+     * olioHallitsija.toString() === "1|1|2.0|0";
      * 
      * olioHallitsija.lisaa(new Object());
-     * olioHallitsija.toString() === "2|2|1.0|1";
+     * olioHallitsija.toString() === "2|2|2.0|0";
      * 
      * olioHallitsija.lisaa(new Object());
-     * olioHallitsija.toString() === "3|3|1.0|1";
+     * olioHallitsija.toString() === "3|4|2.0|0";
      * </pre>
      */
     public void lisaa(Object olio) {
@@ -296,9 +238,6 @@ public class TietueHallitsija {
      * tietueet.lisaa(new Object());
      * tietueet.lisaa(new Object());
      * tietueet.toString() === "4|13|2.0|0";
-     * 
-     * tietueet.setKerroin(3.5);
-     * tietueet.toString() === "4|13|3.5|0";
      * </pre>
      */
     public String toString() {
@@ -307,9 +246,9 @@ public class TietueHallitsija {
         sb.append('|');
         sb.append(this.maxLkm);
         sb.append('|');
-        sb.append(this.kerroin);
+        sb.append(this.KERROIN);
         sb.append('|');
-        sb.append(this.vakio);
+        sb.append(this.VAKIO);
         return sb.toString();
     }
     
@@ -329,14 +268,6 @@ public class TietueHallitsija {
         
         tietueet = new TietueHallitsija();
         System.out.println("\n" + tietueet.toString());
-        
-        // muutetaan kerrointa ja vakiota ja tulostetaan taas 10 olion lisäys
-        tietueet.setKerroin(1);
-        tietueet.setVakio(3);
-        for (int i = 0; i < 10; i++) {
-            tietueet.lisaa(new Object());
-            System.out.println(tietueet.toString());
-        }
         
         Object obj = new Object();
         tietueet.lisaa(obj);

@@ -157,13 +157,11 @@ public class Ainesosa {
      * @example
      * <pre name="test">
      * Ainesosa paaryna = new Ainesosa(15, "Päärynä");
-     * paaryna.equals(new Ainesosa("Päärynä")) === false;
-     * paaryna.equals(new Ainesosa(14, "Päärynä")) === false;
+     * paaryna.equals(new Ainesosa("Omena")) === false;
+     * paaryna.equals(new Ainesosa("Päärynä")) === true;
+     * paaryna.equals(new Ainesosa(14, "Päärynä")) === true;
      * paaryna.equals(new Ainesosa(15, "Päärynä")) === true;
-     * paaryna.equals(new Ainesosa(15, "Pääryna")) === false;
-     * 
-     * paaryna.setId(2);
-     * paaryna.equals(new Ainesosa(15, "Päärynä")) === false;
+     * paaryna.equals(new Ainesosa(15, "Omena")) === false;
      * </pre>
      */
     public boolean equals(Object verrattava) {
@@ -171,7 +169,6 @@ public class Ainesosa {
         
         Ainesosa verrattavaAinesosa = (Ainesosa)verrattava;
         if (!verrattavaAinesosa.ainesosaNimi.equals(this.ainesosaNimi)) { return false; }
-        if (verrattavaAinesosa.ainesosa_id != this.ainesosa_id) { return false; }
         
         return true;
     }
@@ -193,7 +190,7 @@ public class Ainesosa {
      * 
      * ainesosa1 = new Ainesosa(0, "banaani");
      * ainesosa2 = new Ainesosa(1, "BANAANI");
-     * ainesosa1.hashCode() == ainesosa2.hashCode() === false;
+     * ainesosa1.hashCode() == ainesosa2.hashCode() === true;
      * 
      * ainesosa1 = new Ainesosa(0, "banaani");
      * ainesosa2 = new Ainesosa(0, "bänaani");
@@ -206,7 +203,6 @@ public class Ainesosa {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.ainesosa_id);
         hash = Hajautus.hajautusString(hash, this.ainesosaNimi);
         return hash;
     }
