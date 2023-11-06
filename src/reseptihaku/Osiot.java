@@ -1,22 +1,25 @@
 package reseptihaku;
 
-import kanta.TietueHallitsija;
+import java.util.ArrayList;
+
+import kanta.Hajautus;
 
 /**
  * @author hakom
  * @version 19 Oct 2023
  *
  */
-public class Osiot extends TietueHallitsija {
+public class Osiot {
 
     private String tiedostoNimi;
     private int juoksevaId;
+    private ArrayList<Osio> osiot;
     
     /**
      * 
      */
     public Osiot() {
-        super();
+        this.osiot = new ArrayList<Osio>();
         this.tiedostoNimi = "resepti_osiot.dat";
         this.juoksevaId = 0;
     }
@@ -31,7 +34,7 @@ public class Osiot extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Osiot osiot = new Osiot();
-     * osiot.toString() === "0|1|resepti_osiot.dat";
+     * osiot.toString() === "0|resepti_osiot.dat";
      * </pre>
      */
     public void setTiedostoNimi(String tiedostonimi) {
@@ -43,35 +46,43 @@ public class Osiot extends TietueHallitsija {
     
     
     /**
+     * @return osioiden lukumäärä
+     */
+    public int getLkm() {
+        return this.osiot.size();
+    }
+    
+    
+    /**
      * @param nimi minkä niminen osio lisätään
      * @return lisätty osio
      * 
      * @example
      * <pre name="test">
      * Osiot osiot = new Osiot();
-     * osiot.toString() === "0|1|resepti_osiot.dat";
+     * osiot.toString() === "0|resepti_osiot.dat";
      * Osio pizzapohja = osiot.lisaaOsio("Pizzapohja");
-     * osiot.toString() === "1|1|resepti_osiot.dat";
+     * osiot.toString() === "1|resepti_osiot.dat";
      * pizzapohja.toString() === "0|Pizzapohja";
      * 
      * Osio tomaattikastike = osiot.lisaaOsio("Tomaattikastike");
-     * osiot.toString() === "2|2|resepti_osiot.dat";
+     * osiot.toString() === "2|resepti_osiot.dat";
      * tomaattikastike.toString() === "1|Tomaattikastike";
      * 
      * Osio taytteet = osiot.lisaaOsio("Täytteet");
-     * osiot.toString() === "3|4|resepti_osiot.dat";
+     * osiot.toString() === "3|resepti_osiot.dat";
      * taytteet.toString() === "2|Täytteet";
      * 
      * osiot.lisaaOsio("Täytteet (vaihtoehto 2)");
-     * osiot.toString() === "4|4|resepti_osiot.dat";
+     * osiot.toString() === "4|resepti_osiot.dat";
      * 
      * osiot.lisaaOsio("Täytteet (vaihtoehto 3)");
-     * osiot.toString() === "5|8|resepti_osiot.dat";
+     * osiot.toString() === "5|resepti_osiot.dat";
      * </pre>
      */
     public Osio lisaaOsio(String nimi) {
         Osio osio = new Osio(this.juoksevaId, nimi);
-        lisaa(osio);
+        osiot.add(osio);
         this.juoksevaId++;
         return osio;
     }
@@ -83,15 +94,15 @@ public class Osiot extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Osiot osiot = new Osiot();
-     * osiot.toString() === "0|1|resepti_osiot.dat";
+     * osiot.toString() === "0|resepti_osiot.dat";
      * 
      * Osio kastike = new Osio("Kastike");
-     * osiot.lisaa(kastike);
-     * osiot.toString() === "1|1|resepti_osiot.dat";
+     * osiot.lisaaOsio(kastike);
+     * osiot.toString() === "1|resepti_osiot.dat";
      * </pre>
      */
     public void lisaaOsio(Osio osio) {
-        lisaa(osio);
+        this.osiot.add(osio);
     }
     
     
@@ -107,17 +118,17 @@ public class Osiot extends TietueHallitsija {
      * Osio tayte = new Osio("Täyte");
      * osiot.lisaaOsio(tayte);
      * osiot.lisaaOsio("Kuorrute");
-     * osiot.toString() === "3|4|resepti_osiot.dat";
+     * osiot.toString() === "3|resepti_osiot.dat";
      * 
      * osiot.poistaOsio(tayte);
-     * osiot.toString() === "2|4|resepti_osiot.dat";
+     * osiot.toString() === "2|resepti_osiot.dat";
      * 
      * osiot.poistaOsio(tayte);
-     * osiot.toString() === "2|4|resepti_osiot.dat";
+     * osiot.toString() === "2|resepti_osiot.dat";
      * </pre>
      */
     public void poistaOsio(Osio osio) {
-        poista(osio);
+        this.osiot.remove(osio);
     }
     
     
@@ -126,10 +137,7 @@ public class Osiot extends TietueHallitsija {
      * @return indeksissä ollut Osio tai null
      */
     public Osio annaIndeksista(int indeksi) {
-        // varmistetaan että olio on tyyppiä Ainesosa
-        Object olio = getOlio(indeksi);
-        if (olio.getClass() != Osio.class) { return null; }
-        return (Osio)olio;
+        return this.osiot.get(indeksi);
     }
     
     
@@ -148,25 +156,138 @@ public class Osiot extends TietueHallitsija {
     
     @Override
     /**
-     * Palauttaa tiedot muodossa lukumäärä|maksimi lukumäärä|tiedostonimi
+     * @example
+     * <pre name="test">
+     * Osiot osiot = new Osiot();
+     * osiot.setTiedostoNimi("pizza_osiot.txt");
+     * osiot.lisaaOsio(new Osio("Pizzapohja"));
+     * osiot.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot.lisaaOsio(new Osio("Täytteet"));
+     * 
+     * Osiot kopioOsiot = osiot.clone();
+     * kopioOsiot.toString().equals(osiot.toString()) === true;
+     * 
+     * osiot.annaIndeksista(1).getNimi() === "Tomaattikastike";
+     * kopioOsiot.annaIndeksista(1).getNimi() === "Tomaattikastike";
+     * 
+     * osiot.annaIndeksista(1).setUusiNimi("Tulinen kastike");
+     * osiot.annaIndeksista(1).getNimi() === "Tulinen kastike";
+     * kopioOsiot.annaIndeksista(1).getNimi() === "Tomaattikastike";
+     * 
+     * </pre>
+     */
+    public Osiot clone() {
+        Osiot kopio = new Osiot();
+        kopio.juoksevaId = this.juoksevaId;
+        kopio.tiedostoNimi = this.tiedostoNimi;
+        
+        // kopioidaan yksittäiset osiot
+        for (int i = 0; i < this.osiot.size(); i++) {
+            kopio.osiot.add(this.osiot.get(i).clone());
+        }
+        
+        return kopio;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Osiot osiot1 = new Osiot();
+     * Osiot osiot2 = new Osiot();
+     * osiot1.equals(osiot2) === true;
+     * 
+     * osiot1.setTiedostoNimi("pizza_osiot.txt");
+     * osiot1.equals(osiot2) === false;
+     * 
+     * osiot2.setTiedostoNimi("pizza_osiot.txt");
+     * osiot1.equals(osiot2) === true;
+     * 
+     * osiot1.lisaaOsio(new Osio("Pizzapohja"));
+     * osiot1.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot1.equals(osiot2) === false;
+     * 
+     * osiot2.lisaaOsio(new Osio("Pizzapohja"));
+     * osiot2.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot1.equals(osiot2) === true;
+     * </pre>
+     */
+    public boolean equals(Object verrattava) {
+        if (verrattava == null) { return false; }
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        Osiot verrattavaOsiot = (Osiot)verrattava;
+        if (verrattavaOsiot.juoksevaId != this.juoksevaId) { return false; }
+        if (!verrattavaOsiot.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
+        if (verrattavaOsiot.osiot.size() != this.osiot.size()) { return false; }
+        
+        // käsketään yksittäisten osioiden vertaamaan toisiaan keskenään
+        for (int i = 0; i < this.osiot.size(); i++) {
+            if (!verrattavaOsiot.osiot.get(i).equals(this.osiot.get(i))) { return false; }
+        }
+        
+        return true;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Osiot osiot1 = new Osiot();
+     * Osiot osiot2 = new Osiot();
+     * osiot1.hashCode() == osiot2.hashCode() === true;
+     * 
+     * osiot1.setTiedostoNimi("pizza_osiot.txt");
+     * osiot1.hashCode() == osiot2.hashCode() === false;
+     * 
+     * osiot2.setTiedostoNimi("pizza_osiot.txt");
+     * osiot1.hashCode() == osiot2.hashCode() === true;
+     * 
+     * osiot1.lisaaOsio(new Osio("Pizzapohja"));
+     * osiot1.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot1.hashCode() == osiot2.hashCode() === false;
+     * 
+     * osiot2.lisaaOsio(new Osio("Pizzapohja"));
+     * osiot2.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot1.hashCode() == osiot2.hashCode() === true;
+     * </pre>
+     */
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.juoksevaId);
+        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        
+        for (int i = 0; i < this.osiot.size(); i++) {
+            hash = Hajautus.hajautusInt(hash, this.osiot.get(i).hashCode());
+        }
+        
+        return hash;
+    }
+    
+    
+    @Override
+    /**
+     * Palauttaa tiedot muodossa "tiedostonimi"
      * 
      * @example
      * <pre name="test">
      * Osiot osiot = new Osiot();
-     * osiot.toString() === "0|1|resepti_osiot.dat";
+     * osiot.toString() === "0|resepti_osiot.dat";
      * </pre>
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getLkm());
-        sb.append('|');
-        sb.append(getMaxLkm());
+        sb.append(this.osiot.size());
         sb.append('|');
         sb.append(this.tiedostoNimi);
         return sb.toString();
     }
     
     
+    /**
+     * @param args ei käytössä
+     */
     public static void main(String[] args) {
         Osiot pizzanOsiot = new Osiot();
         System.out.println(pizzanOsiot.toString());
@@ -177,7 +298,6 @@ public class Osiot extends TietueHallitsija {
         pizzanOsiot.lisaaOsio("Täytteet");
         System.out.println(pizzanOsiot.toString());
         
-        System.out.println("Lukumäärä: " + pizzanOsiot.getLkm() + ", maksimi lukumäärä: " + pizzanOsiot.getMaxLkm());
         Osio pizzapohja = pizzanOsiot.annaIndeksista(0);
         Osio tomaattikastike = pizzanOsiot.annaIndeksista(1);
         Osio taytteet = pizzanOsiot.annaIndeksista(2);

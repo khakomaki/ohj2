@@ -239,18 +239,48 @@ public class Osio {
     
     @Override
     /**
+     * @example
+     * <pre name="test">
      * Osio sampylat = new Osio("Sämpylät");
+     * sampylat.lisaaAinesosa("vehnäjauhoja", "8dl");
+     * sampylat.lisaaAinesosa("maito", "4dl");
+     * sampylat.lisaaAinesosa("kuivahiiva", "1ps");
+     * sampylat.lisaaOhje(new Ohje("Lämmitä maito 42-asteiseksi"));
+     * sampylat.lisaaOhje(new Ohje("Sekoita kuivahiiva maitoon"));
+     * sampylat.lisaaOhje(new Ohje("Sekoita jauhot maitoon"));
      * Osio sampylaKopio = sampylat.clone();
      * 
+     * sampylaKopio.equals(sampylat) === true;
      * sampylaKopio.toString().equals(sampylat.toString()) === true;
+     * sampylat.annaOsionAinesosat().equals(sampylaKopio.annaOsionAinesosat()) === true;
+     * sampylat.annaOsionOhjeet().equals(sampylaKopio.annaOsionOhjeet()) === true;
+     * 
+     * sampylat.lisaaOhje("Anna kohota liinan alla");
+     * sampylaKopio.equals(sampylat) === false;
+     * sampylat.annaOsionOhjeet().equals(sampylaKopio.annaOsionOhjeet()) === false;
+     * 
+     * sampylaKopio.lisaaOhje("Anna kohota liinan alla");
+     * sampylaKopio.equals(sampylat) === true;
+     * sampylat.annaOsionOhjeet().equals(sampylaKopio.annaOsionOhjeet()) === true;
      * 
      * sampylat.setUusiNimi("Sämpylä");
      * sampylaKopio.toString().equals(sampylat.toString()) === false;
+     * 
+     * sampylaKopio.setUusiNimi("Sämpylä");
+     * sampylaKopio.toString().equals(sampylat.toString()) === true;
+     * </pre>
      */
     public Osio clone() {
         Osio kopio = new Osio();
         kopio.nimi = this.nimi;
         kopio.osioId = this.osioId;
+        
+        // annetaan viite ainesosiin, ei kopioida
+        kopio.ainesosat = this.ainesosat;
+        
+        // kopioidaan osion omat ainesosat ja ohjeet
+        kopio.osionAinesosat = this.osionAinesosat.clone();
+        kopio.ohjeet = this.ohjeet.clone();
         
         return kopio;
     }
@@ -258,6 +288,8 @@ public class Osio {
     
     @Override
     /**
+     * @example
+     * <pre name="test">
      * Osio pohja1 = new Osio(1, "Kakkupohja");
      * Osio pohja2 = new Osio(1, "Kakkupohj");
      * Osio pohja3 = new Osio(2, "Kakkupohja");
@@ -270,12 +302,17 @@ public class Osio {
      * pohja1.equals(pohja2) === true;
      * pohja2.equals(pohja3) === false;
      * pohja2.equals(pohja1) === true;
+     * </pre>
      */
     public boolean equals(Object verrattava) {
+        if (verrattava == null) { return false; }
         if (verrattava.getClass() != this.getClass()) { return false; }
         Osio verrattavaOsio = (Osio)verrattava;
         if (!verrattavaOsio.nimi.equals(this.nimi)) { return false; }
         if (verrattavaOsio.osioId != this.osioId) { return false; }
+        if (!verrattavaOsio.osionAinesosat.equals(this.osionAinesosat)) { return false; }
+        if (!verrattavaOsio.ohjeet.equals(this.ohjeet)) { return false; }
+        if (!verrattavaOsio.ainesosat.equals(this.ainesosat)) { return false; }
         
         return true;
     }
@@ -283,6 +320,8 @@ public class Osio {
     
     @Override
     /**
+     * @example
+     * <pre name="test">
      * Osio pohja1 = new Osio(1, "Kakkupohja");
      * Osio pohja2 = new Osio(1, "Kakkupohj");
      * Osio pohja3 = new Osio(2, "Kakkupohja");
@@ -294,11 +333,15 @@ public class Osio {
      * pohja2.setUusiNimi("Kakkupohja");
      * pohja1.hashCode() == pohja2.hashCode() === true;
      * pohja1.hashCode() == pohja3.hashCode() === false;
+     * </pre>
      */
     public int hashCode() {
         int hash = 1;
         hash = Hajautus.hajautusInt(hash, this.osioId);
         hash = Hajautus.hajautusString(hash, this.nimi);
+        hash = Hajautus.hajautusInt(hash, this.osionAinesosat.hashCode());
+        hash = Hajautus.hajautusInt(hash, this.ohjeet.hashCode());
+        hash = Hajautus.hajautusInt(hash, this.ainesosat.hashCode());
         
         return hash;
     }
