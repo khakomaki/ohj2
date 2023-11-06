@@ -14,8 +14,8 @@ import kanta.TietueHallitsija;
 public class OsionAinesosat extends TietueHallitsija {
     
     private Ainesosat ainesosat;
-    private String tiedostoNimi;
-    private int osioId;
+    private String tiedostoNimi     = "osion_ainesosat.dat";
+    private int osioId              = 1;
     
     
     /**
@@ -35,6 +35,23 @@ public class OsionAinesosat extends TietueHallitsija {
         this.ainesosat = ainesosat;
         this.tiedostoNimi = "osion_ainesosat.dat";
         this.osioId = osioTunnus;
+    }
+    
+    
+    /**
+     * Parametriton muodostaja.
+     * Luo itselleen oman Ainesosat-luokan.
+     * Osio tunnus alustuu luvuksi 1.
+     * 
+     * @example
+     * <pre name="test">
+     * OsionAinesosat oat = new OsionAinesosat();
+     * oat.toString() === "1|osion_ainesosat.dat|0|1";
+     * </pre>
+     */
+    public OsionAinesosat() {
+        super();
+        this.ainesosat = new Ainesosat();
     }
     
     
@@ -78,6 +95,16 @@ public class OsionAinesosat extends TietueHallitsija {
     
     
     /**
+     * @param osionAinesosa lisättävä osion ainesosa
+     */
+    public void lisaaOsionAinesosa(OsionAinesosa osionAinesosa) {
+        Ainesosa ainesosa = this.ainesosat.anna(osionAinesosa.getId());
+        String maara = osionAinesosa.getMaara();
+        lisaaOsionAinesosa(ainesosa, maara);
+    }
+    
+    
+    /**
      * @param ainesosa lisättävä ainesosa
      */
     public void lisaaOsionAinesosa(Ainesosa ainesosa) {
@@ -115,6 +142,43 @@ public class OsionAinesosat extends TietueHallitsija {
             out.print(osionAinesosa.getMaara());
             out.print("\n");
         }
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Ainesosat ainesosat = new Ainesosat();
+     * OsionAinesosat oat = new OsionAinesosat(55, ainesosat);
+     * oat.lisaaOsionAinesosa(new Ainesosa("riisi"));
+     * oat.lisaaOsionAinesosa(new Ainesosa("soijakastike"));
+     * 
+     * OsionAinesosat oatKopio = oat.clone();
+     * oat.equals(oatKopio) === true;
+     * oat.toString() === "55|osion_ainesosat.dat|2|2";
+     * 
+     * oat.lisaaOsionAinesosa(new Ainesosa("sipuli"));
+     * oat.equals(oatKopio) === false;
+     * 
+     * oatKopio.lisaaOsionAinesosa(new Ainesosa("sipuli"));
+     * oat.equals(oatKopio) === true;
+     * </pre>
+     */
+    public OsionAinesosat clone() {
+        OsionAinesosat kopio = new OsionAinesosat();
+        kopio.osioId = this.osioId;
+        kopio.tiedostoNimi = this.tiedostoNimi;
+        
+        // annetaan viite samaan Ainesosat-luokkaan, koska tarvitaan vain yksi
+        kopio.ainesosat = this.ainesosat;
+        
+        // kopioidaan kaikki alkiot kopioon
+        for (int i = 0; i < this.getLkm(); i++) {
+            kopio.lisaaOsionAinesosa(this.annaIndeksista(i));
+        }
+        
+        return kopio;
     }
     
     

@@ -4,6 +4,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import kanta.Hajautus;
+
 /**
  * @author hakom
  * @version 30 Oct 2023
@@ -310,6 +312,123 @@ public class Ohjeet {
             out.print(this.ohjeet.get(i).getOhjeistus());
             out.print("\n");
         }
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Ohjeet ohjeet = new Ohjeet(2);
+     * ohjeet.setTiedostoNimi("mustikkapiirakka.txt");
+     * ohjeet.lisaa(new Ohje("Sekoita sokeri ja vehnäjauhot"));
+     * ohjeet.lisaa(new Ohje("Lisää kananmuna"));
+     * ohjeet.toString() === "mustikkapiirakka.txt|2|2";
+     * 
+     * Ohjeet kopioOhjeet = ohjeet.clone();
+     * kopioOhjeet.toString() === "mustikkapiirakka.txt|2|2";
+     * kopioOhjeet.anna(0).getOhjeistus() === "Sekoita sokeri ja vehnäjauhot";
+     * kopioOhjeet.anna(1).getOhjeistus() === "Lisää kananmuna";
+     * 
+     * ohjeet.anna(1).setOhjeistus("Lisää vanilliinisokeri");
+     * ohjeet.anna(1).getOhjeistus() === "Lisää vanilliinisokeri";
+     * kopioOhjeet.anna(1).getOhjeistus() === "Lisää kananmuna";
+     * 
+     * ohjeet.lisaa(new Ohje());
+     * ohjeet.lisaa(new Ohje());
+     * ohjeet.toString() === "mustikkapiirakka.txt|2|4";
+     * kopioOhjeet.toString() === "mustikkapiirakka.txt|2|2";
+     * </pre>
+     */
+    public Ohjeet clone() {
+        Ohjeet kopio = new Ohjeet();
+        kopio.lkm = this.lkm;
+        kopio.osioId = this.osioId;
+        kopio.tiedostoNimi = this.tiedostoNimi;
+        
+        for (int i = 0; i < this.lkm; i++) {
+            kopio.ohjeet.add(this.ohjeet.get(i).clone());
+        }
+        
+        return kopio;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Ohjeet ohjeet1 = new Ohjeet();
+     * Ohjeet ohjeet2 = new Ohjeet();
+     * ohjeet1.equals(ohjeet2) === true;
+     * 
+     * ohjeet1.lisaa(new Ohje());
+     * ohjeet1.equals(ohjeet2) === false;
+     * 
+     * ohjeet2.lisaa(new Ohje());
+     * ohjeet1.equals(ohjeet2) === true;
+     * 
+     * Ohje sokeri = new Ohje("Lisää sokeri");
+     * Ohje kananmuna = new Ohje("Lisää kananmuna");
+     * 
+     * ohjeet2.lisaa(sokeri);
+     * ohjeet1.equals(ohjeet2) === false;
+     * 
+     * ohjeet1.lisaa(kananmuna);
+     * ohjeet1.equals(ohjeet2) === false;
+     * </pre>
+     */
+    public boolean equals(Object verrattava) {
+        if (verrattava == null) { return false; }
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        Ohjeet verrattavaOhjeet = (Ohjeet)verrattava;
+        if (verrattavaOhjeet.lkm != this.lkm) { return false; }
+        if (verrattavaOhjeet.osioId != this.osioId) { return false; }
+        if (!verrattavaOhjeet.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
+        
+        // verrataan yksittäiset ohjeet
+        for (int i = 0; i < this.lkm; i++) {
+            if (!verrattavaOhjeet.ohjeet.get(i).equals(this.ohjeet.get(i))) { return false; }
+        }
+        
+        return true;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Ohjeet ohjeet1 = new Ohjeet();
+     * Ohjeet ohjeet2 = new Ohjeet();
+     * ohjeet1.hashCode() == ohjeet2.hashCode() === true;
+     * 
+     * ohjeet1.lisaa(new Ohje());
+     * ohjeet1.hashCode() == ohjeet2.hashCode() === false;
+     * 
+     * ohjeet2.lisaa(new Ohje());
+     * ohjeet1.hashCode() == ohjeet2.hashCode() === true;
+     * 
+     * Ohje sokeri = new Ohje("Lisää sokeri");
+     * Ohje kananmuna = new Ohje("Lisää kananmuna");
+     * 
+     * ohjeet2.lisaa(sokeri);
+     * ohjeet1.hashCode() == ohjeet2.hashCode() === false;
+     * 
+     * ohjeet1.lisaa(kananmuna);
+     * ohjeet1.hashCode() == ohjeet2.hashCode() === false;
+     * </pre>
+     */
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.osioId);
+        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        
+        for (int i = 0; i < this.lkm; i++) {
+            hash = Hajautus.hajautusInt(hash, this.ohjeet.get(i).hashCode());
+        }
+        
+        return hash;
     }
     
     
