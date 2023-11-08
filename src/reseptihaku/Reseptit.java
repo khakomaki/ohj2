@@ -319,7 +319,7 @@ public class Reseptit {
         Resepti mustikkapiirakka = reseptit.lisaaResepti("Mustikkapiirakka");
         reseptit.lisaaResepti("Pizza");
         reseptit.lisaaResepti("Lihapiirakka");
-        
+        mustikkapiirakka.setKuvaus("helppo ja hyvä");
         System.out.println(reseptit + "\n");
         
         reseptit.tulostaReseptit(System.out);
@@ -329,5 +329,19 @@ public class Reseptit {
         mustikkapiirakka.setTahdet(3);
         mustikkapiirakka.setVaativuus(1);
         System.out.println(mustikkapiirakka);
+        
+        Reseptit kopioReseptit = reseptit.clone();
+        System.out.println(kopioReseptit.equals(reseptit));
+        
+        System.out.println(reseptit.hashCode());
+        System.out.println(kopioReseptit.hashCode());
+        
+        mustikkapiirakka.setKuvaus("vaikea ja huono");
+        
+        System.out.println(reseptit.annaIndeksista(0).getKuvaus());
+        System.out.println(kopioReseptit.annaIndeksista(0).getKuvaus());
+        
+        System.out.println(reseptit.hashCode());
+        System.out.println(kopioReseptit.hashCode());
     }
 }
