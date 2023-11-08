@@ -112,6 +112,8 @@ public class Ohje {
     /**
      * @param vaihe asetettava vaihe
      * 
+     * @example
+     * <pre name="test">
      * Ohje ohje = new Ohje();
      * ohje.getVaihe() === 1;
      * 
@@ -126,7 +128,7 @@ public class Ohje {
      * 
      * ohje.setVaihe(1);
      * ohje.getVaihe() === 1;
-     * 
+     * </pre>
      */
     public void setVaihe(int vaihe) {
         if (0 < vaihe) { this.vaihe = vaihe; }
@@ -239,11 +241,14 @@ public class Ohje {
     
     @Override
     /**
+     * @example
+     * <pre name="test">
      * Ohje ohje = new Ohje();
      * ohje.toString() === "1|";
      * 
      * ohje = new Ohje("Lisää sokeri", 7);
      * ohje.toString() === "7|Lisää sokeri";
+     * </pre>
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();

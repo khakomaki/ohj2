@@ -492,7 +492,7 @@ public class Resepti {
      */
     @Override
     public boolean equals(Object verrattava) {
-        // testataan onko samaa luokkaa, jonka jälkeen poistutaan (voidaan tehdä jäljellejääneille typecast)
+        if (verrattava == null) { return false; }
         if (verrattava.getClass() != this.getClass()) { return false; }
         Resepti verrattavaResepti = (Resepti)verrattava;
         
@@ -502,6 +502,7 @@ public class Resepti {
         if (this.tahdet != verrattavaResepti.tahdet) { return false; }
         if (this.vaativuus != verrattavaResepti.vaativuus) { return false; }
         if (!this.kuvaus.equals(verrattavaResepti.getKuvaus())) { return false; }
+        if (!this.osiot.equals(verrattavaResepti.osiot)) { return false; }
         
         return true;
     }

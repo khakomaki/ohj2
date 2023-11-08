@@ -150,17 +150,14 @@ public class Reseptit {
      */
     public ArrayList<Resepti> etsiNimella(String hakusana) {
         ArrayList<Resepti> loydetytReseptit = new ArrayList<Resepti>();
-        
         String kaytettavaHakusana = hakusana.strip();
-        if (kaytettavaHakusana.isBlank()) {
-            // tyhjällä hakusanalla lisätään kaikki reseptit
-            loydetytReseptit = this.reseptit;
-        } else {
-            // lisää kaikki hakusanaan täsmäävät reseptit
-            for (int i = 0; i < this.lkm; i++) {
-                Resepti resepti = annaIndeksista(i);
-                if (resepti.onkoNimessa(kaytettavaHakusana)) { loydetytReseptit.add(resepti); } 
-            }
+        
+        // tyhjällä hakusanalla palautetaan kaikki reseptit
+        if (kaytettavaHakusana.isBlank()) { return this.reseptit; }
+        
+        for (int i = 0; i < this.lkm; i++) {
+            Resepti resepti = annaIndeksista(i);
+            if (resepti.onkoNimessa(kaytettavaHakusana)) { loydetytReseptit.add(resepti); } 
         }
         
         return loydetytReseptit;

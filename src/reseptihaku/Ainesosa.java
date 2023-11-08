@@ -165,6 +165,7 @@ public class Ainesosa {
      * </pre>
      */
     public boolean equals(Object verrattava) {
+        if (verrattava == null) { return false; }
         if (verrattava.getClass() != this.getClass()) { return false; }
         
         Ainesosa verrattavaAinesosa = (Ainesosa)verrattava;

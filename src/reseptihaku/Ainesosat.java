@@ -314,6 +314,8 @@ public class Ainesosat extends TietueHallitsija {
 
     @Override
     /**
+     * @example
+     * <pre name="test">
      * Ainesosat ainesosat1 = new Ainesosat();
      * Ainesosat ainesosat2 = new Ainesosat();
      * ainesosat1.hashCode() == ainesosat2.hashCode() === true;
@@ -329,6 +331,7 @@ public class Ainesosat extends TietueHallitsija {
      * 
      * ainesosat2.lisaaAinesosa(new Ainesosa("porkkana"));
      * ainesosat1.hashCode() == ainesosat2.hashCode() === true;
+     * </pre>
      */
     public int hashCode() {
         int hash = 1;

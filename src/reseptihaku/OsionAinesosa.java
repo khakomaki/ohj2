@@ -72,6 +72,8 @@ public class OsionAinesosa {
     
     @Override
     /**
+     * @example
+     * <pre name="test">
      * OsionAinesosa juusto = new OsionAinesosa(200, "2kg");
      * juusto.toString() === "200|2kg";
      * 
@@ -80,6 +82,7 @@ public class OsionAinesosa {
      * 
      * juustoKopio.setMaara("3kg");
      * juustoKopio.toString().equals(juusto.toString()) === false;
+     * </pre>
      */
     public OsionAinesosa clone() {
         OsionAinesosa kopio = new OsionAinesosa(0);
@@ -132,7 +135,9 @@ public class OsionAinesosa {
      * </pre>
      */
     public boolean equals(Object verrattava) {
+        if (verrattava == null) { return false; }
         if (verrattava.getClass() != this.getClass()) { return false; }
+        
         OsionAinesosa verrattavaOA = (OsionAinesosa)verrattava;
         if (verrattavaOA.ainesosa_id != this.ainesosa_id) { return false; }
         if (verrattavaOA.maara != this.maara) { return false; }
@@ -143,8 +148,11 @@ public class OsionAinesosa {
     
     @Override
     /**
+     * @example
+     * <pre name="test">
      * OsionAinesosa mozzarella = new OsionAinesosa(20501, "120g");
      * mozzarella.toString() === "20501|120g";
+     * </pre>
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
