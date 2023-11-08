@@ -50,6 +50,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     // ====================================================================================================
     
     private Resepti valittuResepti;
+    private Resepti alkuperainenResepti;
     
     @Override
     public Resepti getResult() { 
@@ -63,9 +64,10 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
 
     @Override
     public void setDefault(Resepti oletus) {
-        this.valittuResepti = oletus;
-        // luodaan Reseptipohja jos annettu Resepti on null
+        this.alkuperainenResepti = oletus;
+        // luodaan Reseptipohja jos annettu Resepti on null, muuten luodaan kopio annetusta
         if (oletus == null) { this.valittuResepti = new Resepti(); }
+        else { this.valittuResepti = oletus.clone(); }
         
         naytaReseptinOminaisuudet();
         
@@ -345,8 +347,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     
     private boolean tulikoMuutoksia() {
-        // TODO vertaa tuliko reseptiin muutoksia
-        return true;
+        // valittu resepti ei voi olla null, joten voidaan tehdä vertailu
+        return !this.valittuResepti.equals(this.alkuperainenResepti);
     }
 
 }
