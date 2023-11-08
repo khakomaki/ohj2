@@ -5,12 +5,17 @@ import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import reseptihaku.Ohje;
@@ -49,8 +54,17 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     // ====================================================================================================
     
+    private final Insets PEHMUSTE_ISO = new Insets(10, 10, 10, 10);
+    private final Insets PEHMUSTE_PIENI = new Insets(5, 5, 5, 5);
+    private final int VALI = 10;
+    
+    // luodaan käytettävät fontit
+    Font kirjasinB16 = new Font("System Bold", 16);
+    Font kirjasin14 = new Font(14);
+    
     private Resepti valittuResepti;
     private Resepti alkuperainenResepti;
+    
     
     @Override
     public Resepti getResult() { 
@@ -75,6 +89,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         this.ainesosaJaOhjeetVBox.getChildren().clear();
         naytaOsiot();
     }
+    
     
     private void naytaReseptinOminaisuudet() {
         // TODO vähennä samanlaisen koodin toistoa
@@ -110,15 +125,11 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     
     private VBox naytaOsio(Osio osio) {
-        // TODO ainesosat ja ohjeet
-        
-        // luodaan käytettävät fontit
-        Font kirjasinB16 = new Font("System Bold", 16);
-        Font kirjasin14 = new Font(14);
-        
         VBox osioVBox = new VBox(); // koko osio
         
         HBox osioOstikkoHBox = new HBox();
+        osioOstikkoHBox.setSpacing(VALI);
+        osioOstikkoHBox.setPadding(PEHMUSTE_ISO);
         
         // luo osion nimen tekstikentän
         TextField osioNimiAinesosat = new TextField(osio.getNimi());
@@ -135,9 +146,15 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         HBox osionSisaltoHBox = new HBox();
         
+        ColumnConstraints ainesosaConstraints = luoOtsikkoRajoitteet();
+        ColumnConstraints painikeConstraints = luoPainikeRajoitteet();
+        ColumnConstraints vaiheConstraints = luoVaiheRajoitteet();
+        ColumnConstraints ohjeConstraints = luoOhjeRajoitteet();
+        
         // ==================== näytetään ainesosat ====================
         
         VBox ainesosatVBox = new VBox();
+        ainesosatVBox.setPadding(PEHMUSTE_ISO);
         
         // luo ainesosien otsikon
         Label ainesosatLabel = new Label("Ainesosat");
@@ -145,23 +162,37 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // luodaan GridPane ja otsikot
         GridPane ainesosatGridPane = new GridPane();
-        ainesosatGridPane.add(new Label("määrä"), 0, 0);
-        ainesosatGridPane.add(new Label("ainesosa"), 1, 0);
+        Label maaraLabel = new Label("määrä"); maaraLabel.setPadding(PEHMUSTE_PIENI);
+        Label ainesosaLabel = new Label("ainesosa"); ainesosaLabel.setPadding(PEHMUSTE_PIENI);
+        ainesosatGridPane.add(maaraLabel, 0, 0);
+        ainesosatGridPane.add(ainesosaLabel, 1, 0);
         
+        // määritellään rajoitteet GridPanen sarakkeille
+        ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
+        ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
+        ainesosatGridPane.getColumnConstraints().add(painikeConstraints);
+        
+        // lisätään osion ainesosat yksi kerralla käyttöliittymään
         OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
         for (int i = 0; i < osionAinesosat.getLkm(); i++) {
             int ainesosanRivi = i + 1;
             
             // luo ja lisää TextField-elementit GridPaneen
             OsionAinesosa oa = osionAinesosat.annaIndeksista(i);
-            ainesosatGridPane.add(new TextField(oa.getMaara()), 0, ainesosanRivi);
-            ainesosatGridPane.add(new TextField(osio.getAinesosanNimi(oa.getId())), 1, ainesosanRivi);
+            TextField maaraTextField = new TextField(oa.getMaara());
+            maaraTextField.setAlignment(Pos.CENTER);
+            TextField ainesosaTextField = new TextField(osio.getAinesosanNimi(oa.getId()));
+            ainesosaTextField.setAlignment(Pos.CENTER);
+            
+            ainesosatGridPane.add(maaraTextField, 0, ainesosanRivi);
+            ainesosatGridPane.add(ainesosaTextField, 1, ainesosanRivi);
             
             Button ainesosaPoisto = new Button("x");
             ainesosaPoisto.setOnAction(e -> poistaAinesosa(ainesosatGridPane, ainesosanRivi));
             ainesosatGridPane.add(ainesosaPoisto, 2, ainesosanRivi);
         }
         
+        // lisätään tyhjä ainesosa
         ainesosatGridPane.add(new Label(), 0, ainesosatGridPane.getRowCount() + 1);
         lisaaAinesosa(ainesosatGridPane);
         
@@ -179,26 +210,39 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // luo ohjeiden otsikon
         Label ohjeetLabel = new Label("Ohjeet");
         ohjeetLabel.setFont(kirjasin14);
-        
+        ohjeetLabel.setPadding(PEHMUSTE_ISO);
         
         // luodaan GridPane ja otsikot
         GridPane ohjeetGridPane = new GridPane();
-        ohjeetGridPane.add(new Label("vaihe"), 0, 0);
-        ohjeetGridPane.add(new Label("ohje"), 1, 0);
+        Label vaiheLabel = new Label("vaihe"); vaiheLabel.setPadding(PEHMUSTE_PIENI);
+        Label ohjeLabel = new Label("ohje"); ohjeLabel.setPadding(PEHMUSTE_PIENI);
+        ohjeetGridPane.add(vaiheLabel, 0, 0);
+        ohjeetGridPane.add(ohjeLabel, 1, 0);
         
+        // määritellään rajoitteet GridPanen sarakkeille
+        ohjeetGridPane.getColumnConstraints().add(vaiheConstraints);
+        ohjeetGridPane.getColumnConstraints().add(ohjeConstraints);
+        ohjeetGridPane.getColumnConstraints().add(painikeConstraints);
+        
+        // lisätään osion ohjeet yksi kerralla käyttöliittymään
         Ohjeet osionOhjeet = osio.annaOsionOhjeet();
         for (int i = 0; i < osionOhjeet.getLkm(); i++) {
             int ohjeenRivi = i + 1;
             
             Ohje oo = osionOhjeet.anna(i);
-            ohjeetGridPane.add(new Label("" + ohjeenRivi), 0, ohjeenRivi);
-            ohjeetGridPane.add(new TextField(oo.getOhjeistus()), 1, ohjeenRivi);
+            
+            Label riviNumeroLabel = new Label("" + ohjeenRivi);
+            TextArea ohjeTextArea = luoOhjeTextArea(oo.getOhjeistus());
+            
+            ohjeetGridPane.add(riviNumeroLabel, 0, ohjeenRivi);
+            ohjeetGridPane.add(ohjeTextArea, 1, ohjeenRivi);
             
             Button ohjePoisto = new Button("x");
             ohjePoisto.setOnAction(e -> poistaOhje(ohjeetGridPane, ohjeenRivi));
             ohjeetGridPane.add(ohjePoisto, 2, ohjeenRivi);
         }
         
+        // lisätään tyhjä ohje
         ohjeetGridPane.add(new Label(), 0, ohjeetGridPane.getRowCount() + 1);
         lisaaOhje(ohjeetGridPane);
         
@@ -214,6 +258,53 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         osioVBox.getChildren().add(osionSisaltoHBox);
         
         return osioVBox;
+    }
+    
+    
+    private ColumnConstraints luoOtsikkoRajoitteet() {
+        ColumnConstraints otsikkoConstraints = new ColumnConstraints();
+        otsikkoConstraints.setHalignment(HPos.CENTER);
+        otsikkoConstraints.setHgrow(Priority.SOMETIMES);
+        otsikkoConstraints.setMinWidth(140);
+        return otsikkoConstraints;
+    }
+    
+    
+    private ColumnConstraints luoPainikeRajoitteet() {
+        ColumnConstraints otsikkoConstraints = new ColumnConstraints();
+        otsikkoConstraints.setHalignment(HPos.CENTER);
+        otsikkoConstraints.setHgrow(Priority.NEVER);
+        otsikkoConstraints.setMinWidth(30);
+        otsikkoConstraints.setPrefWidth(30);
+        return otsikkoConstraints;
+    }
+    
+    
+    private ColumnConstraints luoOhjeRajoitteet() {
+        ColumnConstraints otsikkoConstraints = new ColumnConstraints();
+        otsikkoConstraints.setHalignment(HPos.LEFT);
+        otsikkoConstraints.setMinWidth(250);
+        otsikkoConstraints.setHgrow(Priority.ALWAYS);
+        return otsikkoConstraints;
+    }
+    
+    
+    private ColumnConstraints luoVaiheRajoitteet() {
+        ColumnConstraints otsikkoConstraints = new ColumnConstraints();
+        otsikkoConstraints.setHalignment(HPos.CENTER);
+        otsikkoConstraints.setHgrow(Priority.NEVER);
+        otsikkoConstraints.setMinWidth(50);
+        return otsikkoConstraints;
+    }
+    
+    
+    private TextArea luoOhjeTextArea(String ohjeteksti) {
+        TextArea textArea = new TextArea(ohjeteksti);
+        textArea.minWidth(250);
+        textArea.setPrefColumnCount(0);
+        textArea.setPrefRowCount(2);
+        textArea.setWrapText(true);
+        return textArea;
     }
     
     
@@ -326,7 +417,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // lisätään teksti ja syöttökenttä
         paneeli.add(new Label(""), 0, riviLkm);
-        paneeli.add(new TextField(), 1, riviLkm);
+        paneeli.add(luoOhjeTextArea(""), 1, riviLkm);
         
         // lisätään rivin poisto painike
         Button ohjePoisto = new Button("x");
