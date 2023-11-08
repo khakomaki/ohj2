@@ -197,6 +197,18 @@ public class Resepti {
     public Osiot getOsiot() {
          return this.osiot;
     }
+    
+    
+    /**
+     * Lisää reseptiin osion.
+     * Ei lisää pelkkää null-viitettä.
+     * 
+     * @param osio lisättävä osio
+     */
+    public void lisaaOsio(Osio osio) {
+        if (osio == null) { return; }
+        this.osiot.lisaaOsio(osio);
+    }
 
 
     /**
@@ -434,11 +446,24 @@ public class Resepti {
      * pizza.setKuvaus("Itsetehdyllä tomaattikastikkeella.");
      * pizza.setHinta(3);
      * pizza.setVaativuus(4);
+     * pizza.lisaaOsio(new Osio("Pizzapohja"));
+     * pizza.lisaaOsio(new Osio("Tomaattikastike"));
+     * 
      * pizza.toString() === "20|Pizza|3|-1|-1|4";
      * 
      * Resepti kopioPizza = pizza.clone();
      * kopioPizza.toString() === "20|Pizza|3|-1|-1|4";
      * 
+     * kopioPizza.getOsiot().annaIndeksista(0).getNimi() === "Pizzapohja";
+     * kopioPizza.getOsiot().annaIndeksista(1).getNimi() === "Tomaattikastike";
+     * 
+     * pizza.setHinta(1);
+     * pizza.toString() === "20|Pizza|1|-1|-1|4";
+     * kopioPizza.toString() === "20|Pizza|3|-1|-1|4";
+     * 
+     * kopioPizza.setTahdet(1);
+     * pizza.toString() === "20|Pizza|1|-1|-1|4";
+     * kopioPizza.toString() === "20|Pizza|3|-1|1|4";
      * </pre>
      */
     @Override
@@ -451,6 +476,9 @@ public class Resepti {
         kopio.tahdet = this.tahdet;
         kopio.kuvaus = this.kuvaus;
         kopio.vaativuus = this.vaativuus;
+        
+        // luodaan täysi kopio reseptin osioista
+        kopio.osiot = this.osiot.clone();
         
         return kopio;
     }
@@ -484,7 +512,15 @@ public class Resepti {
      * 
      * pizza1.setVaativuus(2);
      * pizza1.equals(pizza2) === false;
-     * pizza2.equals(pizza1) === false;
+     * 
+     * pizza2.setVaativuus(2);
+     * pizza1.equals(pizza2) === true;
+     * 
+     * pizza2.lisaaOsio(new Osio("Pizzapohja"));
+     * pizza1.equals(pizza2) === false;
+     * 
+     * pizza1.lisaaOsio(new Osio("Pizzapohja"));
+     * pizza1.equals(pizza2) === true;
      * 
      * Resepti resepti1 = new Resepti();
      * resepti1.equals(new Resepti()) === true;
@@ -536,9 +572,11 @@ public class Resepti {
      * piirakka.setVaativuus(1);
      * mustikkapiirakka.hashCode() == piirakka.hashCode() === true;
      * 
-     * piirakka.setValmistusaika(1);
-     * piirakka.setVaativuus(2);
+     * mustikkapiirakka.lisaaOsio(new Osio("Muropohja"));
      * mustikkapiirakka.hashCode() == piirakka.hashCode() === false;
+     * 
+     * piirakka.lisaaOsio(new Osio("Muropohja"));
+     * mustikkapiirakka.hashCode() == piirakka.hashCode() === true;
      * </pre>
      */
     public int hashCode() {
@@ -550,6 +588,7 @@ public class Resepti {
         hash = Hajautus.hajautusInt(hash, this.valmistusaika);
         hash = Hajautus.hajautusInt(hash, this.tahdet);;
         hash = Hajautus.hajautusInt(hash, this.vaativuus);
+        hash = Hajautus.hajautusInt(hash, this.osiot.hashCode());
         return hash;
     }
     

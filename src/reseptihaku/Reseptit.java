@@ -4,6 +4,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import kanta.Hajautus;
+
 /**
  * @author hakom
  * @version 19 Oct 2023
@@ -174,6 +176,117 @@ public class Reseptit {
         mustikkapiirakka.luoMustikkapiirakka(this.juoksevaId);
         lisaa(mustikkapiirakka);
         return mustikkapiirakka;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * reseptit.lisaa(new Resepti(1, "Mustikkapiirakka"));
+     * reseptit.lisaa(new Resepti(2, "Juustokakku"));
+     * reseptit.toString() === "2|reseptit.dat";
+     * 
+     * Reseptit reseptitKopio = reseptit.clone();
+     * reseptitKopio.toString() === "2|reseptit.dat";
+     * 
+     * reseptit.setTiedostoNimi("herkut.txt");
+     * reseptit.toString() === "2|herkut.txt";
+     * reseptitKopio.toString() === "2|reseptit.dat";
+     * </pre>
+     */
+    public Reseptit clone() {
+        Reseptit kopio = new Reseptit();
+        kopio.juoksevaId = this.juoksevaId;
+        kopio.lkm = this.lkm;
+        kopio.tiedostoNimi = this.tiedostoNimi;
+        
+        // kopioidaan kaikki yksittäiset reseptit kopioon
+        for (int i = 0; i < this.lkm; i++) {
+            kopio.reseptit.add(this.reseptit.get(i).clone());
+        }
+        
+        return kopio;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit1 = new Reseptit();
+     * Reseptit reseptit2 = new Reseptit();
+     * reseptit1.equals(reseptit2) === true;
+     * reseptit2.equals(reseptit1) === true;
+     * 
+     * reseptit1.setTiedostoNimi("jälkiruoat.txt");
+     * reseptit1.equals(reseptit2) === false;
+     * 
+     * reseptit2.setTiedostoNimi("jälkiruoat.txt");
+     * reseptit1.equals(reseptit2) === true;
+     * 
+     * reseptit1.lisaa(new Resepti(1, "Mustikkapiirakka"));
+     * reseptit1.lisaa(new Resepti(2, "Suklaakakku"));
+     * reseptit1.equals(reseptit2) === false;
+     * 
+     * reseptit2.lisaa(new Resepti(1, "Mustikkapiirakka"));
+     * reseptit2.lisaa(new Resepti(2, "Suklaakakku"));
+     * reseptit1.equals(reseptit2) === true;
+     * </pre>
+     */
+    public boolean equals(Object verrattava) {
+        if (verrattava == null) { return false; }
+        if (verrattava.getClass() != this.getClass()) { return false; }
+        Reseptit verrattavaReseptit = (Reseptit)verrattava;
+        
+        if (verrattavaReseptit.juoksevaId != this.juoksevaId) { return false; }
+        if (verrattavaReseptit.lkm != this.lkm) { return false; }
+        if (!verrattavaReseptit.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
+        
+        // verrataan yksittäisiä reseptejä toisiinsa
+        for (int i = 0; i < this.lkm; i++) {
+            if (!verrattavaReseptit.reseptit.get(i).equals(this.reseptit.get(i))) { return false; }
+        }
+        
+        return true;
+    }
+    
+    
+    @Override
+    /**
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit1 = new Reseptit();
+     * Reseptit reseptit2 = new Reseptit();
+     * reseptit1.hashCode() == reseptit2.hashCode() === true;
+     * 
+     * reseptit1.setTiedostoNimi("jälkiruoat.txt");
+     * reseptit1.hashCode() == reseptit2.hashCode() === false;
+     * 
+     * reseptit2.setTiedostoNimi("jälkiruoat.txt");
+     * reseptit1.hashCode() == reseptit2.hashCode() === true;
+     * 
+     * reseptit1.lisaa(new Resepti(1, "Mustikkapiirakka"));
+     * reseptit1.lisaa(new Resepti(2, "Suklaakakku"));
+     * reseptit1.hashCode() == reseptit2.hashCode() === false;
+     * 
+     * reseptit2.lisaa(new Resepti(1, "Mustikkapiirakka"));
+     * reseptit2.lisaa(new Resepti(2, "Suklaakakku"));
+     * reseptit1.hashCode() == reseptit2.hashCode() === true;
+     * </pre>
+     */
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.juoksevaId);
+        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        hash = Hajautus.hajautusInt(hash, this.lkm);
+        
+        for (int i = 0; i < this.lkm; i++) {
+            hash = Hajautus.hajautusInt(hash, this.reseptit.get(i).hashCode());
+        }
+        
+        return hash;
     }
     
     
