@@ -165,7 +165,16 @@ public class ReseptihakuGUIController implements Initializable {
           // haetaan mikä resepti on valittuna
           int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
           if (valittuResepti < 0) { return; }
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, reseptit.annaIndeksista(valittuResepti));
+          Resepti muokattavaResepti = hakuReseptit.get(valittuResepti);
+          
+          // avataan muokkausnäkymä, josta palatessa saadaan mahdollisesti muokattu resepti
+          Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, muokattavaResepti);
+          
+          // muokkauksesta palatessa katsotaan tuliko muutoksia ja mahdollisesti päivitetään hakutulokset
+          if (!muokattavaResepti.equals(muokattuResepti)) {
+              this.reseptit.vaihdaIndeksista(valittuResepti, muokattuResepti);
+              haeReseptit();
+          }
       }
       
       
@@ -174,7 +183,16 @@ public class ReseptihakuGUIController implements Initializable {
           
           // poistutaan jos indeksi ei ole mieluisa
           if (valittuResepti < 0 || this.hakuReseptit.size() < valittuResepti) { return; }
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, reseptit.annaIndeksista(valittuResepti));
+          Resepti avattavaResepti = hakuReseptit.get(valittuResepti);
+          
+          // avataan reseptinäkymä ja palatessa saadaan mahdollisesti muokattu resepti
+          Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, avattavaResepti);
+          
+          // palatessa katsotaan tuliko muutoksia ja mahdollisesti päivitetään hakutulokset
+          if (!avattavaResepti.equals(muokattuResepti)) {
+              this.reseptit.vaihdaIndeksista(valittuResepti, muokattuResepti);
+              haeReseptit();
+          }
       }
       
       

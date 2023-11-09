@@ -115,6 +115,16 @@ public class Reseptit {
     
     
     /**
+     * @param indeksi minkä indeksin resepti halutaan vaihtaa
+     * @param uusiResepti tilalle vaihdettava resepti
+     */
+    public void vaihdaIndeksista(int indeksi, Resepti uusiResepti) {
+        if (indeksi < 0 || this.lkm < indeksi) { return; }
+        this.reseptit.set(indeksi, uusiResepti);
+    }
+    
+    
+    /**
      * @param os tietovirta johon halutaan tulostaa
      * @param maara kuinka monta reseptia tulostetaan
      */

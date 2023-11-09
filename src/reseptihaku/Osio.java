@@ -171,6 +171,15 @@ public class Osio {
     
     
     /**
+     * @param ainesosa lisättävä ainesosa
+     * @param maara lisättävän ainesosa määrä
+     */
+    public void lisaaAinesosa(Ainesosa ainesosa, String maara) {
+        this.osionAinesosat.lisaaOsionAinesosa(ainesosa, maara);
+    }
+    
+    
+    /**
      * @param ainesosa lisättävän ainesosan nimi
      * @param maara lisättävän ainesosan määrä
      */

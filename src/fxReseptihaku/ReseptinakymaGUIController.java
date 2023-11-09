@@ -121,8 +121,19 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     private void muokkaaResepti() {
-        ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, this.valittuResepti);
-        // TODO ota huomioon päivittää näkymä muokatun mukaiseksi, varaudu että resepti on poistettu
+        Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, this.valittuResepti);
+        
+        // jos muokattu resepti on poistettu, suljetaan näkymä
+        if (muokattuResepti == null) { 
+            this.valittuResepti = muokattuResepti; 
+            sulje(); 
+        }
+        
+        // jos reseptiin on tehty muutoksia, päivitetään käyttöliittymän näkymä
+        if (!valittuResepti.equals(muokattuResepti)) {
+            this.valittuResepti = muokattuResepti;
+            setDefault(valittuResepti); 
+        }
     }
     
     private void poistaResepti() {

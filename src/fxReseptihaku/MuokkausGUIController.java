@@ -18,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import reseptihaku.Ainesosa;
 import reseptihaku.Ohje;
 import reseptihaku.Ohjeet;
 import reseptihaku.Osio;
@@ -43,14 +44,14 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     @FXML private ComboBoxChooser<String> vaativuusSuodatin;
 
     @FXML private void handleSulje() { sulje(); }
-    @FXML private void handleTallenna() { tallenna();}
+    @FXML private void handleTallenna() { tallenna(); }
     @FXML private void handleLisaaOsio() { lisaaOsio(); }
-    @FXML private void handlePoistaResepti() { poistaResepti();}
+    @FXML private void handlePoistaResepti() { poistaResepti(); }
     @FXML private void handlePoistaOsio() { poistaOsio(null); }
     @FXML private void handlePoistaAinesosa() { poistaAinesosa(null, 0); }
-    @FXML private void handleLisaaAinesosa() { lisaaAinesosa(null); }
+    @FXML private void handleLisaaAinesosa() { lisaaAinesosa(null, null, null, ""); }
     @FXML private void handlePoistaOhje() { poistaOhje(null, 0); }
-    @FXML private void handleLisaaOhje() { lisaaOhje(null);}
+    @FXML private void handleLisaaOhje() { lisaaOhje(null); }
     
     // ====================================================================================================
     
@@ -68,7 +69,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     @Override
     public Resepti getResult() { 
-        return this.valittuResepti; 
+        return this.alkuperainenResepti;
     }
 
     @Override
@@ -94,7 +95,10 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     private void naytaReseptinOminaisuudet() {
         // TODO vähennä samanlaisen koodin toistoa
         this.reseptinNimiTextField.setText(this.valittuResepti.getNimi());
+        reseptinNimiTextField.setOnKeyTyped(e -> { valittuResepti.setUusiNimi(reseptinNimiTextField.getText()); });
+        
         this.kuvausTextArea.setText(this.valittuResepti.getKuvaus());
+        kuvausTextArea.setOnKeyTyped(e -> { valittuResepti.setKuvaus(kuvausTextArea.getText()); });
         
         this.hintaSuodatin.clear(); 
         this.hintaSuodatin.setRivit("\n" + Resepti.getHintaVaihtoehdot());
@@ -194,7 +198,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // lisätään tyhjä ainesosa
         ainesosatGridPane.add(new Label(), 0, ainesosatGridPane.getRowCount() + 1);
-        lisaaAinesosa(ainesosatGridPane);
+        lisaaAinesosa(ainesosatGridPane, osio, new Ainesosa(""), "");
         
         // lisätään otsikko ja GridPane ainesosien VBox-elementtiin
         ainesosatVBox.getChildren().add(ainesosatLabel);
@@ -327,7 +331,14 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     private void tallenna() {
         // ei tallenneta turhaan jos ei ole tullut muutoksia
         if (!tulikoMuutoksia()) { return; }
-        Dialogs.showMessageDialog("Ei osata vielä tallentaa");
+        
+        // asetetaan käyttöliittymän tiedot reseptille
+        this.valittuResepti.setKuvaus(this.kuvausTextArea.getText());
+        this.valittuResepti.setUusiNimi(this.reseptinNimiTextField.getText());
+        this.valittuResepti.setHinta(this.hintaSuodatin.getSelectedIndex() + 1);
+        
+        this.alkuperainenResepti = this.valittuResepti;
+        // TODO: tallenna tiedostoon
     }
     
     
@@ -349,6 +360,9 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         VBox osioHBox = naytaOsio(osio);
         ainesosaJaOhjeetVBox.getChildren().add(osioHBox);
         
+        // lisätään osio reseptiin
+        this.valittuResepti.lisaaOsio(osio);
+        
         // tyhjennetään tekstikenttä
         osioTekstiKentta.clear();
     }
@@ -359,6 +373,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         if (osioVBox.getParent() instanceof VBox) {
             VBox ylempiVBox = (VBox)osioVBox.getParent();
             ylempiVBox.getChildren().remove(osioVBox);
+            
+            // TODO: this.valittuResepti.poistaOsio(osio)
         }
     }
     
@@ -369,11 +385,13 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // poistaa kaikki nodet kyseiseltä riviltä
         paneeli.getChildren().removeIf(node -> GridPane.getRowIndex(node) == rivi);
+        
+        // TODO: osio.poistaAinesosa(ainesosa)
     }
     
     
-    private void lisaaAinesosa(GridPane paneeli) {
-        if (paneeli == null) { return; }
+    private void lisaaAinesosa(GridPane paneeli, Osio osio, Ainesosa ainesosa, String maara) {
+        if (paneeli == null || osio == null || ainesosa == null) { return; }
         
         final int riviLkm = paneeli.getRowCount();
         
@@ -391,9 +409,13 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // lisätään rivien lisäys painike seuraavalle riville
         Button ainesosaLisays = new Button("+");
-        ainesosaLisays.setOnAction(e -> lisaaAinesosa(paneeli));
+        
+        // luo samaan paneeliin, samaan osioon tyhjän ainesosan ja määrän
+        ainesosaLisays.setOnAction(e -> lisaaAinesosa(paneeli, osio, new Ainesosa(""), "")); 
         paneeli.add(ainesosaLisays, 2, riviLkm + 1);
         
+        // lisätään ainesosa osioon
+        osio.lisaaAinesosa(ainesosa, maara);
     }
     
     
