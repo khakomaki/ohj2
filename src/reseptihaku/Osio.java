@@ -13,7 +13,7 @@ public class Osio {
     private String nimi;
     private OsionAinesosat osionAinesosat;
     private Ohjeet ohjeet;
-    private Ainesosat ainesosat;            // TODO kaikille viite yhteen ja samaan Ainesosat-olioon
+    private Ainesosat ainesosat;
     private final String oletusNimi = "Osion nimi";
     
     
@@ -31,7 +31,10 @@ public class Osio {
         this.osioId = id;
         this.ohjeet = new Ohjeet(this.osioId);
         setNimi(nimi);
+        
+        this.ainesosat = new Ainesosat();
         luoOsionAinesosat();
+        this.osionAinesosat.setAinesosat(ainesosat);
     }
     
     
@@ -48,7 +51,24 @@ public class Osio {
     public Osio(String nimi) {
         this.ohjeet = new Ohjeet(this.osioId);
         setNimi(nimi);
+        
+        this.ainesosat = new Ainesosat();
         luoOsionAinesosat();
+        this.osionAinesosat.setAinesosat(ainesosat);
+    }
+    
+    
+    /**
+     * @param ainesosat viite ainesosien hallitsijaan
+     */
+    public Osio(Ainesosat ainesosat) {
+        setNimi(null);
+        this.ohjeet = new Ohjeet(this.osioId);
+        
+        Ainesosat asetettavaAinesosat = ainesosat;
+        if (asetettavaAinesosat == null) { asetettavaAinesosat = new Ainesosat(); }
+        luoOsionAinesosat();
+        this.osionAinesosat.setAinesosat(ainesosat);
     }
     
     
@@ -63,8 +83,24 @@ public class Osio {
      */
     public Osio() {
         setNimi(null);
-        luoOsionAinesosat();
         this.ohjeet = new Ohjeet(this.osioId);
+        
+        this.ainesosat = new Ainesosat();
+        luoOsionAinesosat();
+        this.osionAinesosat.setAinesosat(ainesosat);
+    }
+    
+    
+    /**
+     * Asettaa viitteen luokkaan joka hallitsee olemassa olevia ainesosia.
+     * Ei hyväksy null-viitettä.
+     * 
+     * @param ainesosat asetettavat ainesosat
+     */
+    public void setAinesosat(Ainesosat ainesosat) {
+        if (ainesosat == null) { return; }
+        this.ainesosat = ainesosat;
+        this.osionAinesosat.setAinesosat(ainesosat);
     }
     
     
@@ -72,8 +108,7 @@ public class Osio {
      * Luo osion ainesosat
      */
     private void luoOsionAinesosat() {
-        this.ainesosat = new Ainesosat();
-        this.osionAinesosat = new OsionAinesosat(this.osioId, ainesosat);
+        this.osionAinesosat = new OsionAinesosat(this.osioId, this.ainesosat);
     }
     
     

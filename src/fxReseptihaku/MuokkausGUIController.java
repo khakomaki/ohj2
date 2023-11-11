@@ -353,7 +353,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     private void lisaaOsio() {
         String osioTeksti = osioTekstiKentta.getText();
-        if (osioTeksti.isEmpty()) { return; }
+        if (osioTeksti.isEmpty()) { osioTeksti = ""; }
         
         // Luodaan uusi osio ja näytetään se käyttöliittymään
         Osio osio = new Osio(osioTeksti);

@@ -14,6 +14,7 @@ import kanta.Hajautus;
 public class Reseptit {
 
     private ArrayList<Resepti> reseptit = new ArrayList<Resepti>();
+    private Ainesosat ainesosat = new Ainesosat();
     private String tiedostoNimi;
     private int juoksevaId;
     private int lkm;
@@ -70,6 +71,7 @@ public class Reseptit {
      */
     public Resepti lisaaResepti(String nimi) {
         Resepti resepti = new Resepti(this.juoksevaId, nimi);
+        resepti.setAinesosat(ainesosat);
         reseptit.add(resepti);
         this.juoksevaId++;
         this.lkm++;
@@ -96,7 +98,9 @@ public class Reseptit {
      */
     public void lisaa(Resepti resepti) {
         if (resepti == null) { return; }
-        reseptit.add(resepti);
+        Resepti lisattavaResepti = resepti;
+        lisattavaResepti.setAinesosat(ainesosat);
+        reseptit.add(lisattavaResepti);
         this.juoksevaId++;
         this.lkm++;
     }
@@ -115,12 +119,17 @@ public class Reseptit {
     
     
     /**
+     * Ei anna vaihtaa indeksistä jota ei ole olemassa eikä vaihtaa null-viitteeseen.
+     * 
      * @param indeksi minkä indeksin resepti halutaan vaihtaa
      * @param uusiResepti tilalle vaihdettava resepti
      */
     public void vaihdaIndeksista(int indeksi, Resepti uusiResepti) {
-        if (indeksi < 0 || this.lkm < indeksi) { return; }
-        this.reseptit.set(indeksi, uusiResepti);
+        if (indeksi < 0 || this.lkm < indeksi || uusiResepti == null) { return; }
+        
+        Resepti vaihdettavaResepti = uusiResepti;
+        vaihdettavaResepti.setAinesosat(ainesosat);
+        this.reseptit.set(indeksi, vaihdettavaResepti);
     }
     
     
@@ -183,6 +192,7 @@ public class Reseptit {
      */
     public Resepti lisaaMustikkapiirakka() {
         Resepti mustikkapiirakka = new Resepti(1, "");
+        mustikkapiirakka.setAinesosat(ainesosat);
         mustikkapiirakka.luoMustikkapiirakka(this.juoksevaId);
         lisaa(mustikkapiirakka);
         return mustikkapiirakka;
@@ -211,6 +221,7 @@ public class Reseptit {
         kopio.juoksevaId = this.juoksevaId;
         kopio.lkm = this.lkm;
         kopio.tiedostoNimi = this.tiedostoNimi;
+        kopio.ainesosat = this.ainesosat.clone();
         
         // kopioidaan kaikki yksittäiset reseptit kopioon
         for (int i = 0; i < this.lkm; i++) {
@@ -253,6 +264,7 @@ public class Reseptit {
         if (verrattavaReseptit.juoksevaId != this.juoksevaId) { return false; }
         if (verrattavaReseptit.lkm != this.lkm) { return false; }
         if (!verrattavaReseptit.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
+        if (!verrattavaReseptit.ainesosat.equals(this.ainesosat)) { return false; }
         
         // verrataan yksittäisiä reseptejä toisiinsa
         for (int i = 0; i < this.lkm; i++) {
@@ -291,6 +303,7 @@ public class Reseptit {
         hash = Hajautus.hajautusInt(hash, this.juoksevaId);
         hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
         hash = Hajautus.hajautusInt(hash, this.lkm);
+        hash = Hajautus.hajautusInt(hash, this.ainesosat.hashCode());
         
         for (int i = 0; i < this.lkm; i++) {
             hash = Hajautus.hajautusInt(hash, this.reseptit.get(i).hashCode());

@@ -39,6 +39,18 @@ public class OsionAinesosat extends TietueHallitsija {
     
     
     /**
+     * Asettaa viitteen luokkaan joka hallitsee olemassa olevia ainesosia.
+     * Ei hyväksy null-viitettä.
+     * 
+     * @param ainesosat asetettavat ainesosat
+     */
+    public void setAinesosat(Ainesosat ainesosat) {
+        if (ainesosat == null) { return; }
+        this.ainesosat = ainesosat;
+    }
+    
+    
+    /**
      * Parametriton muodostaja.
      * Luo itselleen oman Ainesosat-luokan.
      * Osio tunnus alustuu luvuksi 1.

@@ -18,20 +18,21 @@ public class Resepti {
     
     private int reseptiId =                     -1;
     private String nimi =                       "";
-    private Osiot osiot =                       new Osiot();
+    private Osiot osiot =                       null;
     private String kuvaus =                     "";
     private int hinta =                         -1;
     private int valmistusaika =                 -1;
     private int tahdet =                        -1;
     private int vaativuus =                     -1;
+    private Ainesosat ainesosat =               null;
     
     private static final Map<Integer, String> hintaVaihtoehdot;
     private static final Map<Integer, String> valmistusaikaVaihtoehdot;
     private static final Map<Integer, String> tahdetVaihtoehdot;
     private static final Map<Integer, String> vaativuusVaihtoehdot;
     
-     /* alustetaan HashMapit attribuuttien vaihtoehdoista ensimmäisellä kertaa
-     * ei luoda erikseen joka oliolle
+     /* alustetaan HashMapit attribuuttien vaihtoehdoista ensimmäisellä kertaa.
+     * samat kaikille, joten ei luoda erikseen joka oliolle.
      * luo Mapit muuttumattomiksi, esimerkiksi metodi
      * Resepti.hintaVaihtoehdot.put(7, "€€€€€€€"); heittää virheilmoituksen
      */
@@ -83,6 +84,21 @@ public class Resepti {
     public Resepti(int id, String nimi) {
         this.reseptiId = id;
         setNimi(nimi);
+        this.ainesosat = new Ainesosat();
+        this.osiot = new Osiot(this.ainesosat);
+    }
+    
+    
+    /**
+     * Luo Reseptin.
+     * Reseptin tunnus alustuu -1 ja nimi oletukseksi.
+     * 
+     * @param ainesosat asetettava ainesosien hallitsija
+     */
+    public Resepti(Ainesosat ainesosat) {
+        this.reseptiId = -1;
+        setNimi(null);
+        setAinesosat(ainesosat);
     }
     
     
@@ -99,6 +115,8 @@ public class Resepti {
     public Resepti() {
         this.reseptiId = -1;
         setNimi(null);
+        this.ainesosat = new Ainesosat();
+        this.osiot = new Osiot(this.ainesosat);
     }
     
     
@@ -188,6 +206,19 @@ public class Resepti {
      */
     public String getKuvaus() {
         return this.kuvaus;
+    }
+    
+    
+    /**
+     * Asettaa viitteen luokkaan joka hallitsee olemassa olevia ainesosia.
+     * Ei hyväksy null-viitettä.
+     * 
+     * @param ainesosat asetettavat ainesosat
+     */
+    public void setAinesosat(Ainesosat ainesosat) {
+        if (ainesosat == null) { return; }
+        this.ainesosat = ainesosat;
+        this.osiot.setAinesosat(ainesosat);
     }
     
     
@@ -477,6 +508,9 @@ public class Resepti {
         kopio.kuvaus = this.kuvaus;
         kopio.vaativuus = this.vaativuus;
         
+        // annetaan viite samaan ainesosien hallitsijaan kopioinnin sijasta
+        kopio.ainesosat = this.ainesosat;
+        
         // luodaan täysi kopio reseptin osioista
         kopio.osiot = this.osiot.clone();
         
@@ -539,6 +573,7 @@ public class Resepti {
         if (this.vaativuus != verrattavaResepti.vaativuus) { return false; }
         if (!this.kuvaus.equals(verrattavaResepti.getKuvaus())) { return false; }
         if (!this.osiot.equals(verrattavaResepti.osiot)) { return false; }
+        if (!this.ainesosat.equals(verrattavaResepti.ainesosat)) { return false; }
         
         return true;
     }
@@ -589,6 +624,7 @@ public class Resepti {
         hash = Hajautus.hajautusInt(hash, this.tahdet);;
         hash = Hajautus.hajautusInt(hash, this.vaativuus);
         hash = Hajautus.hajautusInt(hash, this.osiot.hashCode());
+        hash = Hajautus.hajautusInt(hash, this.ainesosat.hashCode());
         return hash;
     }
     

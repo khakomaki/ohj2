@@ -11,17 +11,34 @@ import kanta.Hajautus;
  */
 public class Osiot {
 
+    private Ainesosat ainesosat;
     private String tiedostoNimi;
     private int juoksevaId;
     private ArrayList<Osio> osiot;
     
     /**
-     * 
+     * Luo osiot ja oman ainesosien hallitsijan
      */
     public Osiot() {
         this.osiot = new ArrayList<Osio>();
         this.tiedostoNimi = "resepti_osiot.dat";
         this.juoksevaId = 0;
+        this.ainesosat = new Ainesosat();
+    }
+    
+    
+    /**
+     * Luo osiot annetulla ainesosien hallitsijalla
+     * 
+     * @param ainesosat viite ainesosien hallitsijaan
+     */
+    public Osiot(Ainesosat ainesosat) {
+        this.osiot = new ArrayList<Osio>();
+        this.tiedostoNimi = "resepti_osiot.dat";
+        this.juoksevaId = 0;
+        
+        if (ainesosat == null) { this.ainesosat = new Ainesosat(); return; }
+        this.ainesosat = ainesosat;
     }
     
     
@@ -42,6 +59,23 @@ public class Osiot {
         if (tiedostonimi == null) { return; }
         if (tiedostonimi.length() < 1) { return; }
         this.tiedostoNimi = tiedostonimi;
+    }
+    
+    
+    /**
+     * Asettaa viitteen luokkaan joka hallitsee olemassa olevia ainesosia.
+     * Ei hyväksy null-viitettä.
+     * 
+     * @param ainesosat asetettavat ainesosat
+     */
+    public void setAinesosat(Ainesosat ainesosat) {
+        if (ainesosat == null) { return; }
+        this.ainesosat = ainesosat;
+        
+        // jos osioita on jo lisätty, vaihtaa niiden ainesosat uusiin
+        for (int i = 0; i < this.osiot.size(); i++) {
+            this.osiot.get(i).setAinesosat(ainesosat);
+        }
     }
     
     
@@ -82,6 +116,7 @@ public class Osiot {
      */
     public Osio lisaaOsio(String nimi) {
         Osio osio = new Osio(this.juoksevaId, nimi);
+        osio.setAinesosat(this.ainesosat);
         osiot.add(osio);
         this.juoksevaId++;
         return osio;
@@ -89,6 +124,9 @@ public class Osiot {
     
     
     /**
+     * Lisää yhden osion.
+     * Ei tee mitään null-viitteelle.
+     * 
      * @param osio lisättävä osio
      * 
      * @example
@@ -102,7 +140,10 @@ public class Osiot {
      * </pre>
      */
     public void lisaaOsio(Osio osio) {
-        this.osiot.add(osio);
+        if (osio == null) { return; }
+        Osio lisattavaOsio = osio;
+        lisattavaOsio.setAinesosat(this.ainesosat);
+        this.osiot.add(lisattavaOsio);
     }
     
     
@@ -181,6 +222,9 @@ public class Osiot {
         kopio.juoksevaId = this.juoksevaId;
         kopio.tiedostoNimi = this.tiedostoNimi;
         
+        // annetaan viite samoihin ainesosiin kopioinnin sijasta
+        kopio.ainesosat = this.ainesosat;
+        
         // kopioidaan yksittäiset osiot
         for (int i = 0; i < this.osiot.size(); i++) {
             kopio.osiot.add(this.osiot.get(i).clone());
@@ -220,6 +264,7 @@ public class Osiot {
         if (verrattavaOsiot.juoksevaId != this.juoksevaId) { return false; }
         if (!verrattavaOsiot.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
         if (verrattavaOsiot.osiot.size() != this.osiot.size()) { return false; }
+        if (!verrattavaOsiot.ainesosat.equals(this.ainesosat)) { return false; }
         
         // käsketään yksittäisten osioiden vertaamaan toisiaan keskenään
         for (int i = 0; i < this.osiot.size(); i++) {
@@ -257,6 +302,7 @@ public class Osiot {
         int hash = 1;
         hash = Hajautus.hajautusInt(hash, this.juoksevaId);
         hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        hash = Hajautus.hajautusInt(hash, this.ainesosat.hashCode());
         
         for (int i = 0; i < this.osiot.size(); i++) {
             hash = Hajautus.hajautusInt(hash, this.osiot.get(i).hashCode());
