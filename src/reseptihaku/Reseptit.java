@@ -69,7 +69,7 @@ public class Reseptit {
      * @param nimi reseptin nimi
      * @return luotu resepti
      */
-    public Resepti lisaaResepti(String nimi) {
+    public Resepti lisaa(String nimi) {
         Resepti resepti = new Resepti(this.juoksevaId, nimi);
         resepti.setAinesosat(ainesosat);
         reseptit.add(resepti);
@@ -119,17 +119,24 @@ public class Reseptit {
     
     
     /**
-     * Ei anna vaihtaa indeksistä jota ei ole olemassa eikä vaihtaa null-viitteeseen.
+     * Vaihtaa vanhan resepti-viitteen tilalle uuden.
+     * Ei tee mitään jos jompi kumpi resepteistä on null-viite tai vaihdettavaa reseptiä ei löydy.
      * 
-     * @param indeksi minkä indeksin resepti halutaan vaihtaa
+     * @param vanhaResepti minkä reseptin tilalle vaihdetaan
      * @param uusiResepti tilalle vaihdettava resepti
      */
-    public void vaihdaIndeksista(int indeksi, Resepti uusiResepti) {
-        if (indeksi < 0 || this.lkm < indeksi || uusiResepti == null) { return; }
+    public void vaihdaResepti(Resepti vanhaResepti, Resepti uusiResepti) {
+        if (vanhaResepti == null || uusiResepti == null) { return; }
         
+        // varmistaa että uusi resepti käyttää samaa Ainesosat-viitettä kuin luokka
         Resepti vaihdettavaResepti = uusiResepti;
         vaihdettavaResepti.setAinesosat(ainesosat);
-        this.reseptit.set(indeksi, vaihdettavaResepti);
+        
+        // etsii vaihdettavan indeksin, poistuu jos ei löydy
+        int vanhaReseptiIndeksi = this.reseptit.indexOf(vanhaResepti);
+        if (vanhaReseptiIndeksi < 0) { return; }
+        
+        this.reseptit.set(vanhaReseptiIndeksi, vaihdettavaResepti);
     }
     
     
@@ -159,6 +166,49 @@ public class Reseptit {
      */
     public void tulostaReseptit(OutputStream os) {
         tulostaReseptit(os, this.lkm);
+    }
+    
+    
+    /**
+     * Poistaa annetun reseptin resepteistä
+     * 
+     * @param resepti poistettava resepti
+     * 
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * Resepti resepti1 = reseptit.lisaa("Mustikkapiirakka");
+     * Resepti resepti2 = reseptit.lisaa("Lihapiirakka");
+     * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
+     * reseptit.toString() === "3|reseptit.dat";
+     * 
+     * reseptit.poista(resepti2);
+     * reseptit.toString() === "2|reseptit.dat";
+     * 
+     * reseptit.poista(null);
+     * reseptit.toString() === "2|reseptit.dat";
+     * 
+     * reseptit.poista(resepti1);
+     * reseptit.toString() === "1|reseptit.dat";
+     * 
+     * reseptit.poista(resepti1);
+     * reseptit.toString() === "1|reseptit.dat";
+     * 
+     * reseptit.poista(resepti3);
+     * reseptit.toString() === "0|reseptit.dat";
+     * 
+     * reseptit.poista(resepti1);
+     * reseptit.toString() === "0|reseptit.dat";
+     * </pre>
+     */
+    public void poista(Resepti resepti) {
+        int poistettavanIndeksi = reseptit.indexOf(resepti);
+        
+        // poistutaan jos poistettavaa ei löydetty
+        if (poistettavanIndeksi < 0) { return; }
+        
+        this.reseptit.remove(poistettavanIndeksi);
+        this.lkm--;
     }
     
     
@@ -339,9 +389,9 @@ public class Reseptit {
         Reseptit reseptit = new Reseptit();
         System.out.println(reseptit);
         
-        Resepti mustikkapiirakka = reseptit.lisaaResepti("Mustikkapiirakka");
-        reseptit.lisaaResepti("Pizza");
-        reseptit.lisaaResepti("Lihapiirakka");
+        Resepti mustikkapiirakka = reseptit.lisaa("Mustikkapiirakka");
+        reseptit.lisaa("Pizza");
+        reseptit.lisaa("Lihapiirakka");
         mustikkapiirakka.setKuvaus("helppo ja hyvä");
         System.out.println(reseptit + "\n");
         

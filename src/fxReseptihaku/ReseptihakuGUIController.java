@@ -114,11 +114,6 @@ public class ReseptihakuGUIController implements Initializable {
           this.ylinVaativuus.setRivit("\n" + Resepti.getVaativuusVaihtoehdot());
           
           // TODO: kuuntelijat suodattimien muuttumiselle
-          /*
-          this.alinHinta.valueProperty().addListener((havainnoitava, vanhaArvo, uusiArvo) -> {
-              //
-          });
-          */
       }
       
       
@@ -157,7 +152,13 @@ public class ReseptihakuGUIController implements Initializable {
       
       
       private void lisaaResepti() {
-          ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Lisää resepti", null, null);
+          Resepti luotuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Lisää resepti", null, null);
+          
+          // poistutaan jos luotu resepti on null
+          if (luotuResepti == null) { return; }
+          
+          reseptit.lisaa(luotuResepti);
+          haeReseptit();
       }
       
       
@@ -170,9 +171,16 @@ public class ReseptihakuGUIController implements Initializable {
           // avataan muokkausnäkymä, josta palatessa saadaan mahdollisesti muokattu resepti
           Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, muokattavaResepti);
           
+          // poistaa reseptin resepteistä jos palautetaan null viite (resepti on poistettu muokkausnäkymässä)
+          if (muokattuResepti == null) {
+              reseptit.poista(muokattavaResepti);
+              haeReseptit();
+              return;
+          }
+          
           // muokkauksesta palatessa katsotaan tuliko muutoksia ja mahdollisesti päivitetään hakutulokset
           if (!muokattavaResepti.equals(muokattuResepti)) {
-              this.reseptit.vaihdaIndeksista(valittuResepti, muokattuResepti);
+              this.reseptit.vaihdaResepti(muokattavaResepti, muokattuResepti);
               haeReseptit();
           }
       }
@@ -188,9 +196,16 @@ public class ReseptihakuGUIController implements Initializable {
           // avataan reseptinäkymä ja palatessa saadaan mahdollisesti muokattu resepti
           Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, avattavaResepti);
           
+          // poistaa reseptin resepteistä jos palautetaan null viite (resepti on poistettu avausnäkymässä)
+          if (muokattuResepti == null) {
+              reseptit.poista(avattavaResepti);
+              haeReseptit();
+              return;
+          }
+          
           // palatessa katsotaan tuliko muutoksia ja mahdollisesti päivitetään hakutulokset
           if (!avattavaResepti.equals(muokattuResepti)) {
-              this.reseptit.vaihdaIndeksista(valittuResepti, muokattuResepti);
+              this.reseptit.vaihdaResepti(avattavaResepti, muokattuResepti);
               haeReseptit();
           }
       }
@@ -213,7 +228,10 @@ public class ReseptihakuGUIController implements Initializable {
           
           // näytetään dialogi reseptin poistamisesta
           boolean vastaus = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
-          if (vastaus) { Dialogs.showMessageDialog("Ei osata poistaa reseptiä vielä"); }
+          if (vastaus) { 
+              reseptit.poista(hakuReseptit.get(valittuResepti));
+              haeReseptit();
+          }
       }
       
       

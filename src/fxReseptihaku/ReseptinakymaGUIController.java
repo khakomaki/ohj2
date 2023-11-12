@@ -58,6 +58,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         naytaReseptinOhjeet();        
     }
     
+    
     private void naytaReseptinOminaisuudet() {
         // asetetaan reseptin tiedot näkymään
         this.reseptinNimi.setText(this.valittuResepti.getNimi());
@@ -67,6 +68,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         this.reseptinTahdet.setText(this.valittuResepti.getTahdetString());
         this.reseptinVaativuus.setText(this.valittuResepti.getVaativuusString());
     }
+    
     
     private void naytaReseptinAinesosat() {
         // tyhjennetään VBox sisältö
@@ -90,6 +92,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         }
     }
     
+    
     private void naytaReseptinOhjeet() {
         // tyhjennetään VBox sisältö
         this.ohjeetVBox.getChildren().clear();
@@ -112,21 +115,25 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         }
     }
     
+    
     private void sulje() {
         ModalController.closeStage(reseptinNimi);
     }
+    
     
     private void tulosta() {
         Dialogs.showMessageDialog("Ei osata tulostaa vielä");
     }
     
+    
     private void muokkaaResepti() {
         Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, this.valittuResepti);
         
         // jos muokattu resepti on poistettu, suljetaan näkymä
-        if (muokattuResepti == null) { 
-            this.valittuResepti = muokattuResepti; 
-            sulje(); 
+        if (muokattuResepti == null) {
+            this.valittuResepti = null;
+            sulje();
+            return;
         }
         
         // jos reseptiin on tehty muutoksia, päivitetään käyttöliittymän näkymä
@@ -136,9 +143,13 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         }
     }
     
+    
     private void poistaResepti() {
         boolean vastaus = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
-        if (vastaus) { Dialogs.showMessageDialog("Ei osata poistaa reseptiä vielä"); }
+        if (vastaus) {
+            this.valittuResepti = null;
+            sulje();
+        }
     }
     
 }

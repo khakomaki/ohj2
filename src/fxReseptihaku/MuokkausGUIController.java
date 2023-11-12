@@ -332,11 +332,6 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // ei tallenneta turhaan jos ei ole tullut muutoksia
         if (!tulikoMuutoksia()) { return; }
         
-        // asetetaan käyttöliittymän tiedot reseptille
-        this.valittuResepti.setKuvaus(this.kuvausTextArea.getText());
-        this.valittuResepti.setUusiNimi(this.reseptinNimiTextField.getText());
-        this.valittuResepti.setHinta(this.hintaSuodatin.getSelectedIndex() + 1);
-        
         this.alkuperainenResepti = this.valittuResepti;
         // TODO: tallenna tiedostoon
     }
@@ -345,7 +340,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     private void poistaResepti() {
         boolean vastaus = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
         if (vastaus) { 
-            Dialogs.showMessageDialog("Ei osata poistaa reseptiä vielä");
+            this.alkuperainenResepti = null;
             suljeTallentamatta();
         }
     }

@@ -39,18 +39,6 @@ public class OsionAinesosat extends TietueHallitsija {
     
     
     /**
-     * Asettaa viitteen luokkaan joka hallitsee olemassa olevia ainesosia.
-     * Ei hyväksy null-viitettä.
-     * 
-     * @param ainesosat asetettavat ainesosat
-     */
-    public void setAinesosat(Ainesosat ainesosat) {
-        if (ainesosat == null) { return; }
-        this.ainesosat = ainesosat;
-    }
-    
-    
-    /**
      * Parametriton muodostaja.
      * Luo itselleen oman Ainesosat-luokan.
      * Osio tunnus alustuu luvuksi 1.
@@ -68,6 +56,18 @@ public class OsionAinesosat extends TietueHallitsija {
     
     
     /**
+     * Asettaa viitteen luokkaan joka hallitsee olemassa olevia ainesosia.
+     * Ei hyväksy null-viitettä.
+     * 
+     * @param ainesosat asetettavat ainesosat
+     */
+    public void setAinesosat(Ainesosat ainesosat) {
+        if (ainesosat == null) { return; }
+        this.ainesosat = ainesosat;
+    }
+    
+    
+    /**
      * @param tiedostonimi tiedoston nimi johon tallennetaan
      */
     public void setTiedostoNimi(String tiedostonimi) {
@@ -79,6 +79,9 @@ public class OsionAinesosat extends TietueHallitsija {
     
     
     /**
+     * Lisää osion ainesosan (ainesosa + määrä).
+     * Ei lisää nullia ainesosana.
+     * 
      * @param ainesosa lisättävä ainesosa
      * @param maara ainesosan määrä
      */
