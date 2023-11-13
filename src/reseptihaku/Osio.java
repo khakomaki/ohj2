@@ -210,7 +210,7 @@ public class Osio {
      * @param maara lisättävän ainesosa määrä
      */
     public void lisaaAinesosa(Ainesosa ainesosa, String maara) {
-        this.osionAinesosat.lisaaOsionAinesosa(ainesosa, maara);
+        this.osionAinesosat.lisaa(ainesosa, maara);
     }
     
     

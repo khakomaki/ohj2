@@ -182,7 +182,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
             int ainesosanRivi = i + 1;
             
             // luo ja lisää TextField-elementit GridPaneen
-            OsionAinesosa oa = osionAinesosat.annaIndeksista(i);
+            OsionAinesosa oa = osionAinesosat.anna(i);
             TextField maaraTextField = new TextField(oa.getMaara());
             maaraTextField.setAlignment(Pos.CENTER);
             TextField ainesosaTextField = new TextField(osio.getAinesosanNimi(oa.getId()));

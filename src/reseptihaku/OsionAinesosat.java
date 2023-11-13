@@ -85,17 +85,17 @@ public class OsionAinesosat extends TietueHallitsija {
      * @param ainesosa lisättävä ainesosa
      * @param maara ainesosan määrä
      */
-    public void lisaaOsionAinesosa(Ainesosa ainesosa, String maara) {
+    public void lisaa(Ainesosa ainesosa, String maara) {
         // ei lisätä nulleja
         if (ainesosa == null) { return; }
         
         // koitetaan onko ainesosissa olemassa jo vastaava ainesosa, jos ei ole niin käsketään lisäämään
         Ainesosa lisattavaAinesosa = this.ainesosat.anna(ainesosa.getNimi());
-        if (lisattavaAinesosa == null) { lisattavaAinesosa = this.ainesosat.lisaaAinesosa(ainesosa); }
+        if (lisattavaAinesosa == null) { lisattavaAinesosa = this.ainesosat.lisaa(ainesosa); }
         
         // luodaan osion ainesosa ainesosilta saadulla tiedolla ja määrällä
         OsionAinesosa osionAinesosa = new OsionAinesosa(lisattavaAinesosa.getId(), maara);
-        lisaa(osionAinesosa);
+        lisaaOlio(osionAinesosa);
     }
     
     
@@ -105,17 +105,17 @@ public class OsionAinesosat extends TietueHallitsija {
      */
     public void lisaaOsionAinesosa(String ainesosaNimi, String maara) {
         Ainesosa ainesosa = new Ainesosa(ainesosaNimi);
-        lisaaOsionAinesosa(ainesosa, maara);
+        lisaa(ainesosa, maara);
     }
     
     
     /**
      * @param osionAinesosa lisättävä osion ainesosa
      */
-    public void lisaaOsionAinesosa(OsionAinesosa osionAinesosa) {
+    public void lisaa(OsionAinesosa osionAinesosa) {
         Ainesosa ainesosa = this.ainesosat.anna(osionAinesosa.getId());
         String maara = osionAinesosa.getMaara();
-        lisaaOsionAinesosa(ainesosa, maara);
+        lisaa(ainesosa, maara);
     }
     
     
@@ -123,16 +123,36 @@ public class OsionAinesosat extends TietueHallitsija {
      * @param ainesosa lisättävä ainesosa
      */
     public void lisaaOsionAinesosa(Ainesosa ainesosa) {
-        lisaaOsionAinesosa(ainesosa, "");
+        lisaa(ainesosa, "");
+    }
+    
+    
+    /**
+     * Poistaa osion ainesosan, jos annettu ainesosa löytyy.
+     * 
+     * @param osionAinesosa poistettava osion ainesosa
+     */
+    public void poista(OsionAinesosa osionAinesosa) {
+        poista(osionAinesosa);
     }
     
     
     /**
      * @param indeksi mistä indeksistä halutaan osion ainesosa
      * @return osion ainesosa halutusta indeksistä tai null
+     * 
+     * @example
+     * <pre name="test">
+     * OsionAinesosat oat = new OsionAinesosat();
+     * oat.anna(0) == null === true;
+     * 
+     * oat.lisaaOsionAinesosa("Mansikka", "2dl");
+     * oat.anna(0).equals(new OsionAinesosa(0, "2dl")) === true;
+     * </pre>
      */
-    public OsionAinesosa annaIndeksista(int indeksi) {
+    public OsionAinesosa anna(int indeksi) {
         Object olio = getOlio(indeksi);
+        if (olio == null) { return null; }
         if (olio.getClass() != OsionAinesosa.class) { return null; }
         return (OsionAinesosa)olio;
     }
@@ -144,7 +164,7 @@ public class OsionAinesosat extends TietueHallitsija {
     public void tulostaOsionAinesosat(OutputStream os) {
         PrintStream out = new PrintStream(os);
         for (int i = 0; i < getLkm(); i++) {
-            OsionAinesosa osionAinesosa = this.annaIndeksista(i);
+            OsionAinesosa osionAinesosa = this.anna(i);
             
             // ei tulosteta mitään jos OsionAinesosa on null
             if (osionAinesosa == null) return;
@@ -190,7 +210,7 @@ public class OsionAinesosat extends TietueHallitsija {
         
         // kopioidaan kaikki alkiot kopioon
         for (int i = 0; i < this.getLkm(); i++) {
-            kopio.lisaaOsionAinesosa(this.annaIndeksista(i));
+            kopio.lisaa(this.anna(i));
         }
         
         return kopio;
@@ -231,7 +251,7 @@ public class OsionAinesosat extends TietueHallitsija {
         
         // verrataan alkioita keskenään
         for (int i = 0; i < this.getLkm(); i++) {
-            if (!verrattavaOA.annaIndeksista(i).equals(this.annaIndeksista(i))) { return false; }
+            if (!verrattavaOA.anna(i).equals(this.anna(i))) { return false; }
         }
         if (!verrattavaOA.ainesosat.equals(this.ainesosat)) { return false; }
         
@@ -270,7 +290,7 @@ public class OsionAinesosat extends TietueHallitsija {
         hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
         
         for (int i = 0; i < this.getLkm(); i++) {
-            hash = Hajautus.hajautusInt(hash, this.annaIndeksista(i).hashCode());
+            hash = Hajautus.hajautusInt(hash, this.anna(i).hashCode());
         }
         
         return hash;
@@ -308,8 +328,8 @@ public class OsionAinesosat extends TietueHallitsija {
     public static void main(String[] args) {
         int nykyisenOsionId = 1;
         Ainesosat kaikkiAinesosat = new Ainesosat();
-        kaikkiAinesosat.lisaaAinesosa("sipulia");
-        kaikkiAinesosat.lisaaAinesosa("suolaa");
+        kaikkiAinesosat.lisaa("sipulia");
+        kaikkiAinesosat.lisaa("suolaa");
         OsionAinesosat osionAinesosat = new OsionAinesosat(nykyisenOsionId, kaikkiAinesosat);
         
         System.out.println("Osion ainesosat -oliot:\n" + osionAinesosat.toString());

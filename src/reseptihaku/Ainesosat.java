@@ -91,7 +91,7 @@ public class Ainesosat extends TietueHallitsija {
      * Ainesosat ainesosat = new Ainesosat();
      * ainesosat.anna("banaani") === null;
      * 
-     * ainesosat.lisaaAinesosa("BANAANI");
+     * ainesosat.lisaa("BANAANI");
      * ainesosat.anna("banaani").toString() === "0|banaani";
      * 
      * </pre>
@@ -120,7 +120,7 @@ public class Ainesosat extends TietueHallitsija {
      * ainesosat.anna(0) === null;
      * ainesosat.anna(1) === null;
      * 
-     * ainesosat.lisaaAinesosa("BANAANI");
+     * ainesosat.lisaa("BANAANI");
      * ainesosat.anna(0).toString() === "0|banaani";
      * </pre>
      */
@@ -160,20 +160,20 @@ public class Ainesosat extends TietueHallitsija {
      * ainesosat.toString() === "ainesosat.dat|0|1";
      * ainesosat.anna("ketsuppia") === null;
      * 
-     * ainesosat.lisaaAinesosa("ketsuppia");
+     * ainesosat.lisaa("ketsuppia");
      * ainesosat.toString() === "ainesosat.dat|1|1";
      * ainesosat.anna("ketsuppia").toString() === "0|ketsuppia";
      * 
-     * ainesosat.lisaaAinesosa("sinappia");
+     * ainesosat.lisaa("sinappia");
      * ainesosat.toString() === "ainesosat.dat|2|2";
      * ainesosat.anna("sinappia").toString() === "1|sinappia";
      * </pre>
      */
-    public Ainesosa lisaaAinesosa(String ainesosaNimi) {
+    public Ainesosa lisaa(String ainesosaNimi) {
         // uusi ainesosa ja kasvatetaan tunnuslukua
         Ainesosa ainesosa = new Ainesosa(this.annettavaTunnusLuku, ainesosaNimi);
         this.annettavaTunnusLuku++;
-        lisaa(ainesosa);
+        lisaaOlio(ainesosa);
         return ainesosa;
     }
     
@@ -182,9 +182,36 @@ public class Ainesosat extends TietueHallitsija {
      * @param ainesosa lisättävä ainesosa
      * @return lisätty ainesosa
      */
-    public Ainesosa lisaaAinesosa(Ainesosa ainesosa) {
-        Ainesosa lisattavaAinesosa = lisaaAinesosa(ainesosa.getNimi());
+    public Ainesosa lisaa(Ainesosa ainesosa) {
+        Ainesosa lisattavaAinesosa = lisaa(ainesosa.getNimi());
         return lisattavaAinesosa;
+    }
+    
+    
+    /**
+     * @param ainesosa poistettava ainesosa
+     * 
+     * @example
+     * <pre name="test">
+     * Ainesosat ainesosat = new Ainesosat();
+     * Ainesosa sokeri = new Ainesosa("Sokeri");
+     * Ainesosa kananmuna = new Ainesosa("kananmuna");
+     * ainesosat.lisaa(sokeri);
+     * ainesosat.lisaa(kananmuna);
+     * ainesosat.toString() === "ainesosat.dat|2|2";
+     * 
+     * ainesosat.poista(null);
+     * ainesosat.toString() === "ainesosat.dat|2|2";
+     * 
+     * ainesosat.poista(new Ainesosa("suola"));
+     * ainesosat.toString() === "ainesosat.dat|2|2";
+     * 
+     * ainesosat.poista(sokeri);
+     * ainesosat.toString() === "ainesosat.dat|1|2";
+     * </pre>
+     */
+    public void poista(Ainesosa ainesosa) {
+        poistaOlio(ainesosa);
     }
     
     
@@ -209,11 +236,11 @@ public class Ainesosat extends TietueHallitsija {
      * Ainesosat ainesosat = new Ainesosat();
      * ainesosat.toString() === "ainesosat.dat|0|1";
      * 
-     * ainesosat.lisaaAinesosa("punasipuli");
+     * ainesosat.lisaa("punasipuli");
      * ainesosat.toString() === "ainesosat.dat|1|1";
      * 
-     * ainesosat.lisaaAinesosa("valkosipuli");
-     * ainesosat.lisaaAinesosa("keltasipuli");
+     * ainesosat.lisaa("valkosipuli");
+     * ainesosat.lisaa("keltasipuli");
      * ainesosat.toString() === "ainesosat.dat|3|4";
      * </pre>
      */
@@ -233,9 +260,9 @@ public class Ainesosat extends TietueHallitsija {
      * @example
      * <pre name="test">
      * Ainesosat ainesosat = new Ainesosat();
-     * ainesosat.lisaaAinesosa(new Ainesosa("porkkana"));
-     * ainesosat.lisaaAinesosa(new Ainesosa("peruna"));
-     * ainesosat.lisaaAinesosa(new Ainesosa("sipuli"));
+     * ainesosat.lisaa(new Ainesosa("porkkana"));
+     * ainesosat.lisaa(new Ainesosa("peruna"));
+     * ainesosat.lisaa(new Ainesosa("sipuli"));
      * 
      * Ainesosat kopioAinesosat = ainesosat.clone();
      * ainesosat.toString().equals(kopioAinesosat.toString()) === true;
@@ -259,7 +286,7 @@ public class Ainesosat extends TietueHallitsija {
         
         for (int i = 0; i < this.getLkm(); i++) {
             Ainesosa kopioAinesosa = annaIndeksista(i).clone();
-            kopio.lisaa(kopioAinesosa);
+            kopio.lisaaOlio(kopioAinesosa);
         }
         kopio.annettavaTunnusLuku = this.annettavaTunnusLuku;
         kopio.tiedostoNimi = this.tiedostoNimi;
@@ -285,10 +312,10 @@ public class Ainesosat extends TietueHallitsija {
      * ainesosat2.setTiedostoNimi("ainesosat.txt");
      * ainesosat1.equals(ainesosat2) === true;
      * 
-     * ainesosat1.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat1.lisaa(new Ainesosa("porkkana"));
      * ainesosat1.equals(ainesosat2) === false;
      * 
-     * ainesosat2.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat2.lisaa(new Ainesosa("porkkana"));
      * ainesosat1.equals(ainesosat2) === true;
      * </pre>
      */
@@ -326,10 +353,10 @@ public class Ainesosat extends TietueHallitsija {
      * ainesosat2.setTiedostoNimi("ainesosat.txt");
      * ainesosat1.hashCode() == ainesosat2.hashCode() === true;
      * 
-     * ainesosat1.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat1.lisaa(new Ainesosa("porkkana"));
      * ainesosat1.hashCode() == ainesosat2.hashCode() === false;
      * 
-     * ainesosat2.lisaaAinesosa(new Ainesosa("porkkana"));
+     * ainesosat2.lisaa(new Ainesosa("porkkana"));
      * ainesosat1.hashCode() == ainesosat2.hashCode() === true;
      * </pre>
      */
@@ -354,11 +381,11 @@ public class Ainesosat extends TietueHallitsija {
         ainesosat.setTiedostoNimi("ainesosat.dat");
         System.out.println("Tallennus tiedosto: " + ainesosat.getTiedostonimi());
         System.out.println(ainesosat.toString() );
-        ainesosat.lisaaAinesosa("maitoa");
+        ainesosat.lisaa("maitoa");
         System.out.println(ainesosat.toString() );
-        ainesosat.lisaaAinesosa("perunoita");
+        ainesosat.lisaa("perunoita");
         System.out.println(ainesosat.toString() );
-        ainesosat.lisaaAinesosa("porkkanoita");
+        ainesosat.lisaa("porkkanoita");
         System.out.println(ainesosat.toString() );
         Ainesosa maito = ainesosat.anna("PERUNOITA");
         System.out.println(maito);

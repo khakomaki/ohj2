@@ -144,17 +144,17 @@ public class TietueHallitsija {
      * olioHallitsija.toString() === "0|1|2.0|0";
      * 
      * Object olio = new Object();
-     * olioHallitsija.lisaa(olio);
+     * olioHallitsija.lisaaOlio(olio);
      * olioHallitsija.toString() === "1|1|2.0|0";
      * 
-     * olioHallitsija.lisaa(new Object());
+     * olioHallitsija.lisaaOlio(new Object());
      * olioHallitsija.toString() === "2|2|2.0|0";
      * 
-     * olioHallitsija.lisaa(new Object());
+     * olioHallitsija.lisaaOlio(new Object());
      * olioHallitsija.toString() === "3|4|2.0|0";
      * </pre>
      */
-    public void lisaa(Object olio) {
+    public void lisaaOlio(Object olio) {
         if (!onkoTilaa()) { lisaaTilaa(); }
         this.oliot[lkm] = olio;
         this.lkm++;
@@ -170,25 +170,25 @@ public class TietueHallitsija {
      * @example
      * <pre name="test">
      * TietueHallitsija th = new TietueHallitsija();
-     * th.lisaa(new Object());
-     * th.lisaa(new Object());
+     * th.lisaaOlio(new Object());
+     * th.lisaaOlio(new Object());
      * 
      * th.toString() === "2|2|2.0|0";
-     * th.poista(5) === 2;
-     * th.poista(-1) === 2;
-     * th.poista(1) === 1;
-     * th.poista(1) === 1;
-     * th.poista(0) === 0;
-     * th.poista(0) === 0;
+     * th.poistaOlio(5) === 2;
+     * th.poistaOlio(-1) === 2;
+     * th.poistaOlio(1) === 1;
+     * th.poistaOlio(1) === 1;
+     * th.poistaOlio(0) === 0;
+     * th.poistaOlio(0) === 0;
      * th.toString() === "0|2|2.0|0";
      * 
      * th = new TietueHallitsija(1);
      * th.toString() === "0|1|2.0|0";
-     * th.poista(0);
+     * th.poistaOlio(0);
      * th.toString() === "0|1|2.0|0";
      * </pre>
      */
-    public int poista(int indeksi) {
+    public int poistaOlio(int indeksi) {
         // poistutaan jos indeksi ei ole mieluisa
         if (indeksi < 0 || this.lkm <= indeksi) { return this.lkm; }
         
@@ -208,10 +208,10 @@ public class TietueHallitsija {
      * @param olio poistettava olio
      * @return olioiden lukumäärä mahdollisen poiston jälkeen
      */
-    public int poista(Object olio) {
+    public int poistaOlio(Object olio) {
         for (int i = 0; i < this.lkm; i++) {
             if (oliot[i].equals(olio)) { 
-                return poista(i);
+                return poistaOlio(i);
             }
         }
         return this.lkm;
@@ -231,12 +231,12 @@ public class TietueHallitsija {
      * tietueet = new TietueHallitsija(13);
      * tietueet.toString() === "0|13|2.0|0";
      * 
-     * tietueet.lisaa(new Object());
+     * tietueet.lisaaOlio(new Object());
      * tietueet.toString() === "1|13|2.0|0";
      * 
-     * tietueet.lisaa(new Object());
-     * tietueet.lisaa(new Object());
-     * tietueet.lisaa(new Object());
+     * tietueet.lisaaOlio(new Object());
+     * tietueet.lisaaOlio(new Object());
+     * tietueet.lisaaOlio(new Object());
      * tietueet.toString() === "4|13|2.0|0";
      * </pre>
      */
@@ -262,7 +262,7 @@ public class TietueHallitsija {
         
         // lisätään 10 oliota ja tulostetaan jokaisen lisäyksen jälkenen
         for (int i = 0; i < 10; i++) {
-            tietueet.lisaa(new Object());
+            tietueet.lisaaOlio(new Object());
             System.out.println(tietueet.toString());
         }
         
@@ -270,12 +270,12 @@ public class TietueHallitsija {
         System.out.println("\n" + tietueet.toString());
         
         Object obj = new Object();
-        tietueet.lisaa(obj);
+        tietueet.lisaaOlio(obj);
         System.out.println(tietueet);
-        tietueet.poista(obj);
+        tietueet.poistaOlio(obj);
         System.out.println(tietueet);
         
-        tietueet.poista(5);
+        tietueet.poistaOlio(5);
         System.out.println(tietueet);
     }
 }

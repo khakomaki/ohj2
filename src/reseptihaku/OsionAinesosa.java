@@ -14,6 +14,8 @@ public class OsionAinesosa {
     
     
     /**
+     * Luo osion ainesosan
+     * 
      * @param ainesosa_id osion ainesosan tunnus
      * @param maara osion ainesosan määrä
      * 
@@ -30,6 +32,8 @@ public class OsionAinesosa {
     
     
     /**
+     * Luo osion ainesosan
+     * 
      * @param ainesosa_id osion ainesosan tunnus
      * 
      * @example
@@ -44,6 +48,8 @@ public class OsionAinesosa {
     
     
     /**
+     * Palauttaa osion ainesosan tunnuksen
+     * 
      * @return ainesosan tunnus
      */
     public int getId() {
@@ -52,6 +58,8 @@ public class OsionAinesosa {
     
     
     /**
+     * palauttaa osion ainesosan määrän
+     * 
      * @return ainesosan määrä
      */
     public String getMaara() {
@@ -72,6 +80,8 @@ public class OsionAinesosa {
     
     @Override
     /**
+     * Luo täydellisen kopion osion ainesosasta
+     * 
      * @example
      * <pre name="test">
      * OsionAinesosa juusto = new OsionAinesosa(200, "2kg");
@@ -94,6 +104,8 @@ public class OsionAinesosa {
     
     @Override
     /**
+     * Muodostaa hash-koodin osion ainesosalle
+     * 
      * @example
      * <pre name="test">
      * OsionAinesosa juusto1 = new OsionAinesosa(200, "2kg");
@@ -118,6 +130,8 @@ public class OsionAinesosa {
     
     @Override
     /**
+     * Vertailee onko olio sama kuin itse
+     * 
      * @example
      * <pre name="test">
      * OsionAinesosa juusto1 = new OsionAinesosa(200, "2kg");
@@ -148,6 +162,8 @@ public class OsionAinesosa {
     
     @Override
     /**
+     * Palauttaa tietonsa merkkijonona
+     * 
      * @example
      * <pre name="test">
      * OsionAinesosa mozzarella = new OsionAinesosa(20501, "120g");
