@@ -11,7 +11,7 @@ import kanta.TietueHallitsija;
  * @version 15 Oct 2023
  *
  */
-public class OsionAinesosat extends TietueHallitsija {
+public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
     
     private Ainesosat ainesosat;
     private String tiedostoNimi     = "osion_ainesosat.dat";
@@ -153,10 +153,7 @@ public class OsionAinesosat extends TietueHallitsija {
      * </pre>
      */
     public OsionAinesosa anna(int indeksi) {
-        Object olio = getOlio(indeksi);
-        if (olio == null) { return null; }
-        if (olio.getClass() != OsionAinesosa.class) { return null; }
-        return (OsionAinesosa)olio;
+        return getOlio(indeksi);
     }
     
     

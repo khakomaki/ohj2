@@ -11,7 +11,7 @@ import kanta.TietueHallitsija;
  * @version 15 Oct 2023
  *
  */
-public class Ainesosat extends TietueHallitsija {
+public class Ainesosat extends TietueHallitsija<Ainesosa> {
 
     private String tiedostoNimi;
     private int annettavaTunnusLuku;
@@ -143,10 +143,7 @@ public class Ainesosat extends TietueHallitsija {
      * @return indeksissä ollut olio tai null
      */
     public Ainesosa annaIndeksista(int indeksi) {
-        // varmistetaan että olio on tyyppiä Ainesosa
-        Object olio = this.getOlio(indeksi);
-        if (olio.getClass() != Ainesosa.class) { return null; }
-        return (Ainesosa)olio;
+        return this.getOlio(indeksi);
     }
     
     

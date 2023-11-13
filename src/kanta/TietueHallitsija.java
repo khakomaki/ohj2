@@ -3,11 +3,12 @@ package kanta;
 /**
  * @author hakom
  * @version 18 Oct 2023
+ * @param <T> Tietueen hallitsijan tyyppi
  *
  */
-public class TietueHallitsija {
+public class TietueHallitsija<T> {
     
-    private Object[] oliot = new Object[1];
+    private T[] oliot;
     private int maxLkm =        1;
     private int lkm =           0;
     private final int VAKIO =         0;
@@ -22,12 +23,13 @@ public class TietueHallitsija {
      * 
      * @example
      * <pre name="test">
-     * TietueHallitsija tietuehallitsija = new TietueHallitsija();
+     * TietueHallitsija<Object> tietuehallitsija = new TietueHallitsija<Object>();
      * tietuehallitsija.toString() === "0|1|2.0|0";
      * </pre>
      */
+    @SuppressWarnings("unchecked")
     public TietueHallitsija() {
-        //
+        this.oliot = (T[]) new Object[this.maxLkm];
     }
     
     
@@ -39,26 +41,27 @@ public class TietueHallitsija {
      * 
      * @example
      * <pre name="test">
-     * TietueHallitsija tietueet = new TietueHallitsija(8);
+     * TietueHallitsija<Object> tietueet = new TietueHallitsija<Object>(8);
      * tietueet.toString() === "0|8|2.0|0";
      * 
-     * tietueet = new TietueHallitsija(0);
+     * tietueet = new TietueHallitsija<Object>(0);
      * tietueet.toString() === "0|1|2.0|0";
      * 
-     * tietueet = new TietueHallitsija(100);
+     * tietueet = new TietueHallitsija<Object>(100);
      * tietueet.toString() === "0|100|2.0|0";
      * 
-     * tietueet = new TietueHallitsija(-100);
+     * tietueet = new TietueHallitsija<Object>(-100);
      * tietueet.toString() === "0|1|2.0|0";
      * 
-     * tietueet = new TietueHallitsija(1);
+     * tietueet = new TietueHallitsija<Object>(1);
      * tietueet.toString() === "0|1|2.0|0";
      * </pre>
      */
+    @SuppressWarnings("unchecked")
     public TietueHallitsija(int maxLkm) {
         if (maxLkm < 1) { return; }
         this.maxLkm = maxLkm;
-        this.oliot = new Object[this.maxLkm];
+        this.oliot = (T[]) new Object[this.maxLkm];
     }
     
     
@@ -74,7 +77,7 @@ public class TietueHallitsija {
      * @param indeksi mistä indeksistä halutaan olio
      * @return indeksissä oleva olio, tai muuten null
      */
-    public Object getOlio(int indeksi) {
+    public T getOlio(int indeksi) {
         // palautetaan null jos yritetään ottaa määrittelemättömästä paikasta
         if (this.lkm < indeksi || indeksi < 0) { return null; }
         return this.oliot[indeksi];
@@ -108,7 +111,7 @@ public class TietueHallitsija {
      * 
      * @example
      * <pre name="test">
-     * TietueHallitsija tietueet = new TietueHallitsija();
+     * TietueHallitsija<Object> tietueet = new TietueHallitsija<Object>();
      * tietueet.lisaaTilaa() === 2;
      * tietueet.lisaaTilaa() === 4;
      * tietueet.lisaaTilaa() === 8;
@@ -127,7 +130,9 @@ public class TietueHallitsija {
         } else { this.maxLkm++; }
         
         // luodaan uusi lista uudella koolla, lisätään olemassaolevat olioviitteet ja käännetään viite siihen
-        Object[] uudetOliot = new Object[this.maxLkm];
+        @SuppressWarnings("unchecked")
+        T[] uudetOliot = (T[]) new Object[this.maxLkm];
+        
         for (int i = 0; i < this.lkm; i++) { uudetOliot[i] = this.oliot[i]; }
         this.oliot = uudetOliot;
         
@@ -140,7 +145,7 @@ public class TietueHallitsija {
      * 
      * @example
      * <pre name="test">
-     * TietueHallitsija olioHallitsija = new TietueHallitsija();
+     * TietueHallitsija<Object> olioHallitsija = new TietueHallitsija<Object>();
      * olioHallitsija.toString() === "0|1|2.0|0";
      * 
      * Object olio = new Object();
@@ -154,7 +159,7 @@ public class TietueHallitsija {
      * olioHallitsija.toString() === "3|4|2.0|0";
      * </pre>
      */
-    public void lisaaOlio(Object olio) {
+    public void lisaaOlio(T olio) {
         if (!onkoTilaa()) { lisaaTilaa(); }
         this.oliot[lkm] = olio;
         this.lkm++;
@@ -169,7 +174,7 @@ public class TietueHallitsija {
      * 
      * @example
      * <pre name="test">
-     * TietueHallitsija th = new TietueHallitsija();
+     * TietueHallitsija<Object> th = new TietueHallitsija<Object>();
      * th.lisaaOlio(new Object());
      * th.lisaaOlio(new Object());
      * 
@@ -182,7 +187,7 @@ public class TietueHallitsija {
      * th.poistaOlio(0) === 0;
      * th.toString() === "0|2|2.0|0";
      * 
-     * th = new TietueHallitsija(1);
+     * th = new TietueHallitsija<Object>(1);
      * th.toString() === "0|1|2.0|0";
      * th.poistaOlio(0);
      * th.toString() === "0|1|2.0|0";
@@ -208,7 +213,7 @@ public class TietueHallitsija {
      * @param olio poistettava olio
      * @return olioiden lukumäärä mahdollisen poiston jälkeen
      */
-    public int poistaOlio(Object olio) {
+    public int poistaOlio(T olio) {
         for (int i = 0; i < this.lkm; i++) {
             if (oliot[i].equals(olio)) { 
                 return poistaOlio(i);
@@ -225,10 +230,10 @@ public class TietueHallitsija {
      * 
      * @example
      * <pre name="test">
-     * TietueHallitsija tietueet = new TietueHallitsija();
+     * TietueHallitsija<Object> tietueet = new TietueHallitsija<Object>();
      * tietueet.toString() === "0|1|2.0|0";
      * 
-     * tietueet = new TietueHallitsija(13);
+     * tietueet = new TietueHallitsija<Object>(13);
      * tietueet.toString() === "0|13|2.0|0";
      * 
      * tietueet.lisaaOlio(new Object());
@@ -257,7 +262,7 @@ public class TietueHallitsija {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
-        TietueHallitsija tietueet = new TietueHallitsija();
+        TietueHallitsija<Object> tietueet = new TietueHallitsija<Object>();
         System.out.println(tietueet.toString());
         
         // lisätään 10 oliota ja tulostetaan jokaisen lisäyksen jälkenen
@@ -266,7 +271,7 @@ public class TietueHallitsija {
             System.out.println(tietueet.toString());
         }
         
-        tietueet = new TietueHallitsija();
+        tietueet = new TietueHallitsija<Object>();
         System.out.println("\n" + tietueet.toString());
         
         Object obj = new Object();
