@@ -14,10 +14,10 @@ import kanta.Hajautus;
 public class Reseptit {
 
     private ArrayList<Resepti> reseptit = new ArrayList<Resepti>();
-    private Ainesosat ainesosat = new Ainesosat();
-    private String tiedostoNimi;
-    private int juoksevaId;
-    private int lkm;
+    private Ainesosat ainesosat         = new Ainesosat();
+    private String tiedostoNimi         = "reseptit.dat";
+    private int juoksevaId              = 1;
+    private int lkm                     = 0;
     
     /**
      * Reseptit.
@@ -32,7 +32,7 @@ public class Reseptit {
      * </pre>
      */
     public Reseptit() {
-        this.tiedostoNimi = "reseptit.dat";
+        //
     }
     
     
@@ -66,8 +66,24 @@ public class Reseptit {
     
     
     /**
+     * Luo uuden reseptin nimellä ja palauttaa sen.
+     * Antaa tunnuksen juoksevalla id:llä.
+     * 
      * @param nimi reseptin nimi
      * @return luotu resepti
+     * 
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * Resepti resepti1 = reseptit.lisaa("Mustikkapiirakka");
+     * Resepti resepti2 = reseptit.lisaa("Lihapiirakka");
+     * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
+     * reseptit.toString() === "3|reseptit.dat";
+     * 
+     * resepti1.getTunnus() === 1;
+     * resepti2.getTunnus() === 2;
+     * resepti3.getTunnus() === 3;
+     * </pre>
      */
     public Resepti lisaa(String nimi) {
         Resepti resepti = new Resepti(this.juoksevaId, nimi);
@@ -80,26 +96,55 @@ public class Reseptit {
     
     
     /**
+     * Lisää uuden reseptin.
+     * Varmistaa että tunnukset pysyvät kasvavassa järjestyksessä.
+     * 
      * @param resepti lisättävä resepti
      * 
      * @example
      * <pre name="test">
      * Reseptit reseptit = new Reseptit();
-     * reseptit.toString() === "0|reseptit.dat";
      * 
-     * reseptit.lisaa(new Resepti());
+     * Resepti mustikkapiirakka = new Resepti("Mustikkapiirakka");
+     * mustikkapiirakka.getTunnus() === -1;
+     * reseptit.lisaa(mustikkapiirakka);
+     * mustikkapiirakka.getTunnus() === 1;
      * reseptit.toString() === "1|reseptit.dat";
      * 
-     * reseptit.lisaa(new Resepti());
-     * reseptit.lisaa(new Resepti());
-     * reseptit.lisaa(new Resepti());
+     * Resepti lihapiirakka = new Resepti(12, "Lihapiirakka");
+     * lihapiirakka.getTunnus() === 12;
+     * reseptit.lisaa(lihapiirakka);
+     * lihapiirakka.getTunnus() === 12;
+     * 
+     * Resepti kasvispiirakka = new Resepti(5, "Kasvispiirakka");
+     * kasvispiirakka.getTunnus() === 5;
+     * reseptit.lisaa(kasvispiirakka);
+     * kasvispiirakka.getTunnus() === 13;
+     * 
+     * Resepti makaronilaatikko = new Resepti(13, "Makaronilaatikko");
+     * makaronilaatikko.getTunnus() === 13;
+     * reseptit.lisaa(makaronilaatikko);
+     * makaronilaatikko.getTunnus() === 14;
      * reseptit.toString() === "4|reseptit.dat";
+     * 
+     * Resepti maksalaatikko = new Resepti(15, "Maksalaatikko");
+     * maksalaatikko.getTunnus() === 15;
+     * reseptit.lisaa(maksalaatikko);
+     * maksalaatikko.getTunnus() === 15;
      * </pre>
      */
     public void lisaa(Resepti resepti) {
         if (resepti == null) { return; }
         Resepti lisattavaResepti = resepti;
         lisattavaResepti.setAinesosat(ainesosat);
+        
+        // asettaa tunnukseksi juoksevan id:n jos tunnus ei ole kasvavassa järjestyksessä
+        int reseptinTunnus = lisattavaResepti.getTunnus();        
+        if (reseptinTunnus < this.juoksevaId) { lisattavaResepti.setTunnus(this.juoksevaId); }
+        
+        // vaihtaa juoksevan id:n reseptin tunnukseen, jos se on enemmän kuin juokseva id
+        if (this.juoksevaId < reseptinTunnus) { this.juoksevaId = reseptinTunnus; }
+        
         reseptit.add(lisattavaResepti);
         this.juoksevaId++;
         this.lkm++;
@@ -107,14 +152,29 @@ public class Reseptit {
     
     
     /**
+     * Antaa annetussa indeksissä olevan reseptin.
+     * Palauttaa null jos indeksi ei ollut mieluisa.
+     * 
      * @param indeksi mistä indeksistä yritetään ottaa Resepti
      * @return indeksissä ollut Resepti tai null
+     * 
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * Resepti resepti1 = reseptit.lisaa("Mustikkapiirakka");
+     * Resepti resepti2 = reseptit.lisaa("Lihapiirakka");
+     * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
+     * reseptit.toString() === "3|reseptit.dat";
+     * 
+     * reseptit.anna(-1) == null === true;
+     * reseptit.anna(0) == resepti1 === true;
+     * reseptit.anna(1) == resepti2 === true;
+     * reseptit.anna(2) == resepti3 === true;
+     * </pre>
      */
-    public Resepti annaIndeksista(int indeksi) {
-        // varmistetaan että olio on tyyppiä Ainesosa
-        Object olio = reseptit.get(indeksi);
-        if (olio.getClass() != Resepti.class) { return null; }
-        return (Resepti)olio;
+    public Resepti anna(int indeksi) {
+        if (indeksi < 0 || this.lkm < indeksi) { return null; }
+        return reseptit.get(indeksi);
     }
     
     
@@ -124,6 +184,36 @@ public class Reseptit {
      * 
      * @param vanhaResepti minkä reseptin tilalle vaihdetaan
      * @param uusiResepti tilalle vaihdettava resepti
+     * 
+     * @example
+     * <pre name="test">
+     * Reseptit reseptit = new Reseptit();
+     * Resepti resepti1 = reseptit.lisaa("Mustikkapiirakka");
+     * Resepti resepti2 = reseptit.lisaa("Lihapiirakka");
+     * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
+     * reseptit.anna(1) == resepti2 === true;
+     * 
+     * Resepti resepti4 = new Resepti(1, "Kasvispiirakka");
+     * reseptit.vaihdaResepti(resepti4, resepti2);
+     * 
+     * reseptit.vaihdaResepti(resepti2, resepti4);
+     * reseptit.anna(1) == resepti4 === true;
+     * 
+     * reseptit.vaihdaResepti(resepti2, resepti1);
+     * reseptit.anna(1) == resepti4 === true;
+     * 
+     * reseptit.vaihdaResepti(resepti1, resepti1);
+     * reseptit.anna(0) == resepti1 === true;
+     * 
+     * reseptit.vaihdaResepti(resepti3, resepti1);
+     * reseptit.anna(2) == resepti1 === true;
+     * 
+     * reseptit.vaihdaResepti(resepti3, null);
+     * reseptit.anna(2) == resepti1 === true;
+     * 
+     * reseptit.vaihdaResepti(null, resepti1);
+     * reseptit.anna(2) == resepti1 === true;
+     * </pre>
      */
     public void vaihdaResepti(Resepti vanhaResepti, Resepti uusiResepti) {
         if (vanhaResepti == null || uusiResepti == null) { return; }
@@ -141,6 +231,8 @@ public class Reseptit {
     
     
     /**
+     * Tulostaa annetun määrän verran reseptejä
+     * 
      * @param os tietovirta johon halutaan tulostaa
      * @param maara kuinka monta reseptia tulostetaan
      */
@@ -155,13 +247,15 @@ public class Reseptit {
         
         PrintStream out = new PrintStream(os);
         for (int i = 0; i < tulostettavaMaara; i++) {
-            out.print(this.annaIndeksista(i));
+            out.print(this.anna(i));
             out.print("\n");
         }
     }
     
     
     /**
+     * Tulostaa kaikki reseptit
+     * 
      * @param os tietovirta johon halutaan tulostaa
      */
     public void tulostaReseptit(OutputStream os) {
@@ -227,7 +321,7 @@ public class Reseptit {
         if (kaytettavaHakusana.isBlank()) { return this.reseptit; }
         
         for (int i = 0; i < this.lkm; i++) {
-            Resepti resepti = annaIndeksista(i);
+            Resepti resepti = anna(i);
             if (resepti.onkoNimessa(kaytettavaHakusana)) { loydetytReseptit.add(resepti); } 
         }
         
@@ -251,6 +345,8 @@ public class Reseptit {
     
     @Override
     /**
+     * Luo täydellisen kopion itsestänsä
+     * 
      * @example
      * <pre name="test">
      * Reseptit reseptit = new Reseptit();
@@ -284,6 +380,8 @@ public class Reseptit {
     
     @Override
     /**
+     * Vertailee ovatko Reseptit-oliot samoja
+     * 
      * @example
      * <pre name="test">
      * Reseptit reseptit1 = new Reseptit();
@@ -327,6 +425,8 @@ public class Reseptit {
     
     @Override
     /**
+     * Muodostaa hash-koodin
+     * 
      * @example
      * <pre name="test">
      * Reseptit reseptit1 = new Reseptit();
@@ -411,8 +511,8 @@ public class Reseptit {
         
         mustikkapiirakka.setKuvaus("vaikea ja huono");
         
-        System.out.println(reseptit.annaIndeksista(0).getKuvaus());
-        System.out.println(kopioReseptit.annaIndeksista(0).getKuvaus());
+        System.out.println(reseptit.anna(0).getKuvaus());
+        System.out.println(kopioReseptit.anna(0).getKuvaus());
         
         System.out.println(reseptit.hashCode());
         System.out.println(kopioReseptit.hashCode());

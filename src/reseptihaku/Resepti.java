@@ -103,6 +103,26 @@ public class Resepti {
     
     
     /**
+     * Luo Reseptin annetulla nimellä.
+     * Reseptin tunnus alustuu -1.
+     * 
+     * @param nimi reseptin nimi
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti makaronilaatikko = new Resepti("Makaronilaatikko");
+     * makaronilaatikko.toString() === "-1|Makaronilaatikko|-1|-1|-1|-1";
+     * </pre>
+     */
+    public Resepti(String nimi) {
+        this.reseptiId = -1;
+        setNimi(nimi);
+        this.ainesosat = new Ainesosat();
+        this.osiot = new Osiot();
+    }
+    
+    
+    /**
      * Luo Reseptin.
      * Nimi alustuu oletusnimeksi ja reseptin tunnus -1.
      * 
@@ -121,6 +141,9 @@ public class Resepti {
     
     
     /**
+     * Asettaa reseptin nimen ensimmäistä kertaa.
+     * Jos syötetään tyhjä merkkijono tai null, antaa oletusnimen.
+     * 
      * @param nimi reseptin nimi
      * 
      * @example
@@ -147,6 +170,9 @@ public class Resepti {
     
     
     /**
+     * Asettaa reseptin nimen uudelleen.
+     * Ei anna muuttaa nimeä null-viitteeksi tai tyhjäksi merkkijonoksi.
+     * 
      * @param nimi reseptin nimi
      * 
      * @example
@@ -173,7 +199,15 @@ public class Resepti {
     
     
     /**
+     * Antaa reseptin nimen
+     * 
      * @return reseptin nimi
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti pizza = new Resepti("Margarita pizza");
+     * pizza.getNimi().equals("Margarita pizza") === true;
+     * </pre>
      */
     public String getNimi() {
         return this.nimi;
@@ -181,6 +215,9 @@ public class Resepti {
     
     
     /**
+     * Asettaa reseptin kuvauksen.
+     * Jos annetaan null-viite, vaihtaa kuvauksen tyhjäksi merkkijonoksi.
+     * 
      * @param kuvaus reseptin kuvaus
      * 
      * @example
@@ -202,10 +239,68 @@ public class Resepti {
     
     
     /**
+     * Antaa reseptin kuvauksen.
+     * 
      * @return reseptin kuvaus
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti sampyla = new Resepti();
+     * sampyla.getKuvaus() === "";
+     * 
+     * sampyla.setKuvaus("Parhaimmillaan uunituoreena.");
+     * sampyla.getKuvaus() === "Parhaimmillaan uunituoreena.";
+     * 
+     * sampyla.setKuvaus(null);
+     * sampyla.getKuvaus() === "";
+     * </pre>
      */
     public String getKuvaus() {
         return this.kuvaus;
+    }
+    
+    
+    /**
+     * Asettaa reseptin tunnuksen
+     * 
+     * @param tunnus asetettava tunnus
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti maksalaatikko = new Resepti("Maksalaatikko");
+     * maksalaatikko.getTunnus() === -1;
+     * 
+     * maksalaatikko.setTunnus(1);
+     * maksalaatikko.getTunnus() === 1;
+     * 
+     * maksalaatikko.setTunnus(-500);
+     * maksalaatikko.getTunnus() === -500;
+     * 
+     * maksalaatikko.setTunnus(250);
+     * maksalaatikko.getTunnus() === 250;
+     * </pre>
+     */
+    public void setTunnus(int tunnus) {
+        this.reseptiId = tunnus;
+    }
+    
+    
+    /**
+     * Antaa reseptin tunnuksen/id:n
+     * 
+     * @return reseptin tunnus
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti resepti = new Resepti();
+     * resepti.getTunnus() === -1;
+     * 
+     * resepti = new Resepti(1, "Mustikkapiirakka");
+     * resepti.getTunnus() === 1;
+     * </pre>
+     */
+    public int getTunnus() {
+        return this.reseptiId;
     }
     
     
@@ -223,7 +318,21 @@ public class Resepti {
     
     
     /**
+     * Antaa reseptin osiot.
+     * 
      * @return reseptin osiot
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti resepti = new Resepti();
+     * resepti.getOsiot().equals(new Osiot()) === true;
+     * 
+     * resepti.lisaaOsio(new Osio("Pohja"));
+     * resepti.lisaaOsio(new Osio("Täyte"));
+     * 
+     * resepti.getOsiot().annaIndeksista(0).equals(new Osio("Pohja")) === true;
+     * resepti.getOsiot().annaIndeksista(1).equals(new Osio("Täyte")) === true;
+     * </pre>
      */
     public Osiot getOsiot() {
          return this.osiot;
@@ -235,6 +344,18 @@ public class Resepti {
      * Ei lisää pelkkää null-viitettä.
      * 
      * @param osio lisättävä osio
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti resepti = new Resepti();
+     * resepti.getOsiot().equals(new Osiot()) === true;
+     * 
+     * resepti.lisaaOsio(new Osio("Pohja"));
+     * resepti.lisaaOsio(new Osio("Täyte"));
+     * 
+     * resepti.getOsiot().annaIndeksista(0).equals(new Osio("Pohja")) === true;
+     * resepti.getOsiot().annaIndeksista(1).equals(new Osio("Täyte")) === true;
+     * </pre>
      */
     public void lisaaOsio(Osio osio) {
         if (osio == null) { return; }
@@ -581,6 +702,7 @@ public class Resepti {
     
     @Override
     /**
+     * Muodostaa hash-koodin Reseptistä
      * 
      * @example
      * <pre name="test">
