@@ -208,9 +208,10 @@ public class Osio {
     /**
      * @param ainesosa lisättävä ainesosa
      * @param maara lisättävän ainesosa määrä
+     * @return lisätty osion ainesosa
      */
-    public void lisaaAinesosa(Ainesosa ainesosa, String maara) {
-        this.osionAinesosat.lisaa(ainesosa, maara);
+    public OsionAinesosa lisaaAinesosa(Ainesosa ainesosa, String maara) {
+        return this.osionAinesosat.lisaa(ainesosa, maara);
     }
     
     
@@ -220,6 +221,16 @@ public class Osio {
      */
     public void lisaaAinesosa(String ainesosa, String maara) {
         this.osionAinesosat.lisaaOsionAinesosa(ainesosa, maara);
+    }
+    
+    
+    /**
+     * Poistaa osion ainesosan, jos sellainen löytyy
+     * 
+     * @param osionAinesosa poistettava osion ainesosa
+     */
+    public void poistaAinesosa(OsionAinesosa osionAinesosa) {
+        this.osionAinesosat.poista(osionAinesosa);
     }
     
     
@@ -237,6 +248,16 @@ public class Osio {
     public void lisaaOhje(String ohjeistus) {
         Ohje ohje = new Ohje(ohjeistus);
         this.ohjeet.lisaa(ohje);
+    }
+    
+    
+    /**
+     * Poistaa annetun ohjeen, jos sellainen löydetään
+     * 
+     * @param ohje poistettava ohje
+     */
+    public void poistaOhje(Ohje ohje) {
+        this.ohjeet.poista(ohje);
     }
     
     

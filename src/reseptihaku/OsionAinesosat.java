@@ -84,10 +84,11 @@ public class OsionAinesosat extends TietueHallitsija {
      * 
      * @param ainesosa lisättävä ainesosa
      * @param maara ainesosan määrä
+     * @return lisätty osion ainesosa
      */
-    public void lisaa(Ainesosa ainesosa, String maara) {
+    public OsionAinesosa lisaa(Ainesosa ainesosa, String maara) {
         // ei lisätä nulleja
-        if (ainesosa == null) { return; }
+        if (ainesosa == null) { return null; }
         
         // koitetaan onko ainesosissa olemassa jo vastaava ainesosa, jos ei ole niin käsketään lisäämään
         Ainesosa lisattavaAinesosa = this.ainesosat.anna(ainesosa.getNimi());
@@ -96,6 +97,7 @@ public class OsionAinesosat extends TietueHallitsija {
         // luodaan osion ainesosa ainesosilta saadulla tiedolla ja määrällä
         OsionAinesosa osionAinesosa = new OsionAinesosa(lisattavaAinesosa.getId(), maara);
         lisaaOlio(osionAinesosa);
+        return osionAinesosa;
     }
     
     
@@ -133,7 +135,7 @@ public class OsionAinesosat extends TietueHallitsija {
      * @param osionAinesosa poistettava osion ainesosa
      */
     public void poista(OsionAinesosa osionAinesosa) {
-        poista(osionAinesosa);
+        poistaOlio(osionAinesosa);
     }
     
     

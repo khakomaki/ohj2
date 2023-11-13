@@ -47,8 +47,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     @FXML private void handleTallenna() { tallenna(); }
     @FXML private void handleLisaaOsio() { lisaaOsio(); }
     @FXML private void handlePoistaResepti() { poistaResepti(); }
-    @FXML private void handlePoistaOsio() { poistaOsio(null); }
-    @FXML private void handlePoistaAinesosa() { poistaAinesosa(null, 0); }
+    @FXML private void handlePoistaOsio() { poistaOsio(null, null); }
+    @FXML private void handlePoistaAinesosa() { poistaAinesosa(null, 0, null, null); }
     @FXML private void handleLisaaAinesosa() { lisaaAinesosa(null, null, null, ""); }
     @FXML private void handlePoistaOhje() { poistaOhje(null, 0); }
     @FXML private void handleLisaaOhje() { lisaaOhje(null); }
@@ -141,7 +141,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // luo osion poisto-painikkeen
         Button osioPoisto = new Button("x");
-        osioPoisto.setOnAction(e -> poistaOsio(osioVBox)); // poistaa VBox-elementin
+        osioPoisto.setOnAction(e -> poistaOsio(osioVBox, osio)); // poistaa VBox-elementin
         osioPoisto.setFont(kirjasinB16);
         
         // lisätään teksti ja painike HBox-elementtiin
@@ -192,7 +192,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
             ainesosatGridPane.add(ainesosaTextField, 1, ainesosanRivi);
             
             Button ainesosaPoisto = new Button("x");
-            ainesosaPoisto.setOnAction(e -> poistaAinesosa(ainesosatGridPane, ainesosanRivi));
+            ainesosaPoisto.setOnAction(e -> poistaAinesosa(ainesosatGridPane, ainesosanRivi, osio, oa));
             ainesosatGridPane.add(ainesosaPoisto, 2, ainesosanRivi);
         }
         
@@ -363,25 +363,27 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
-    private void poistaOsio(VBox osioVBox) {
+    private void poistaOsio(VBox osioVBox, Osio osio) {
         if (osioVBox == null) { return; }
         if (osioVBox.getParent() instanceof VBox) {
             VBox ylempiVBox = (VBox)osioVBox.getParent();
             ylempiVBox.getChildren().remove(osioVBox);
-            
-            // TODO: this.valittuResepti.poistaOsio(osio)
         }
+        
+        this.valittuResepti.poistaOsio(osio);
     }
     
     
-    private void poistaAinesosa(GridPane paneeli, int rivi) {
+    private void poistaAinesosa(GridPane paneeli, int rivi, Osio osio, OsionAinesosa ainesosa) {
         // ei yritetä poistaa null paneelista
         if (paneeli == null) { return; }
         
         // poistaa kaikki nodet kyseiseltä riviltä
         paneeli.getChildren().removeIf(node -> GridPane.getRowIndex(node) == rivi);
         
-        // TODO: osio.poistaAinesosa(ainesosa)
+        // jos osio ei ole null, yritetään poistaa siitä annettu ainesosa
+        if (osio == null) { return; }
+        osio.poistaAinesosa(ainesosa);
     }
     
     
@@ -391,15 +393,18 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         final int riviLkm = paneeli.getRowCount();
         
         // poistetaan kaikki viimeisteltä riviltä (lisäys painike)
-        poistaAinesosa(paneeli, riviLkm - 1);
+        poistaAinesosa(paneeli, riviLkm - 1, null, null);
         
         // lisätään syöttökentät
         paneeli.add(new TextField(), 0, riviLkm);
         paneeli.add(new TextField(), 1, riviLkm);
         
+        // lisätään ainesosa osioon
+        OsionAinesosa osionAinesosa = osio.lisaaAinesosa(ainesosa, maara);
+        
         // lisätään rivin poisto painike
         Button ainesosaPoisto = new Button("x");
-        ainesosaPoisto.setOnAction(e -> poistaAinesosa(paneeli, riviLkm));
+        ainesosaPoisto.setOnAction(e -> poistaAinesosa(paneeli, riviLkm, osio, osionAinesosa));
         paneeli.add(ainesosaPoisto, 2, riviLkm);
         
         // lisätään rivien lisäys painike seuraavalle riville
@@ -408,9 +413,6 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // luo samaan paneeliin, samaan osioon tyhjän ainesosan ja määrän
         ainesosaLisays.setOnAction(e -> lisaaAinesosa(paneeli, osio, new Ainesosa(""), "")); 
         paneeli.add(ainesosaLisays, 2, riviLkm + 1);
-        
-        // lisätään ainesosa osioon
-        osio.lisaaAinesosa(ainesosa, maara);
     }
     
     

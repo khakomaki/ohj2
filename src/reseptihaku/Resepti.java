@@ -361,6 +361,16 @@ public class Resepti {
         if (osio == null) { return; }
         this.osiot.lisaaOsio(osio);
     }
+    
+    
+    /**
+     * Poistaa annetun osion, jos sellainen löytyy
+     * 
+     * @param osio poistettava osio
+     */
+    public void poistaOsio(Osio osio) {
+        this.osiot.poistaOsio(osio);
+    }
 
 
     /**
