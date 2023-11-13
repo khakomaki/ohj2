@@ -50,8 +50,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     @FXML private void handlePoistaOsio() { poistaOsio(null, null); }
     @FXML private void handlePoistaAinesosa() { poistaAinesosa(null, 0, null, null); }
     @FXML private void handleLisaaAinesosa() { lisaaAinesosa(null, null, null, ""); }
-    @FXML private void handlePoistaOhje() { poistaOhje(null, 0); }
-    @FXML private void handleLisaaOhje() { lisaaOhje(null); }
+    @FXML private void handlePoistaOhje() { poistaOhje(null, 0, null, null); }
+    @FXML private void handleLisaaOhje() { lisaaOhje(null, null, null); }
     
     // ====================================================================================================
     
@@ -242,13 +242,13 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
             ohjeetGridPane.add(ohjeTextArea, 1, ohjeenRivi);
             
             Button ohjePoisto = new Button("x");
-            ohjePoisto.setOnAction(e -> poistaOhje(ohjeetGridPane, ohjeenRivi));
+            ohjePoisto.setOnAction(e -> poistaOhje(ohjeetGridPane, ohjeenRivi, osio, oo));
             ohjeetGridPane.add(ohjePoisto, 2, ohjeenRivi);
         }
         
         // lisätään tyhjä ohje
         ohjeetGridPane.add(new Label(), 0, ohjeetGridPane.getRowCount() + 1);
-        lisaaOhje(ohjeetGridPane);
+        lisaaOhje(ohjeetGridPane, null, null);
         
         // lisätään otsikko ja GridPane ohjeiden VBox-elementtiin
         ohjeetVBox.getChildren().add(ohjeetLabel);
@@ -416,23 +416,27 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
-    private void poistaOhje(GridPane paneeli, int rivi) {
+    private void poistaOhje(GridPane paneeli, int rivi, Osio osio, Ohje ohje) {
         // vältetään null viitteet
         if (paneeli == null) { return; }
         
         // poistaa kaikki nodet kyseiseltä riviltä
         paneeli.getChildren().removeIf(node -> GridPane.getRowIndex(node) == rivi);
+        
+        // jos osio ei ole null, yritetään poistaa siitä annettu ohje
+        if (osio == null) { return; }
+        osio.poistaOhje(ohje);
     }
     
     
-    private void lisaaOhje(GridPane paneeli) {
+    private void lisaaOhje(GridPane paneeli, Osio osio, Ohje ohje) {
         // vältetään null viitteet
         if (paneeli == null) { return; }
         
         final int riviLkm = paneeli.getRowCount();
         
         // poistetaan kaikki viimeisteltä riviltä (lisäys painike)
-        poistaOhje(paneeli, riviLkm - 1);
+        poistaOhje(paneeli, riviLkm - 1, null, null);
         
         // lisätään teksti ja syöttökenttä
         paneeli.add(new Label(""), 0, riviLkm);
@@ -440,18 +444,18 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // lisätään rivin poisto painike
         Button ohjePoisto = new Button("x");
-        ohjePoisto.setOnAction(e -> poistaOhje(paneeli, riviLkm));
+        ohjePoisto.setOnAction(e -> poistaOhje(paneeli, riviLkm, osio, ohje));
         paneeli.add(ohjePoisto, 2, riviLkm);
         
         // lisätään rivien lisäys painike seuraavalle riville
-        Button ohjeLisaysButton = luoOhjeenLisaysPainike(paneeli);
+        Button ohjeLisaysButton = luoOhjeenLisaysPainike(paneeli, osio, ohje);
         paneeli.add(ohjeLisaysButton, 2, paneeli.getRowCount() + 1);
     }
     
     
-    private Button luoOhjeenLisaysPainike(GridPane paneeli) {
+    private Button luoOhjeenLisaysPainike(GridPane paneeli, Osio osio, Ohje ohje) {
         Button ohjeLisays = new Button("+");
-        ohjeLisays.setOnAction(e -> lisaaOhje(paneeli));
+        ohjeLisays.setOnAction(e -> lisaaOhje(paneeli, osio, ohje));
         return ohjeLisays;
     }
     
