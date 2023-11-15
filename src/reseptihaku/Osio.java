@@ -98,8 +98,16 @@ public class Osio {
      */
     private void setNimi(String nimi) {
         // asettaa oletusnimen jos annettu nimi on null tai tyhjä merkkijono
-        if (nimi == null) { this.nimi = oletusNimi; return; }
-        if (nimi.length() < 1) { this.nimi = oletusNimi; return; }
+        if (nimi == null) { 
+            this.nimi = oletusNimi; 
+            return; 
+        }
+        
+        if (nimi.length() < 1) { 
+            this.nimi = oletusNimi; 
+            return; 
+        }
+        
         this.nimi = nimi;
     }
     
@@ -124,8 +132,8 @@ public class Osio {
      */
     public void setUusiNimi(String nimi) {
         // ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
-        if (nimi == null) { return; }
-        if (nimi.length() < 1) { return; }
+        if (nimi == null) return;
+        if (nimi.length() < 1) return;
         this.nimi = nimi;
     }
     
@@ -325,13 +333,13 @@ public class Osio {
      * </pre>
      */
     public boolean equals(Object verrattava) {
-        if (verrattava == null) { return false; }
-        if (verrattava.getClass() != this.getClass()) { return false; }
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
         Osio verrattavaOsio = (Osio)verrattava;
-        if (!verrattavaOsio.nimi.equals(this.nimi)) { return false; }
-        if (verrattavaOsio.osioId != this.osioId) { return false; }
-        if (!verrattavaOsio.osionAinesosat.equals(this.osionAinesosat)) { return false; }
-        if (!verrattavaOsio.ohjeet.equals(this.ohjeet)) { return false; }
+        if (!verrattavaOsio.nimi.equals(this.nimi)) return false;
+        if (verrattavaOsio.osioId != this.osioId) return false;
+        if (!verrattavaOsio.osionAinesosat.equals(this.osionAinesosat)) return false;
+        if (!verrattavaOsio.ohjeet.equals(this.ohjeet)) return false;
         
         return true;
     }

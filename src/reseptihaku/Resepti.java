@@ -147,8 +147,11 @@ public class Resepti {
      */
     private void setNimi(String nimi) {
         // asettaa oletusnimen jos annettu nimi on null tai tyhjä merkkijono
-        if (nimi == null) { this.nimi = oletusNimi; return; }
-        if (nimi.length() < 1) { this.nimi = oletusNimi; return; }
+        if (nimi == null || nimi.length() < 1) { 
+            this.nimi = oletusNimi; 
+            return;
+        }
+        
         this.nimi = nimi;
     }
     
@@ -176,8 +179,7 @@ public class Resepti {
      */
     public void setUusiNimi(String nimi) {
         // ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
-        if (nimi == null) { return; }
-        if (nimi.length() < 1) { return; }
+        if (nimi == null || nimi.length() < 1) return;
         this.nimi = nimi;
     }
     
@@ -217,7 +219,11 @@ public class Resepti {
      * </pre>
      */
     public void setKuvaus(String kuvaus) {
-        if (kuvaus == null) { this.kuvaus = ""; return; }
+        if (kuvaus == null) { 
+            this.kuvaus = ""; 
+            return; 
+        }
+        
         this.kuvaus = kuvaus;
     }
     
@@ -329,7 +335,7 @@ public class Resepti {
      * </pre>
      */
     public void lisaaOsio(Osio osio) {
-        if (osio == null) { return; }
+        if (osio == null) return;
         this.osiot.lisaaOsio(osio);
     }
     
@@ -358,8 +364,8 @@ public class Resepti {
      * @param hinta mikä hinta vaihtoehto halutaan asettaa
      */
     public void setHinta(int hinta) {
-        if (hinta == -1) { this.hinta = -1; }
-        if (Resepti.hintaVaihtoehdot.containsKey(hinta)) { this.hinta = hinta; }
+        if (hinta == -1) this.hinta = -1;
+        if (Resepti.hintaVaihtoehdot.containsKey(hinta)) this.hinta = hinta;
     }
     
     
@@ -369,8 +375,8 @@ public class Resepti {
      * @param valmistusaika mikä valmistusaika vaihtoehto halutaan asettaa
      */
     public void setValmistusaika(int valmistusaika) {
-        if (valmistusaika == -1) { this.valmistusaika = -1; }
-        if (Resepti.valmistusaikaVaihtoehdot.containsKey(valmistusaika)) { this.valmistusaika = valmistusaika; }
+        if (valmistusaika == -1) this.valmistusaika = -1;
+        if (Resepti.valmistusaikaVaihtoehdot.containsKey(valmistusaika)) this.valmistusaika = valmistusaika;
     }
     
     
@@ -380,8 +386,8 @@ public class Resepti {
      * @param tahdet mikä tahdet vaihtoehto halutaan asettaa
      */
     public void setTahdet(int tahdet) {
-        if (tahdet == -1) { this.tahdet = -1; }
-        if (Resepti.tahdetVaihtoehdot.containsKey(tahdet)) { this.tahdet = tahdet; }
+        if (tahdet == -1) this.tahdet = -1;
+        if (Resepti.tahdetVaihtoehdot.containsKey(tahdet)) this.tahdet = tahdet;
     }
     
     
@@ -391,8 +397,8 @@ public class Resepti {
      * @param vaativuus mikä vaativuus vaihtoehto halutaan asettaa
      */
     public void setVaativuus(int vaativuus) {
-        if (vaativuus == -1) { this.vaativuus = -1; }
-        if (Resepti.vaativuusVaihtoehdot.containsKey(vaativuus)) { this.vaativuus = vaativuus; }
+        if (vaativuus == -1) this.vaativuus = -1;
+        if (Resepti.vaativuusVaihtoehdot.containsKey(vaativuus)) this.vaativuus = vaativuus;
     }
     
     
@@ -529,7 +535,7 @@ public class Resepti {
     
     
     private String vaihdaNull(String s) {
-        if (s == null ) { return ""; }
+        if (s == null ) return "";
         return s;
     }
     
@@ -556,7 +562,7 @@ public class Resepti {
      * </pre>
      */
     public boolean onkoNimessa(String merkkijono) {
-        if (merkkijono == null) { return true; }
+        if (merkkijono == null) return true;
         // luo regex lauseen joka etsii merkkijonon sisältävää merkkijonoa
         StringBuilder regexLause = new StringBuilder();
         regexLause.append(".*");
@@ -661,17 +667,17 @@ public class Resepti {
      */
     @Override
     public boolean equals(Object verrattava) {
-        if (verrattava == null) { return false; }
-        if (verrattava.getClass() != this.getClass()) { return false; }
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
         Resepti verrattavaResepti = (Resepti)verrattava;
         
-        if (!this.nimi.equals(verrattavaResepti.getNimi())) { return false; }
-        if (this.hinta != verrattavaResepti.hinta) { return false; }
-        if (this.valmistusaika != verrattavaResepti.valmistusaika) { return false; }
-        if (this.tahdet != verrattavaResepti.tahdet) { return false; }
-        if (this.vaativuus != verrattavaResepti.vaativuus) { return false; }
-        if (!this.kuvaus.equals(verrattavaResepti.getKuvaus())) { return false; }
-        if (!this.osiot.equals(verrattavaResepti.osiot)) { return false; }
+        if (!this.nimi.equals(verrattavaResepti.getNimi())) return false;
+        if (this.hinta != verrattavaResepti.hinta) return false;
+        if (this.valmistusaika != verrattavaResepti.valmistusaika) return false;
+        if (this.tahdet != verrattavaResepti.tahdet) return false;
+        if (this.vaativuus != verrattavaResepti.vaativuus) return false;
+        if (!this.kuvaus.equals(verrattavaResepti.getKuvaus())) return false;
+        if (!this.osiot.equals(verrattavaResepti.osiot)) return false;
         
         return true;
     }

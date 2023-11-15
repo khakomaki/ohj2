@@ -72,7 +72,7 @@ public class Ohje {
      */
     public void setOhjeistus(String ohjeistus) {
         // ei anneta asettaa nullia
-        if (ohjeistus == null) { return; }
+        if (ohjeistus == null) return;
         
         this.ohjeistus = ohjeistus;
     }
@@ -131,7 +131,7 @@ public class Ohje {
      * </pre>
      */
     public void setVaihe(int vaihe) {
-        if (0 < vaihe) { this.vaihe = vaihe; }
+        if (0 < vaihe) this.vaihe = vaihe;
     }
     
     
@@ -195,12 +195,12 @@ public class Ohje {
      * </pre>
      */
     public boolean equals(Object verrattava) {
-        if (verrattava == null) { return false; }
-        if (verrattava.getClass() != this.getClass()) { return false; }
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
         
         Ohje verrattavaOhje = (Ohje)verrattava;
-        if (!verrattavaOhje.ohjeistus.equals(this.ohjeistus)) { return false; }
-        if (verrattavaOhje.vaihe != this.vaihe) { return false; }
+        if (!verrattavaOhje.ohjeistus.equals(this.ohjeistus)) return false;
+        if (verrattavaOhje.vaihe != this.vaihe) return false;
         return true;
     }
     

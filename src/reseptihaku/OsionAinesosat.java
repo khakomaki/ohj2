@@ -56,8 +56,8 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
      */
     public void setTiedostoNimi(String tiedostonimi) {
         // varmistetaan ettei annettu nimi ole null tai tyhjä merkkijono
-        if (tiedostonimi == null) { return; }
-        if (tiedostonimi.length() < 1) { return; }
+        if (tiedostonimi == null) return;
+        if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
     }
     
@@ -191,17 +191,17 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
      * </pre>
      */
     public boolean equals(Object verrattava) {
-        if (verrattava == null) { return false; }
-        if (verrattava.getClass() != this.getClass()) { return false; }
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
         
         OsionAinesosat verrattavaOA = (OsionAinesosat)verrattava;
-        if (verrattavaOA.osioId != this.osioId) { return false; }
-        if (!verrattavaOA.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
-        if (verrattavaOA.getLkm() != this.getLkm()) { return false; }
+        if (verrattavaOA.osioId != this.osioId) return false;
+        if (!verrattavaOA.tiedostoNimi.equals(this.tiedostoNimi)) return false;
+        if (verrattavaOA.getLkm() != this.getLkm()) return false;
         
         // verrataan alkioita keskenään
         for (int i = 0; i < this.getLkm(); i++) {
-            if (!verrattavaOA.anna(i).equals(this.anna(i))) { return false; }
+            if (!verrattavaOA.anna(i).equals(this.anna(i))) return false;
         }
         
         return true;

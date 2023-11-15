@@ -58,8 +58,8 @@ public class Reseptit {
      */
     public void setTiedostoNimi(String tiedostonimi) {
         // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
-        if (tiedostonimi == null) { return; }
-        if (tiedostonimi.length() < 1) { return; }
+        if (tiedostonimi == null) return;
+        if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
     }
     
@@ -137,10 +137,10 @@ public class Reseptit {
         
         // asettaa tunnukseksi juoksevan id:n jos tunnus ei ole kasvavassa järjestyksessä
         int reseptinTunnus = lisattavaResepti.getTunnus();        
-        if (reseptinTunnus < this.juoksevaId) { lisattavaResepti.setTunnus(this.juoksevaId); }
+        if (reseptinTunnus < this.juoksevaId) lisattavaResepti.setTunnus(this.juoksevaId);
         
         // vaihtaa juoksevan id:n reseptin tunnukseen, jos se on enemmän kuin juokseva id
-        if (this.juoksevaId < reseptinTunnus) { this.juoksevaId = reseptinTunnus; }
+        if (this.juoksevaId < reseptinTunnus) this.juoksevaId = reseptinTunnus;
         
         reseptit.add(lisattavaResepti);
         this.juoksevaId++;
@@ -170,7 +170,7 @@ public class Reseptit {
      * </pre>
      */
     public Resepti anna(int indeksi) {
-        if (indeksi < 0 || this.lkm < indeksi) { return null; }
+        if (indeksi < 0 || this.lkm < indeksi) return null;
         return reseptit.get(indeksi);
     }
     
@@ -213,14 +213,14 @@ public class Reseptit {
      * </pre>
      */
     public void vaihdaResepti(Resepti vanhaResepti, Resepti uusiResepti) {
-        if (vanhaResepti == null || uusiResepti == null) { return; }
+        if (vanhaResepti == null || uusiResepti == null) return;
         
         // varmistaa että uusi resepti käyttää samaa Ainesosat-viitettä kuin luokka
         Resepti vaihdettavaResepti = uusiResepti;
         
         // etsii vaihdettavan indeksin, poistuu jos ei löydy
         int vanhaReseptiIndeksi = this.reseptit.indexOf(vanhaResepti);
-        if (vanhaReseptiIndeksi < 0) { return; }
+        if (vanhaReseptiIndeksi < 0) return;
         
         this.reseptit.set(vanhaReseptiIndeksi, vaihdettavaResepti);
     }
@@ -236,10 +236,10 @@ public class Reseptit {
         int tulostettavaMaara = maara;
         
         // ei tulosta mitään jos annettu luku on negatiivinen
-        if (maara < 0) { return; }
+        if (maara < 0) return;
         
         // tulostaa lukumäärän verran jos annettu määrä olisi enemmän
-        if (this.lkm < maara) { tulostettavaMaara = this.lkm; }
+        if (this.lkm < maara) tulostettavaMaara = this.lkm;
         
         PrintStream out = new PrintStream(os);
         for (int i = 0; i < tulostettavaMaara; i++) {
@@ -295,7 +295,7 @@ public class Reseptit {
         int poistettavanIndeksi = reseptit.indexOf(resepti);
         
         // poistutaan jos poistettavaa ei löydetty
-        if (poistettavanIndeksi < 0) { return; }
+        if (poistettavanIndeksi < 0) return;
         
         this.reseptit.remove(poistettavanIndeksi);
         this.lkm--;
@@ -314,11 +314,11 @@ public class Reseptit {
         String kaytettavaHakusana = hakusana.strip();
         
         // tyhjällä hakusanalla palautetaan kaikki reseptit
-        if (kaytettavaHakusana.isBlank()) { return this.reseptit; }
+        if (kaytettavaHakusana.isBlank()) return this.reseptit;
         
         for (int i = 0; i < this.lkm; i++) {
             Resepti resepti = anna(i);
-            if (resepti.onkoNimessa(kaytettavaHakusana)) { loydetytReseptit.add(resepti); } 
+            if (resepti.onkoNimessa(kaytettavaHakusana)) loydetytReseptit.add(resepti);
         }
         
         return loydetytReseptit;
@@ -399,17 +399,17 @@ public class Reseptit {
      * </pre>
      */
     public boolean equals(Object verrattava) {
-        if (verrattava == null) { return false; }
-        if (verrattava.getClass() != this.getClass()) { return false; }
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
         Reseptit verrattavaReseptit = (Reseptit)verrattava;
         
-        if (verrattavaReseptit.juoksevaId != this.juoksevaId) { return false; }
-        if (verrattavaReseptit.lkm != this.lkm) { return false; }
-        if (!verrattavaReseptit.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
+        if (verrattavaReseptit.juoksevaId != this.juoksevaId) return false;
+        if (verrattavaReseptit.lkm != this.lkm) return false;
+        if (!verrattavaReseptit.tiedostoNimi.equals(this.tiedostoNimi)) return false;
         
         // verrataan yksittäisiä reseptejä toisiinsa
         for (int i = 0; i < this.lkm; i++) {
-            if (!verrattavaReseptit.reseptit.get(i).equals(this.reseptit.get(i))) { return false; }
+            if (!verrattavaReseptit.reseptit.get(i).equals(this.reseptit.get(i))) return false;
         }
         
         return true;

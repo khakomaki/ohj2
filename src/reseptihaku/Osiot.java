@@ -39,8 +39,8 @@ public class Osiot {
      */
     public void setTiedostoNimi(String tiedostonimi) {
         // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
-        if (tiedostonimi == null) { return; }
-        if (tiedostonimi.length() < 1) { return; }
+        if (tiedostonimi == null) return;
+        if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
     }
     
@@ -105,7 +105,7 @@ public class Osiot {
      * </pre>
      */
     public void lisaaOsio(Osio osio) {
-        if (osio == null) { return; }
+        if (osio == null) return;
         Osio lisattavaOsio = osio;
         this.osiot.add(lisattavaOsio);
     }
@@ -219,16 +219,16 @@ public class Osiot {
      * </pre>
      */
     public boolean equals(Object verrattava) {
-        if (verrattava == null) { return false; }
-        if (verrattava.getClass() != this.getClass()) { return false; }
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
         Osiot verrattavaOsiot = (Osiot)verrattava;
-        if (verrattavaOsiot.juoksevaId != this.juoksevaId) { return false; }
-        if (!verrattavaOsiot.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
-        if (verrattavaOsiot.osiot.size() != this.osiot.size()) { return false; }
+        if (verrattavaOsiot.juoksevaId != this.juoksevaId) return false;
+        if (!verrattavaOsiot.tiedostoNimi.equals(this.tiedostoNimi)) return false;
+        if (verrattavaOsiot.osiot.size() != this.osiot.size()) return false;
         
         // käsketään yksittäisten osioiden vertaamaan toisiaan keskenään
         for (int i = 0; i < this.osiot.size(); i++) {
-            if (!verrattavaOsiot.osiot.get(i).equals(this.osiot.get(i))) { return false; }
+            if (!verrattavaOsiot.osiot.get(i).equals(this.osiot.get(i))) return false;
         }
         
         return true;

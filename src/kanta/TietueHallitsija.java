@@ -59,7 +59,7 @@ public class TietueHallitsija<T> {
      */
     @SuppressWarnings("unchecked")
     public TietueHallitsija(int maxLkm) {
-        if (maxLkm < 1) { return; }
+        if (maxLkm < 1) return;
         this.maxLkm = maxLkm;
         this.oliot = (T[]) new Object[this.maxLkm];
     }
@@ -79,7 +79,7 @@ public class TietueHallitsija<T> {
      */
     public T getOlio(int indeksi) {
         // palautetaan null jos yritetään ottaa määrittelemättömästä paikasta
-        if (this.lkm < indeksi || indeksi < 0) { return null; }
+        if (this.lkm < indeksi || indeksi < 0) return null;
         return this.oliot[indeksi];
     }
     
@@ -127,13 +127,18 @@ public class TietueHallitsija<T> {
         // vaihdetaan uuteen mnaksimi lukumäärään, jos se on vähintään yhden enemmän kuin alkuperäinen
         if (this.maxLkm + 1 <= uusiMaxLkm) { 
             this.maxLkm = uusiMaxLkm; 
-        } else { this.maxLkm++; }
+        } else { 
+            this.maxLkm++; 
+        }
         
         // luodaan uusi lista uudella koolla, lisätään olemassaolevat olioviitteet ja käännetään viite siihen
         @SuppressWarnings("unchecked")
         T[] uudetOliot = (T[]) new Object[this.maxLkm];
         
-        for (int i = 0; i < this.lkm; i++) { uudetOliot[i] = this.oliot[i]; }
+        for (int i = 0; i < this.lkm; i++) { 
+            uudetOliot[i] = this.oliot[i]; 
+        }
+        
         this.oliot = uudetOliot;
         
         return this.maxLkm;
@@ -160,7 +165,7 @@ public class TietueHallitsija<T> {
      * </pre>
      */
     public void lisaaOlio(T olio) {
-        if (!onkoTilaa()) { lisaaTilaa(); }
+        if (!onkoTilaa()) lisaaTilaa();
         this.oliot[lkm] = olio;
         this.lkm++;
     }
@@ -195,7 +200,7 @@ public class TietueHallitsija<T> {
      */
     public int poistaOlio(int indeksi) {
         // poistutaan jos indeksi ei ole mieluisa
-        if (indeksi < 0 || this.lkm <= indeksi) { return this.lkm; }
+        if (indeksi < 0 || this.lkm <= indeksi) return this.lkm;
         
         // siirretään indeksistä eteenpäin kaikkia taaksepäin
         for (int i = indeksi + 1; i < this.lkm; i++ ) {

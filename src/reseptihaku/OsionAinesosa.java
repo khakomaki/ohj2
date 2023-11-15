@@ -207,12 +207,12 @@ public class OsionAinesosa {
      * </pre>
      */
     public boolean equals(Object verrattava) {
-        if (verrattava == null) { return false; }
-        if (verrattava.getClass() != this.getClass()) { return false; }
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
         
         OsionAinesosa verrattavaOA = (OsionAinesosa)verrattava;
-        if (!verrattavaOA.ainesosaNimi.equals(this.ainesosaNimi)) { return false; }
-        if (!verrattavaOA.maara.equals(this.maara)) { return false; }
+        if (!verrattavaOA.ainesosaNimi.equals(this.ainesosaNimi)) return false;
+        if (!verrattavaOA.maara.equals(this.maara)) return false;
         
         return true;
     }

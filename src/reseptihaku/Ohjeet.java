@@ -90,7 +90,7 @@ public class Ohjeet {
         Ohje lisattavaOhje = ohje;
         
         // luo uuden ohjeen jos annetaan null
-        if (ohje == null) { lisattavaOhje = new Ohje(); }
+        if (ohje == null) lisattavaOhje = new Ohje();
         this.ohjeet.add(lisattavaOhje);
         this.lkm++;
         paivitaVaiheet();
@@ -129,7 +129,7 @@ public class Ohjeet {
      */
     public void poista(int indeksi) {
         // ei tehdä mitään jos indeksi ei ole mieluisa
-        if (indeksi < 0 || lkm <= indeksi) { return; }
+        if (indeksi < 0 || lkm <= indeksi) return;
         
         ohjeet.remove(indeksi);
         this.lkm--;
@@ -195,7 +195,7 @@ public class Ohjeet {
      * </pre>
      */
     public Ohje anna(int indeksi) {
-        if (indeksi < 0 || this.lkm <= indeksi) { return null; }
+        if (indeksi < 0 || this.lkm <= indeksi) return null;
         return ohjeet.get(indeksi);
     }
     
@@ -223,8 +223,8 @@ public class Ohjeet {
      */
     public void setTiedostoNimi(String tiedostonimi) {
         // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
-        if (tiedostonimi == null) { return; }
-        if (tiedostonimi.length() < 1) { return; }
+        if (tiedostonimi == null) return;
+        if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
     }
     
@@ -379,16 +379,16 @@ public class Ohjeet {
      * </pre>
      */
     public boolean equals(Object verrattava) {
-        if (verrattava == null) { return false; }
-        if (verrattava.getClass() != this.getClass()) { return false; }
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
         Ohjeet verrattavaOhjeet = (Ohjeet)verrattava;
-        if (verrattavaOhjeet.lkm != this.lkm) { return false; }
-        if (verrattavaOhjeet.osioId != this.osioId) { return false; }
-        if (!verrattavaOhjeet.tiedostoNimi.equals(this.tiedostoNimi)) { return false; }
+        if (verrattavaOhjeet.lkm != this.lkm) return false;
+        if (verrattavaOhjeet.osioId != this.osioId) return false;
+        if (!verrattavaOhjeet.tiedostoNimi.equals(this.tiedostoNimi)) return false;
         
         // verrataan yksittäiset ohjeet
         for (int i = 0; i < this.lkm; i++) {
-            if (!verrattavaOhjeet.ohjeet.get(i).equals(this.ohjeet.get(i))) { return false; }
+            if (!verrattavaOhjeet.ohjeet.get(i).equals(this.ohjeet.get(i))) return false;
         }
         
         return true;
