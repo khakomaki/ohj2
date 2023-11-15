@@ -13,7 +13,6 @@ public class Osio {
     private String nimi;
     private OsionAinesosat osionAinesosat;
     private Ohjeet ohjeet;
-    private Ainesosat ainesosat;
     private final String oletusNimi = "Osion nimi";
     
     
@@ -32,9 +31,7 @@ public class Osio {
         this.ohjeet = new Ohjeet(this.osioId);
         setNimi(nimi);
         
-        this.ainesosat = new Ainesosat();
         luoOsionAinesosat();
-        this.osionAinesosat.setAinesosat(ainesosat);
     }
     
     
@@ -52,23 +49,7 @@ public class Osio {
         this.ohjeet = new Ohjeet(this.osioId);
         setNimi(nimi);
         
-        this.ainesosat = new Ainesosat();
         luoOsionAinesosat();
-        this.osionAinesosat.setAinesosat(ainesosat);
-    }
-    
-    
-    /**
-     * @param ainesosat viite ainesosien hallitsijaan
-     */
-    public Osio(Ainesosat ainesosat) {
-        setNimi(null);
-        this.ohjeet = new Ohjeet(this.osioId);
-        
-        Ainesosat asetettavaAinesosat = ainesosat;
-        if (asetettavaAinesosat == null) { asetettavaAinesosat = new Ainesosat(); }
-        luoOsionAinesosat();
-        this.osionAinesosat.setAinesosat(ainesosat);
     }
     
     
@@ -85,22 +66,7 @@ public class Osio {
         setNimi(null);
         this.ohjeet = new Ohjeet(this.osioId);
         
-        this.ainesosat = new Ainesosat();
         luoOsionAinesosat();
-        this.osionAinesosat.setAinesosat(ainesosat);
-    }
-    
-    
-    /**
-     * Asettaa viitteen luokkaan joka hallitsee olemassa olevia ainesosia.
-     * Ei hyväksy null-viitettä.
-     * 
-     * @param ainesosat asetettavat ainesosat
-     */
-    public void setAinesosat(Ainesosat ainesosat) {
-        if (ainesosat == null) { return; }
-        this.ainesosat = ainesosat;
-        this.osionAinesosat.setAinesosat(ainesosat);
     }
     
     
@@ -108,7 +74,7 @@ public class Osio {
      * Luo osion ainesosat
      */
     private void luoOsionAinesosat() {
-        this.osionAinesosat = new OsionAinesosat(this.osioId, this.ainesosat);
+        this.osionAinesosat = new OsionAinesosat(this.osioId);
     }
     
     
@@ -179,17 +145,6 @@ public class Osio {
     
     
     /**
-     * @param ainesosaId minkä aineosan nimi halutaan
-     * @return ainesosan nimi
-     */
-    public String getAinesosanNimi(int ainesosaId) {
-        Ainesosa ainesosa = this.ainesosat.anna(ainesosaId);
-        if (ainesosa == null) { return ""; }
-        return ainesosa.getNimi();
-    }
-    
-    
-    /**
      * @return osion ainesosat -olio
      */
     public OsionAinesosat annaOsionAinesosat() {
@@ -206,21 +161,24 @@ public class Osio {
     
     
     /**
-     * @param ainesosa lisättävä ainesosa
-     * @param maara lisättävän ainesosa määrä
-     * @return lisätty osion ainesosa
+     * Luo ja lisää annetun mukaisen osion ainesosan
+     * 
+     * @param ainesosa ainesosan nimi
+     * @param maara ainesosan määrä
+     * @return luotu osion ainesosa
      */
-    public OsionAinesosa lisaaAinesosa(Ainesosa ainesosa, String maara) {
-        return this.osionAinesosat.lisaa(ainesosa, maara);
+    public OsionAinesosa lisaaAinesosa(String ainesosa, String maara) {
+        OsionAinesosa osionAinesosa = new OsionAinesosa(ainesosa, maara);
+        this.osionAinesosat.lisaa(osionAinesosa);
+        return osionAinesosa;
     }
     
     
     /**
-     * @param ainesosa lisättävän ainesosan nimi
-     * @param maara lisättävän ainesosan määrä
+     * @param ainesosa lisättävä osion ainesosa
      */
-    public void lisaaAinesosa(String ainesosa, String maara) {
-        this.osionAinesosat.lisaaOsionAinesosa(ainesosa, maara);
+    public void lisaaAinesosa(OsionAinesosa ainesosa) {
+        this.osionAinesosat.lisaa(ainesosa);
     }
     
     
@@ -340,9 +298,6 @@ public class Osio {
         kopio.nimi = this.nimi;
         kopio.osioId = this.osioId;
         
-        // annetaan viite ainesosiin, ei kopioida
-        kopio.ainesosat = this.ainesosat;
-        
         // kopioidaan osion omat ainesosat ja ohjeet
         kopio.osionAinesosat = this.osionAinesosat.clone();
         kopio.ohjeet = this.ohjeet.clone();
@@ -377,7 +332,6 @@ public class Osio {
         if (verrattavaOsio.osioId != this.osioId) { return false; }
         if (!verrattavaOsio.osionAinesosat.equals(this.osionAinesosat)) { return false; }
         if (!verrattavaOsio.ohjeet.equals(this.ohjeet)) { return false; }
-        if (!verrattavaOsio.ainesosat.equals(this.ainesosat)) { return false; }
         
         return true;
     }
@@ -406,7 +360,6 @@ public class Osio {
         hash = Hajautus.hajautusString(hash, this.nimi);
         hash = Hajautus.hajautusInt(hash, this.osionAinesosat.hashCode());
         hash = Hajautus.hajautusInt(hash, this.ohjeet.hashCode());
-        hash = Hajautus.hajautusInt(hash, this.ainesosat.hashCode());
         
         return hash;
     }
@@ -434,12 +387,12 @@ public class Osio {
         System.out.println(lattytaikina.toString());
         
         OsionAinesosat osionAinesosat = lattytaikina.annaOsionAinesosat();
-        osionAinesosat.lisaaOsionAinesosa("maitoa", "5dl");
-        osionAinesosat.lisaaOsionAinesosa("kananmunia", "3kpl");
-        osionAinesosat.lisaaOsionAinesosa("sokeria", "2rkl");
-        osionAinesosat.lisaaOsionAinesosa("vehnäjauhoja", "3dl");
-        osionAinesosat.lisaaOsionAinesosa("suolaa", "1tl");
-        osionAinesosat.lisaaOsionAinesosa("voi", "");
+        osionAinesosat.lisaa(new OsionAinesosa("maitoa", "5dl"));
+        osionAinesosat.lisaa(new OsionAinesosa("kananmunia", "3kpl"));
+        osionAinesosat.lisaa(new OsionAinesosa("sokeria", "2rkl"));
+        osionAinesosat.lisaa(new OsionAinesosa("vehnäjauhoja", "3dl"));
+        osionAinesosat.lisaa(new OsionAinesosa("suolaa", "1tl"));
+        osionAinesosat.lisaa(new OsionAinesosa("voi", ""));
         System.out.println(osionAinesosat.toString() + "\n");
         
         osionAinesosat.tulostaOsionAinesosat(System.out);

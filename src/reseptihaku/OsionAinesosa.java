@@ -9,58 +9,99 @@ import kanta.Hajautus;
  */
 public class OsionAinesosa {
     
-    private int ainesosa_id     = 0;
+    private String ainesosaNimi = "ainesosa";
     private String maara        = "";
     
     
     /**
-     * Luo osion ainesosan
-     * 
-     * @param ainesosa_id osion ainesosan tunnus
-     * @param maara osion ainesosan määrä
+     * Luo oletus ainesosan oletus nimellä ja määrällä
      * 
      * @example
      * <pre name="test">
-     * OsionAinesosa osionAinesosa = new OsionAinesosa(7, "5dl");
-     * osionAinesosa.toString() === "7|5dl";
+     * OsionAinesosa oletus = new OsionAinesosa();
+     * oletus.toString() === "ainesosa|";
      * </pre>
      */
-    public OsionAinesosa(int ainesosa_id, String maara) {
-        this.ainesosa_id = ainesosa_id;
-        this.maara = maara;
+    public OsionAinesosa() {
+        //
     }
     
     
     /**
-     * Luo osion ainesosan
+     * Luo osion ainesosan määrällä
      * 
-     * @param ainesosa_id osion ainesosan tunnus
+     * @param ainesosa ainesosan nimi
+     * @param maara ainesosan määrä
      * 
      * @example
      * <pre name="test">
-     * OsionAinesosa osionAinesosa = new OsionAinesosa(7);
-     * osionAinesosa.toString() === "7|";
+     * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
+     * peruna.toString() === "peruna|1kg";
      * </pre>
      */
-    public OsionAinesosa(int ainesosa_id) {
-        this.ainesosa_id = ainesosa_id;
+    public OsionAinesosa(String ainesosa, String maara) {
+        setAinesosa(ainesosa);
+        setMaara(maara);
     }
     
     
     /**
-     * Palauttaa osion ainesosan tunnuksen
+     * Palauttaa osion ainesosan nimen
      * 
-     * @return ainesosan tunnus
+     * @return ainesosan nimi
+     * 
+     * @example
+     * <pre name="test">
+     * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
+     * peruna.toString() === "peruna|1kg";
+     * peruna.getAinesosa() === "peruna";
+     * </pre>
      */
-    public int getId() {
-        return this.ainesosa_id;
+    public String getAinesosa() {
+        return this.ainesosaNimi;
     }
     
     
     /**
-     * palauttaa osion ainesosan määrän
+     * Asettaa osion ainesosan nimen.
+     * Ei aseta null-viitteeksi.
+     * 
+     * @param ainesosa asetettava ainesosan nimi
+     * 
+     * @example
+     * <pre name="test">
+     * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
+     * peruna.toString() === "peruna|1kg";
+     * peruna.getAinesosa() === "peruna";
+     * 
+     * peruna.setAinesosa("makkara");
+     * peruna.getAinesosa() === "makkara";
+     * 
+     * peruna.setAinesosa(null);
+     * peruna.getAinesosa() === "makkara";
+     * 
+     * peruna.setAinesosa("");
+     * peruna.getAinesosa() === "makkara";
+     * </pre>
+     */
+    public void setAinesosa(String ainesosa) {
+        // ei tehdä muutoksia jos yritetään laittaa nimeksi null tai tyhjä merkkijono
+        if (ainesosa == null || ainesosa.length() < 1) return;
+        this.ainesosaNimi = ainesosa;
+    }
+    
+    
+    /**
+     * Palauttaa osion ainesosan määrän
      * 
      * @return ainesosan määrä
+     * 
+     * @example
+     * <pre name="test">
+     * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
+     * peruna.toString() === "peruna|1kg";
+     * peruna.getMaara() === "1kg";
+     * </pre>
      */
     public String getMaara() {
         return this.maara;
@@ -68,12 +109,29 @@ public class OsionAinesosa {
     
     
     /**
-     * Asettaa osion kyseisen ainesosan määrän
+     * Asettaa osion kyseisen ainesosan määrän.
+     * Ei aseta null-viitteeksi
      * 
      * @param maara asetettava määrä
+     * 
+     * @example
+     * <pre name="test">
+     * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
+     * peruna.toString() === "peruna|1kg";
+     * peruna.getMaara() === "1kg";
+     * 
+     * peruna.setMaara("2kg");
+     * peruna.getMaara() === "2kg";
+     * 
+     * peruna.setMaara(null);
+     * peruna.getMaara() === "2kg";
+     * 
+     * peruna.setMaara("");
+     * peruna.getMaara() === "";
+     * </pre>
      */
     public void setMaara(String maara) {
-        if (maara == null) { return; }
+        if (maara == null) return;
         this.maara = maara;
     }
     
@@ -84,8 +142,8 @@ public class OsionAinesosa {
      * 
      * @example
      * <pre name="test">
-     * OsionAinesosa juusto = new OsionAinesosa(200, "2kg");
-     * juusto.toString() === "200|2kg";
+     * OsionAinesosa juusto = new OsionAinesosa("juusto", "2kg");
+     * juusto.toString() === "juusto|2kg";
      * 
      * OsionAinesosa juustoKopio = juusto.clone();
      * juustoKopio.toString().equals(juusto.toString()) === true;
@@ -95,8 +153,8 @@ public class OsionAinesosa {
      * </pre>
      */
     public OsionAinesosa clone() {
-        OsionAinesosa kopio = new OsionAinesosa(0);
-        kopio.ainesosa_id = this.ainesosa_id;
+        OsionAinesosa kopio = new OsionAinesosa();
+        kopio.ainesosaNimi = this.ainesosaNimi;
         kopio.maara = this.maara;
         return kopio;
     }
@@ -108,9 +166,9 @@ public class OsionAinesosa {
      * 
      * @example
      * <pre name="test">
-     * OsionAinesosa juusto1 = new OsionAinesosa(200, "2kg");
-     * OsionAinesosa juusto2 = new OsionAinesosa(201, "2kg");
-     * OsionAinesosa juusto3 = new OsionAinesosa(200, "3kg");
+     * OsionAinesosa juusto1 = new OsionAinesosa("juusto", "2kg");
+     * OsionAinesosa juusto2 = new OsionAinesosa("sinihomejuusto", "2kg");
+     * OsionAinesosa juusto3 = new OsionAinesosa("juusto", "3kg");
      * 
      * juusto1.hashCode() == juusto2.hashCode() === false;
      * juusto1.hashCode() == juusto3.hashCode() === false;
@@ -122,7 +180,7 @@ public class OsionAinesosa {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.ainesosa_id);
+        hash = Hajautus.hajautusString(hash, this.ainesosaNimi);
         hash = Hajautus.hajautusString(hash, this.maara);
         return hash;
     }
@@ -134,9 +192,9 @@ public class OsionAinesosa {
      * 
      * @example
      * <pre name="test">
-     * OsionAinesosa juusto1 = new OsionAinesosa(200, "2kg");
-     * OsionAinesosa juusto2 = new OsionAinesosa(201, "2kg");
-     * OsionAinesosa juusto3 = new OsionAinesosa(200, "3kg");
+     * OsionAinesosa juusto1 = new OsionAinesosa("juusto", "2kg");
+     * OsionAinesosa juusto2 = new OsionAinesosa("sinihomejuusto", "2kg");
+     * OsionAinesosa juusto3 = new OsionAinesosa("juusto", "3kg");
      * 
      * juusto1.equals(juusto2) === false;
      * juusto1.equals(juusto3) === false;
@@ -153,8 +211,8 @@ public class OsionAinesosa {
         if (verrattava.getClass() != this.getClass()) { return false; }
         
         OsionAinesosa verrattavaOA = (OsionAinesosa)verrattava;
-        if (verrattavaOA.ainesosa_id != this.ainesosa_id) { return false; }
-        if (verrattavaOA.maara != this.maara) { return false; }
+        if (!verrattavaOA.ainesosaNimi.equals(this.ainesosaNimi)) { return false; }
+        if (!verrattavaOA.maara.equals(this.maara)) { return false; }
         
         return true;
     }
@@ -166,13 +224,13 @@ public class OsionAinesosa {
      * 
      * @example
      * <pre name="test">
-     * OsionAinesosa mozzarella = new OsionAinesosa(20501, "120g");
-     * mozzarella.toString() === "20501|120g";
+     * OsionAinesosa mozzarella = new OsionAinesosa("Mozzarella", "120g");
+     * mozzarella.toString() === "Mozzarella|120g";
      * </pre>
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.ainesosa_id);
+        sb.append(this.ainesosaNimi);
         sb.append('|');
         sb.append(this.maara);
         return sb.toString();

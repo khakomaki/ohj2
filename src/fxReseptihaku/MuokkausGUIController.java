@@ -18,7 +18,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import reseptihaku.Ainesosa;
 import reseptihaku.Ohje;
 import reseptihaku.Ohjeet;
 import reseptihaku.Osio;
@@ -49,7 +48,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     @FXML private void handlePoistaResepti() { poistaResepti(); }
     @FXML private void handlePoistaOsio() { poistaOsio(null, null); }
     @FXML private void handlePoistaAinesosa() { poistaAinesosa(null, 0, null, null); }
-    @FXML private void handleLisaaAinesosa() { lisaaAinesosa(null, null, null, ""); }
+    @FXML private void handleLisaaAinesosa() { lisaaAinesosa(null, null, null); }
     @FXML private void handlePoistaOhje() { poistaOhje(null, 0, null, null); }
     @FXML private void handleLisaaOhje() { lisaaOhje(null, null, null); }
     
@@ -185,7 +184,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
             OsionAinesosa oa = osionAinesosat.anna(i);
             TextField maaraTextField = new TextField(oa.getMaara());
             maaraTextField.setAlignment(Pos.CENTER);
-            TextField ainesosaTextField = new TextField(osio.getAinesosanNimi(oa.getId()));
+            TextField ainesosaTextField = new TextField(oa.getAinesosa());
             ainesosaTextField.setAlignment(Pos.CENTER);
             
             ainesosatGridPane.add(maaraTextField, 0, ainesosanRivi);
@@ -198,7 +197,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // lisätään tyhjä ainesosa
         ainesosatGridPane.add(new Label(), 0, ainesosatGridPane.getRowCount() + 1);
-        lisaaAinesosa(ainesosatGridPane, osio, new Ainesosa(""), "");
+        lisaaAinesosa(ainesosatGridPane, osio, new OsionAinesosa());
         
         // lisätään otsikko ja GridPane ainesosien VBox-elementtiin
         ainesosatVBox.getChildren().add(ainesosatLabel);
@@ -387,8 +386,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
-    private void lisaaAinesosa(GridPane paneeli, Osio osio, Ainesosa ainesosa, String maara) {
-        if (paneeli == null || osio == null || ainesosa == null) { return; }
+    private void lisaaAinesosa(GridPane paneeli, Osio osio, OsionAinesosa osionAinesosa) {
+        if (paneeli == null || osio == null || osionAinesosa == null) { return; }
         
         final int riviLkm = paneeli.getRowCount();
         
@@ -400,7 +399,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         paneeli.add(new TextField(), 1, riviLkm);
         
         // lisätään ainesosa osioon
-        OsionAinesosa osionAinesosa = osio.lisaaAinesosa(ainesosa, maara);
+        osio.lisaaAinesosa(osionAinesosa);
         
         // lisätään rivin poisto painike
         Button ainesosaPoisto = new Button("x");
@@ -411,7 +410,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         Button ainesosaLisays = new Button("+");
         
         // luo samaan paneeliin, samaan osioon tyhjän ainesosan ja määrän
-        ainesosaLisays.setOnAction(e -> lisaaAinesosa(paneeli, osio, new Ainesosa(""), "")); 
+        ainesosaLisays.setOnAction(e -> lisaaAinesosa(paneeli, osio, new OsionAinesosa())); 
         paneeli.add(ainesosaLisays, 2, riviLkm + 1);
     }
     
