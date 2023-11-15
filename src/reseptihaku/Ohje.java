@@ -1,5 +1,6 @@
 package reseptihaku;
 
+import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 
 /**
@@ -132,6 +133,35 @@ public class Ohje {
      */
     public void setVaihe(int vaihe) {
         if (0 < vaihe) this.vaihe = vaihe;
+    }
+    
+    
+    /**
+     * Parsii annetusta rivistä omat tietonsa
+     * 
+     * @param rivi parsittava rivi
+     * 
+     * @example
+     * <pre name="test">
+     * Ohje ohje = new Ohje();
+     * ohje.parse("1|Lisää mansikat");
+     * ohje.toString() === "1|Lisää mansikat";
+     * 
+     * ohje = new Ohje();
+     * ohje.parse(null);
+     * ohje.toString() === "1|";
+     * 
+     * ohje = new Ohje();
+     * ohje.parse("Lisää mansikat|1");
+     * ohje.toString() === "1|1";
+     * </pre>
+     */
+    public void parse(String rivi) {
+        if (rivi == null || rivi.length() < 1) return;
+        
+        StringBuilder sb = new StringBuilder(rivi);
+        setVaihe(Mjonot.erota(sb, '|', this.vaihe));
+        setOhjeistus(Mjonot.erota(sb, '|'));
     }
     
     

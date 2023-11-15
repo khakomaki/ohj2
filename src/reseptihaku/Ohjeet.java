@@ -2,9 +2,17 @@ package reseptihaku;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
 
 import kanta.Hajautus;
+import kanta.SailoException;
 
 /**
  * @author hakom
@@ -17,6 +25,7 @@ public class Ohjeet {
     private int osioId              = 0;
     private int lkm                 = 0;
     private ArrayList<Ohje> ohjeet  = new ArrayList<Ohje>();
+    private boolean muutettu        = false;
     
     
     /**
@@ -46,14 +55,6 @@ public class Ohjeet {
      */
     public Ohjeet(int osioId) {
         this.osioId = osioId;
-    }
-    
-    
-    /**
-     * @param id asetettava osion tunnus
-     */
-    public void setOsio(int id) {
-        this.osioId = id;
     }
     
     
@@ -93,7 +94,9 @@ public class Ohjeet {
         if (ohje == null) lisattavaOhje = new Ohje();
         this.ohjeet.add(lisattavaOhje);
         this.lkm++;
-        paivitaVaiheet();
+        lisattavaOhje.setVaihe(this.lkm);
+        
+        this.muutettu = true;
     }
     
     
@@ -133,7 +136,9 @@ public class Ohjeet {
         
         ohjeet.remove(indeksi);
         this.lkm--;
-        paivitaVaiheet();
+        paivitaVaiheet(indeksi);
+        
+        this.muutettu = true;
     }
     
     
@@ -173,7 +178,8 @@ public class Ohjeet {
             if (this.ohjeet.get(i).equals(poistettava)) {
                 ohjeet.remove(i);
                 this.lkm--;
-                paivitaVaiheet();
+                paivitaVaiheet(i);
+                this.muutettu = true;
                 break;
             }
         }
@@ -226,6 +232,8 @@ public class Ohjeet {
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
+        
+        this.muutettu = true;
     }
     
     
@@ -243,6 +251,143 @@ public class Ohjeet {
      */
     public String getTiedostonimi() {
         return this.tiedostoNimi;
+    }
+    
+    
+    /**
+     * Lukee ohjeet tiedostosta
+     * 
+     * @param tiedostonimi mistä tiedostosta yritetään lukea
+     * @throws SailoException jos tiedoston lukeminen epäonnistuu
+     */
+    public void lueTiedostosta(String tiedostonimi) throws SailoException {
+        
+        try (Scanner fi = new Scanner(new FileInputStream(new File(getPerusTiedostoNimi())))) {
+            while (fi.hasNext()) {
+                String rivi = fi.nextLine().strip();
+                
+                // skipataan tyhjät ja kommenttirivit
+                if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
+                
+                // käsketään ohjeen parsimaan tiedot ja lisätään ohjeisiin
+                Ohje ohje = new Ohje();
+                ohje.parse(rivi);
+                lisaa(ohje);
+            }
+            
+            this.muutettu = false;
+            
+        } catch (FileNotFoundException exception) {
+            throw new SailoException("Tiedostoa \"" + tiedostonimi + "\" ei saada avattua");
+        }
+    }
+    
+    
+    /**
+     * Lukee ohjeet aiemmin asetetusta tiedostosta
+     * 
+     * @throws SailoException jos tiedoston lukeminen epäonnistuu
+     */
+    public void lueTiedostosta() throws SailoException {
+        lueTiedostosta(this.getPerusTiedostoNimi());
+    }
+    
+    
+    /**
+     * Tallentaa tiedostoon ohjeiden muutokset.
+     * Vaihtaa nykyisen tallennustiedoston varmuuskopioksi.
+     * Luo tallennustiedoston jos sellaista ei vielä ollut.
+     * 
+     * @throws SailoException jos tallennus epäonnistuu
+     */
+    public void tallenna() throws SailoException {
+        if (!muutettu) return;
+        
+        File tiedosto = new File(getPerusTiedostoNimi());
+        File varmuuskopio = new File(getVarmuuskopioNimi());
+        
+        // koitetaan poistaa edellistä varmuuskopiota
+        // heitetään virhe jos sellainen on olemassa eikä voida poistaa
+        if (!varmuuskopio.delete() && varmuuskopio.exists()) {
+            throw new SailoException("Ei voida poistaa varmuuskopio-tiedostoa");
+        }
+        
+        // koitetaan luoda tiedosto jos sellaista ei vielä ole
+        if (!tiedosto.exists()) {
+            try {
+                tiedosto.createNewFile();
+                
+            } catch (IOException exception) {
+                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
+            }
+        }
+        
+        // koitetaan nimetä olemassaoleva tiedosto varmuuskopioksi
+        if (!tiedosto.renameTo(varmuuskopio)) {
+            throw new SailoException("Ei voida nimetä uudelleen tallennus-tiedostoa");
+        }
+        
+        try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
+            // syöttää jokaisen ohjeen tiedot omalle rivilleen
+            for (Ohje ohje : this.ohjeet) {
+                fo.println(ohje);
+            }
+        } catch (FileNotFoundException exception) {
+            throw new SailoException("Tiedostoa \"" + this.tiedostoNimi + "\" ei saada avattua");
+            
+        } catch (IOException exception) {
+            throw new SailoException("Tiedostoon \"" + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
+            
+        }
+    }
+    
+    
+    /**
+     * Palauttaa varmuuskopio-tiedoston nimen.
+     * Liimaa ".bak" tiedostopäätteen tilalle, sellainen löytyy.
+     * 
+     * @return varmuuskopio-tiedoston nimi
+     * 
+     * @example
+     * <pre name="test">
+     * Ohjeet ohjeet = new Ohjeet();
+     * ohjeet.getVarmuuskopioNimi() === "ohjeet.bak";
+     * 
+     * ohjeet.setTiedostoNimi("ohje.ohjeet.txt");
+     * ohjeet.getVarmuuskopioNimi() === "ohje.ohjeet.bak";
+     * 
+     * ohjeet.setTiedostoNimi("ohje");
+     * ohjeet.getVarmuuskopioNimi() === "ohje.bak";
+     * 
+     * ohjeet.setTiedostoNimi("");
+     * ohjeet.getVarmuuskopioNimi() === "ohje.bak";
+     * </pre>
+     */
+    public String getVarmuuskopioNimi() {
+        int tiedostopaate = this.tiedostoNimi.lastIndexOf('.');
+        if (tiedostopaate < 1) return this.tiedostoNimi + ".bak";
+        return this.tiedostoNimi.substring(0, tiedostopaate) + ".bak";
+    }
+    
+    
+    /**
+     * Palauttaa tallennus tiedoston nimen ilman päätettä.
+     * 
+     * @return tallennus tiedoston nimi ilman päätettä
+     * 
+     * @example
+     * <pre name="test">
+     * Ohjeet ohjeet = new Ohjeet();
+     * ohjeet.getPerusTiedostoNimi() === "ohjeet";
+     * 
+     * ohjeet.setTiedostoNimi("mun.ohjeet.tiedosto.txt");
+     * ohjeet.getPerusTiedostoNimi() === "mun.ohjeet.tiedosto";
+     * </pre>
+     */
+    public String getPerusTiedostoNimi() {
+        int tiedostopaate = this.tiedostoNimi.lastIndexOf('.');
+        if (tiedostopaate < 1) return this.tiedostoNimi;
+        return this.tiedostoNimi.substring(0, tiedostopaate);
     }
     
     
@@ -271,7 +416,7 @@ public class Ohjeet {
     
     /**
      * Päivittää ohjeiden sisältämien ohjeiden vaihe numerot vastaamaan
-     * taulukon järjestystä. Alkavat numerosta 1.
+     * taulukon järjestystä. Alkavat numerosta annetusta indeksista.
      * 
      * @example
      * <pre name="test">
@@ -283,17 +428,12 @@ public class Ohjeet {
      * ohjeet.anna(0).getVaihe() === 1;
      * ohjeet.anna(1).getVaihe() === 2;
      * ohjeet.anna(2).getVaihe() === 3;
-     * 
-     * ohjeet.anna(1).setVaihe(555);
-     * ohjeet.anna(1).getVaihe() === 555;
-     * 
-     * ohjeet.lisaa(new Ohje());
-     * ohjeet.anna(1).getVaihe() === 2;
-     * 
      * </pre>
      */
-    private void paivitaVaiheet() {
-        for (int i = 0; i < this.lkm; i++) {
+    private void paivitaVaiheet(int indeksista) {
+        if (indeksista < 0) return;
+        
+        for (int i = indeksista; i < this.lkm; i++) {
             Ohje ohje = this.ohjeet.get(i);
             ohje.setVaihe(i + 1);
         }
@@ -476,5 +616,23 @@ public class Ohjeet {
         
         System.out.println(ohjeet.toString());
         ohjeet.tulostaOhjeet(System.out);
+        
+        // tallentaa
+        try {
+            ohjeet.tallenna();
+        } catch (SailoException exception) {
+            System.out.println(exception.getMessage());
+        }
+        
+        // lukee tallennetusta tiedostosta
+        Ohjeet ohjeetTiedostosta = new Ohjeet(5);
+        try {
+            ohjeetTiedostosta.lueTiedostosta();
+        } catch (SailoException exception) {
+            System.out.println(exception.getMessage());
+        }
+        
+        System.out.println(ohjeetTiedostosta);
+        ohjeetTiedostosta.tulostaOhjeet(System.out);
     }
 }
