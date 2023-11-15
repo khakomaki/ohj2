@@ -15,7 +15,6 @@ public class Reseptit {
 
     private ArrayList<Resepti> reseptit = new ArrayList<Resepti>();
     private String tiedostoNimi         = "reseptit.dat";
-    private int juoksevaId              = 1;
     private int lkm                     = 0;
     
     /**
@@ -79,15 +78,14 @@ public class Reseptit {
      * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
      * reseptit.toString() === "3|reseptit.dat";
      * 
-     * resepti1.getTunnus() === 1;
-     * resepti2.getTunnus() === 2;
-     * resepti3.getTunnus() === 3;
+     * reseptit.anna(0).equals(resepti1) === true
+     * reseptit.anna(1).equals(resepti2) === true;
+     * reseptit.anna(2).equals(resepti3) === true;
      * </pre>
      */
     public Resepti lisaa(String nimi) {
-        Resepti resepti = new Resepti(this.juoksevaId, nimi);
+        Resepti resepti = new Resepti(nimi);
         reseptit.add(resepti);
-        this.juoksevaId++;
         this.lkm++;
         return resepti;
     }
@@ -104,46 +102,17 @@ public class Reseptit {
      * Reseptit reseptit = new Reseptit();
      * 
      * Resepti mustikkapiirakka = new Resepti("Mustikkapiirakka");
-     * mustikkapiirakka.getTunnus() === -1;
      * reseptit.lisaa(mustikkapiirakka);
-     * mustikkapiirakka.getTunnus() === 1;
      * reseptit.toString() === "1|reseptit.dat";
      * 
-     * Resepti lihapiirakka = new Resepti(12, "Lihapiirakka");
-     * lihapiirakka.getTunnus() === 12;
-     * reseptit.lisaa(lihapiirakka);
-     * lihapiirakka.getTunnus() === 12;
-     * 
-     * Resepti kasvispiirakka = new Resepti(5, "Kasvispiirakka");
-     * kasvispiirakka.getTunnus() === 5;
-     * reseptit.lisaa(kasvispiirakka);
-     * kasvispiirakka.getTunnus() === 13;
-     * 
-     * Resepti makaronilaatikko = new Resepti(13, "Makaronilaatikko");
-     * makaronilaatikko.getTunnus() === 13;
-     * reseptit.lisaa(makaronilaatikko);
-     * makaronilaatikko.getTunnus() === 14;
-     * reseptit.toString() === "4|reseptit.dat";
-     * 
-     * Resepti maksalaatikko = new Resepti(15, "Maksalaatikko");
-     * maksalaatikko.getTunnus() === 15;
-     * reseptit.lisaa(maksalaatikko);
-     * maksalaatikko.getTunnus() === 15;
+     * reseptit.lisaa(new Resepti());
+     * reseptit.toString() === "2|reseptit.dat";
      * </pre>
      */
     public void lisaa(Resepti resepti) {
-        if (resepti == null) { return; }
+        if (resepti == null) return;
         Resepti lisattavaResepti = resepti;
-        
-        // asettaa tunnukseksi juoksevan id:n jos tunnus ei ole kasvavassa järjestyksessä
-        int reseptinTunnus = lisattavaResepti.getTunnus();        
-        if (reseptinTunnus < this.juoksevaId) lisattavaResepti.setTunnus(this.juoksevaId);
-        
-        // vaihtaa juoksevan id:n reseptin tunnukseen, jos se on enemmän kuin juokseva id
-        if (this.juoksevaId < reseptinTunnus) this.juoksevaId = reseptinTunnus;
-        
         reseptit.add(lisattavaResepti);
-        this.juoksevaId++;
         this.lkm++;
     }
     
@@ -190,7 +159,7 @@ public class Reseptit {
      * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
      * reseptit.anna(1) == resepti2 === true;
      * 
-     * Resepti resepti4 = new Resepti(1, "Kasvispiirakka");
+     * Resepti resepti4 = new Resepti("Kasvispiirakka");
      * reseptit.vaihdaResepti(resepti4, resepti2);
      * 
      * reseptit.vaihdaResepti(resepti2, resepti4);
@@ -331,8 +300,8 @@ public class Reseptit {
      * @return mustikkapiirakka resepti
      */
     public Resepti lisaaMustikkapiirakka() {
-        Resepti mustikkapiirakka = new Resepti(1, "");
-        mustikkapiirakka.luoMustikkapiirakka(this.juoksevaId);
+        Resepti mustikkapiirakka = new Resepti("");
+        mustikkapiirakka.luoMustikkapiirakka();
         lisaa(mustikkapiirakka);
         return mustikkapiirakka;
     }
@@ -345,8 +314,8 @@ public class Reseptit {
      * @example
      * <pre name="test">
      * Reseptit reseptit = new Reseptit();
-     * reseptit.lisaa(new Resepti(1, "Mustikkapiirakka"));
-     * reseptit.lisaa(new Resepti(2, "Juustokakku"));
+     * reseptit.lisaa(new Resepti("Mustikkapiirakka"));
+     * reseptit.lisaa(new Resepti("Juustokakku"));
      * reseptit.toString() === "2|reseptit.dat";
      * 
      * Reseptit reseptitKopio = reseptit.clone();
@@ -359,7 +328,6 @@ public class Reseptit {
      */
     public Reseptit clone() {
         Reseptit kopio = new Reseptit();
-        kopio.juoksevaId = this.juoksevaId;
         kopio.lkm = this.lkm;
         kopio.tiedostoNimi = this.tiedostoNimi;
         
@@ -389,12 +357,12 @@ public class Reseptit {
      * reseptit2.setTiedostoNimi("jälkiruoat.txt");
      * reseptit1.equals(reseptit2) === true;
      * 
-     * reseptit1.lisaa(new Resepti(1, "Mustikkapiirakka"));
-     * reseptit1.lisaa(new Resepti(2, "Suklaakakku"));
+     * reseptit1.lisaa(new Resepti("Mustikkapiirakka"));
+     * reseptit1.lisaa(new Resepti("Suklaakakku"));
      * reseptit1.equals(reseptit2) === false;
      * 
-     * reseptit2.lisaa(new Resepti(1, "Mustikkapiirakka"));
-     * reseptit2.lisaa(new Resepti(2, "Suklaakakku"));
+     * reseptit2.lisaa(new Resepti("Mustikkapiirakka"));
+     * reseptit2.lisaa(new Resepti("Suklaakakku"));
      * reseptit1.equals(reseptit2) === true;
      * </pre>
      */
@@ -403,7 +371,6 @@ public class Reseptit {
         if (verrattava.getClass() != this.getClass()) return false;
         Reseptit verrattavaReseptit = (Reseptit)verrattava;
         
-        if (verrattavaReseptit.juoksevaId != this.juoksevaId) return false;
         if (verrattavaReseptit.lkm != this.lkm) return false;
         if (!verrattavaReseptit.tiedostoNimi.equals(this.tiedostoNimi)) return false;
         
@@ -432,18 +399,17 @@ public class Reseptit {
      * reseptit2.setTiedostoNimi("jälkiruoat.txt");
      * reseptit1.hashCode() == reseptit2.hashCode() === true;
      * 
-     * reseptit1.lisaa(new Resepti(1, "Mustikkapiirakka"));
-     * reseptit1.lisaa(new Resepti(2, "Suklaakakku"));
+     * reseptit1.lisaa(new Resepti("Mustikkapiirakka"));
+     * reseptit1.lisaa(new Resepti("Suklaakakku"));
      * reseptit1.hashCode() == reseptit2.hashCode() === false;
      * 
-     * reseptit2.lisaa(new Resepti(1, "Mustikkapiirakka"));
-     * reseptit2.lisaa(new Resepti(2, "Suklaakakku"));
+     * reseptit2.lisaa(new Resepti("Mustikkapiirakka"));
+     * reseptit2.lisaa(new Resepti("Suklaakakku"));
      * reseptit1.hashCode() == reseptit2.hashCode() === true;
      * </pre>
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.juoksevaId);
         hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
         hash = Hajautus.hajautusInt(hash, this.lkm);
         

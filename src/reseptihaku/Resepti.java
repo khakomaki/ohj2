@@ -16,14 +16,16 @@ public class Resepti {
     
     private final String oletusNimi = "Reseptin nimi";
     
-    private int reseptiId =                     -1;
-    private String nimi =                       "";
-    private Osiot osiot =                       null;
-    private String kuvaus =                     "";
-    private int hinta =                         -1;
-    private int valmistusaika =                 -1;
-    private int tahdet =                        -1;
-    private int vaativuus =                     -1;
+    private int reseptiId           = -1;
+    private String nimi             = "";
+    private Osiot osiot             = null;
+    private String kuvaus           = "";
+    private int hinta               = -1;
+    private int valmistusaika       = -1;
+    private int tahdet              = -1;
+    private int vaativuus           = -1;
+    
+    private static int annettavaId  = 1;
     
     private static final Map<Integer, String> hintaVaihtoehdot;
     private static final Map<Integer, String> valmistusaikaVaihtoehdot;
@@ -69,26 +71,6 @@ public class Resepti {
     
     
     /**
-     * Luo reseptin.
-     * Sisältää reseptin perustiedot sekä viitteet reseptin sisältämiin ainesosiin ja ohjeisiin.
-     * 
-     * @param id reseptin tunnus
-     * @param nimi reseptin nimi
-     * 
-     * @example
-     * <pre name="test">
-     * Resepti makaronilaatikko = new Resepti(15, "Makaronilaatikko");
-     * makaronilaatikko.toString() === "15|Makaronilaatikko|-1|-1|-1|-1";
-     * </pre>
-     */
-    public Resepti(int id, String nimi) {
-        this.reseptiId = id;
-        setNimi(nimi);
-        this.osiot = new Osiot();
-    }
-    
-    
-    /**
      * Luo Reseptin annetulla nimellä.
      * Reseptin tunnus alustuu -1.
      * 
@@ -101,7 +83,6 @@ public class Resepti {
      * </pre>
      */
     public Resepti(String nimi) {
-        this.reseptiId = -1;
         setNimi(nimi);
         this.osiot = new Osiot();
     }
@@ -118,9 +99,30 @@ public class Resepti {
      * </pre>
      */
     public Resepti() {
-        this.reseptiId = -1;
         setNimi(null);
         this.osiot = new Osiot();
+    }
+    
+    
+    /**
+     * Luo reseptille id:n ja tallentaa
+     * 
+     * @return reseptin tunnus
+     * 
+     * @example
+     * <pre name="test">
+     * Resepti lihapullat = new Resepti("Lihapullat");
+     * lihapullat.toString() === "-1|Lihapullat|-1|-1|-1|-1";
+     * int n = lihapullat.rekisteroi();
+     * 
+     * Resepti perunamuusi = new Resepti("Perunamuusi");
+     * perunamuusi.rekisteroi() === n + 1;
+     * </pre>
+     */
+    public int rekisteroi() {
+        this.reseptiId = Resepti.annettavaId;
+        Resepti.annettavaId++;
+        return this.reseptiId;
     }
     
     
@@ -132,17 +134,17 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti pizza = new Resepti(3, "Pizza");
-     * pizza.toString() === "3|Pizza|-1|-1|-1|-1";
+     * Resepti pizza = new Resepti("Pizza");
+     * pizza.toString() === "-1|Pizza|-1|-1|-1|-1";
      * 
-     * pizza = new Resepti(3, "");
-     * pizza.toString() === "3|Reseptin nimi|-1|-1|-1|-1";
+     * pizza = new Resepti("");
+     * pizza.toString() === "-1|Reseptin nimi|-1|-1|-1|-1";
      * 
-     * pizza = new Resepti(3, "Itsetehty pizza");
-     * pizza.toString() === "3|Itsetehty pizza|-1|-1|-1|-1";
+     * pizza = new Resepti("Itsetehty pizza");
+     * pizza.toString() === "-1|Itsetehty pizza|-1|-1|-1|-1";
      * 
-     * pizza = new Resepti(3, null);
-     * pizza.toString() === "3|Reseptin nimi|-1|-1|-1|-1";
+     * pizza = new Resepti(null);
+     * pizza.toString() === "-1|Reseptin nimi|-1|-1|-1|-1";
      * </pre>
      */
     private void setNimi(String nimi) {
@@ -164,17 +166,17 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti pizza = new Resepti(3, "Pizza");
-     * pizza.toString() === "3|Pizza|-1|-1|-1|-1";
+     * Resepti pizza = new Resepti("Pizza");
+     * pizza.toString() === "-1|Pizza|-1|-1|-1|-1";
      * 
      * pizza.setUusiNimi("");
-     * pizza.toString() === "3|Pizza|-1|-1|-1|-1";
+     * pizza.toString() === "-1|Pizza|-1|-1|-1|-1";
      * 
      * pizza.setUusiNimi("Itsetehty pizza");
-     * pizza.toString() === "3|Itsetehty pizza|-1|-1|-1|-1";
+     * pizza.toString() === "-1|Itsetehty pizza|-1|-1|-1|-1";
      * 
      * pizza.setUusiNimi(null);
-     * pizza.toString() === "3|Itsetehty pizza|-1|-1|-1|-1";
+     * pizza.toString() === "-1|Itsetehty pizza|-1|-1|-1|-1";
      * </pre>
      */
     public void setUusiNimi(String nimi) {
@@ -251,31 +253,6 @@ public class Resepti {
     
     
     /**
-     * Asettaa reseptin tunnuksen
-     * 
-     * @param tunnus asetettava tunnus
-     * 
-     * @example
-     * <pre name="test">
-     * Resepti maksalaatikko = new Resepti("Maksalaatikko");
-     * maksalaatikko.getTunnus() === -1;
-     * 
-     * maksalaatikko.setTunnus(1);
-     * maksalaatikko.getTunnus() === 1;
-     * 
-     * maksalaatikko.setTunnus(-500);
-     * maksalaatikko.getTunnus() === -500;
-     * 
-     * maksalaatikko.setTunnus(250);
-     * maksalaatikko.getTunnus() === 250;
-     * </pre>
-     */
-    public void setTunnus(int tunnus) {
-        this.reseptiId = tunnus;
-    }
-    
-    
-    /**
      * Antaa reseptin tunnuksen/id:n
      * 
      * @return reseptin tunnus
@@ -284,9 +261,6 @@ public class Resepti {
      * <pre name="test">
      * Resepti resepti = new Resepti();
      * resepti.getTunnus() === -1;
-     * 
-     * resepti = new Resepti(1, "Mustikkapiirakka");
-     * resepti.getTunnus() === 1;
      * </pre>
      */
     public int getTunnus() {
@@ -356,7 +330,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti mokkapalat = new Resepti(2, "Mokkapalat");
+     * Resepti mokkapalat = new Resepti("Mokkapalat");
      * mokkapalat.setHinta(2);
      * mokkapalat.getHinta() === 2;
      * </pre>
@@ -515,7 +489,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti resepti = new Resepti(15, "Kakku");
+     * Resepti resepti = new Resepti("Kakku");
      * resepti.getTaulukkoMuodossa() === "Kakku||||";
      * </pre>
      */
@@ -550,7 +524,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti resepti = new Resepti(1, "Juustokakku");
+     * Resepti resepti = new Resepti("Juustokakku");
      * resepti.onkoNimessa("kakku") === true;
      * resepti.onkoNimessa("KAKKU") === true;
      * resepti.onkoNimessa("Juustokakku") === true;
@@ -581,28 +555,28 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti pizza = new Resepti(20, "Pizza");
+     * Resepti pizza = new Resepti("Pizza");
      * pizza.setKuvaus("Itsetehdyllä tomaattikastikkeella.");
      * pizza.setHinta(3);
      * pizza.setVaativuus(4);
      * pizza.lisaaOsio(new Osio("Pizzapohja"));
      * pizza.lisaaOsio(new Osio("Tomaattikastike"));
      * 
-     * pizza.toString() === "20|Pizza|3|-1|-1|4";
+     * pizza.toString() === "-1|Pizza|3|-1|-1|4";
      * 
      * Resepti kopioPizza = pizza.clone();
-     * kopioPizza.toString() === "20|Pizza|3|-1|-1|4";
+     * kopioPizza.toString() === "-1|Pizza|3|-1|-1|4";
      * 
      * kopioPizza.getOsiot().annaIndeksista(0).getNimi() === "Pizzapohja";
      * kopioPizza.getOsiot().annaIndeksista(1).getNimi() === "Tomaattikastike";
      * 
      * pizza.setHinta(1);
-     * pizza.toString() === "20|Pizza|1|-1|-1|4";
-     * kopioPizza.toString() === "20|Pizza|3|-1|-1|4";
+     * pizza.toString() === "-1|Pizza|1|-1|-1|4";
+     * kopioPizza.toString() === "-1|Pizza|3|-1|-1|4";
      * 
      * kopioPizza.setTahdet(1);
-     * pizza.toString() === "20|Pizza|1|-1|-1|4";
-     * kopioPizza.toString() === "20|Pizza|3|-1|1|4";
+     * pizza.toString() === "-1|Pizza|1|-1|-1|4";
+     * kopioPizza.toString() === "-1|Pizza|3|-1|1|4";
      * </pre>
      */
     @Override
@@ -631,12 +605,12 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti pizza1 = new Resepti(12, "Pizza");
+     * Resepti pizza1 = new Resepti("Pizza");
      * pizza1.setKuvaus("Pizzaa.");
      * pizza1.setHinta(1);
      * pizza1.setTahdet(2);
      * 
-     * Resepti pizza2 = new Resepti(12, "Pizza2");
+     * Resepti pizza2 = new Resepti("Pizza2");
      * pizza1.equals(pizza2) === false;
      * 
      * pizza2.setKuvaus("Pizzaa.");
@@ -689,8 +663,8 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti mustikkapiirakka = new Resepti(2, "Mustikkapiirakka");
-     * Resepti piirakka = new Resepti(2, "Piirakka");
+     * Resepti mustikkapiirakka = new Resepti("Mustikkapiirakka");
+     * Resepti piirakka = new Resepti("Piirakka");
      * mustikkapiirakka.hashCode() == piirakka.hashCode() === false;
      * 
      * piirakka.setUusiNimi("Mustikkapiirakka");
@@ -737,17 +711,15 @@ public class Resepti {
      * Testaamista varten luo mustikkapiirakan reseptin.
      * 
      * TODO: poista kun ei enää tarvita
-     * @param id mustikkapiirakan id
      * 
      * @example
      * <pre name="test">
-     * Resepti mustikkapiirakka = new Resepti(1, "");
-     * mustikkapiirakka.luoMustikkapiirakka(5);
-     * mustikkapiirakka.toString() === "5|Mustikkapiirakka|2|2|3|1";
+     * Resepti mustikkapiirakka = new Resepti("");
+     * mustikkapiirakka.luoMustikkapiirakka();
+     * mustikkapiirakka.toString() === "-1|Mustikkapiirakka|2|2|3|1";
      * </pre>
      */
-    public void luoMustikkapiirakka(int id) {
-        this.reseptiId = id;
+    public void luoMustikkapiirakka() {
         this.nimi = "Mustikkapiirakka";
         this.hinta = 2;
         this.valmistusaika = 2;
@@ -778,8 +750,8 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * Resepti lihapiirakka = new Resepti(2, "Lihapiirakka");
-     * lihapiirakka.toString() === "2|Lihapiirakka|-1|-1|-1|-1";
+     * Resepti lihapiirakka = new Resepti("Lihapiirakka");
+     * lihapiirakka.toString() === "-1|Lihapiirakka|-1|-1|-1|-1";
      * </pre>
      */
     public String toString() {
@@ -850,15 +822,21 @@ public class Resepti {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
-        Resepti lihapiirakka = new Resepti(1, "Lihapiirakka");
+        Resepti lihapiirakka = new Resepti("Lihapiirakka");
         lihapiirakka.setTahdet(2);
         lihapiirakka.setKuvaus("Helppo ja hyvä");
         System.out.println(lihapiirakka);
         System.out.println(lihapiirakka.getKuvaus());
         
-        Resepti mustikkapiirakka = new Resepti(1, "");
-        mustikkapiirakka.luoMustikkapiirakka(1);
+        Resepti mustikkapiirakka = new Resepti("");
+        mustikkapiirakka.luoMustikkapiirakka();
         System.out.println(mustikkapiirakka);
         System.out.println(mustikkapiirakka.getKuvaus());
+        
+        System.out.println(mustikkapiirakka.rekisteroi());
+        System.out.println(mustikkapiirakka);
+        
+        lihapiirakka.rekisteroi();
+        System.out.println(lihapiirakka);
     }
 }

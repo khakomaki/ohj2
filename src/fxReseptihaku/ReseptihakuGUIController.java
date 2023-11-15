@@ -262,7 +262,7 @@ public class ReseptihakuGUIController implements Initializable {
               uusiResepti.satunnaisetAttribuutit();
           }
           
-          reseptit.lisaa(new Resepti(15, "Juustokakku"));
+          reseptit.lisaa(new Resepti("Juustokakku"));
       }
       
       
