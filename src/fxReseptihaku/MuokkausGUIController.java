@@ -59,8 +59,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     private final int VALI = 10;
     
     // luodaan käytettävät fontit
-    Font kirjasinB16 = new Font("System Bold", 16);
-    Font kirjasin14 = new Font(14);
+    private Font kirjasinB16 = new Font("System Bold", 16);
+    private Font kirjasin14 = new Font(14);
     
     private Resepti valittuResepti;
     private Resepti alkuperainenResepti;
@@ -149,10 +149,10 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         HBox osionSisaltoHBox = new HBox();
         
-        ColumnConstraints ainesosaConstraints = luoOtsikkoRajoitteet();
-        ColumnConstraints painikeConstraints = luoPainikeRajoitteet();
-        ColumnConstraints vaiheConstraints = luoVaiheRajoitteet();
-        ColumnConstraints ohjeConstraints = luoOhjeRajoitteet();
+        ColumnConstraints ainesosaConstraints = luoRajoitteet(140, Priority.SOMETIMES, HPos.CENTER);
+        ColumnConstraints painikeConstraints = luoRajoitteet(30, Priority.NEVER, HPos.CENTER);
+        ColumnConstraints vaiheConstraints = luoRajoitteet(50, Priority.NEVER, HPos.CENTER);
+        ColumnConstraints ohjeConstraints = luoRajoitteet(250, Priority.ALWAYS, HPos.LEFT);
         
         // ==================== näytetään ainesosat ====================
         
@@ -264,40 +264,12 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
-    private ColumnConstraints luoOtsikkoRajoitteet() {
-        ColumnConstraints otsikkoConstraints = new ColumnConstraints();
-        otsikkoConstraints.setHalignment(HPos.CENTER);
-        otsikkoConstraints.setHgrow(Priority.SOMETIMES);
-        otsikkoConstraints.setMinWidth(140);
-        return otsikkoConstraints;
-    }
-    
-    
-    private ColumnConstraints luoPainikeRajoitteet() {
-        ColumnConstraints otsikkoConstraints = new ColumnConstraints();
-        otsikkoConstraints.setHalignment(HPos.CENTER);
-        otsikkoConstraints.setHgrow(Priority.NEVER);
-        otsikkoConstraints.setMinWidth(30);
-        otsikkoConstraints.setPrefWidth(30);
-        return otsikkoConstraints;
-    }
-    
-    
-    private ColumnConstraints luoOhjeRajoitteet() {
-        ColumnConstraints otsikkoConstraints = new ColumnConstraints();
-        otsikkoConstraints.setHalignment(HPos.LEFT);
-        otsikkoConstraints.setMinWidth(250);
-        otsikkoConstraints.setHgrow(Priority.ALWAYS);
-        return otsikkoConstraints;
-    }
-    
-    
-    private ColumnConstraints luoVaiheRajoitteet() {
-        ColumnConstraints otsikkoConstraints = new ColumnConstraints();
-        otsikkoConstraints.setHalignment(HPos.CENTER);
-        otsikkoConstraints.setHgrow(Priority.NEVER);
-        otsikkoConstraints.setMinWidth(50);
-        return otsikkoConstraints;
+    private ColumnConstraints luoRajoitteet(int minimiLeveys, Priority leveydenKasvu, HPos ryhmitys) {
+        ColumnConstraints rajoite = new ColumnConstraints();
+        rajoite.setMinWidth(minimiLeveys);
+        rajoite.setHgrow(leveydenKasvu);
+        rajoite.setHalignment(ryhmitys);
+        return rajoite;
     }
     
     
