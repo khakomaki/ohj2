@@ -1,8 +1,17 @@
 package reseptihaku;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import kanta.Hajautus;
+import kanta.MerkkijonoKasittely;
+import kanta.SailoException;
 
 /**
  * @author hakom
@@ -11,17 +20,28 @@ import kanta.Hajautus;
  */
 public class Osiot {
 
-    private String tiedostoNimi;
-    private int juoksevaId;
-    private ArrayList<Osio> osiot;
+    private String tiedostoNimi     = "resepti_osiot.dat";
+    private String polku            = "reseptidata/";
+    private int juoksevaId          = 1;
+    private int reseptiId           = -1;
+    private ArrayList<Osio> osiot   = new ArrayList<Osio>();
+    private boolean muutettu        = true;
     
     /**
-     * Luo osiot ja oman ainesosien hallitsijan
+     * Luo osiot
      */
     public Osiot() {
-        this.osiot = new ArrayList<Osio>();
-        this.tiedostoNimi = "resepti_osiot.dat";
-        this.juoksevaId = 0;
+        //
+    }
+    
+    
+    /**
+     * Luo osiot
+     * 
+     * @param reseptinTunnus mille reseptille osiot luodaan
+     */
+    public Osiot(int reseptinTunnus) {
+        this.reseptiId = reseptinTunnus;
     }
     
     
@@ -42,6 +62,19 @@ public class Osiot {
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
+        this.muutettu = true;
+    }
+    
+    
+    /**
+     * Asettaa tiedostopolun johon osion tiedot tallennetaan
+     * 
+     * @param tiedostopolku mihin osion tiedot tallennetaan
+     */
+    public void setTiedostoPolku(String tiedostopolku) {
+        if (tiedostopolku == null) return;
+        this.polku = tiedostopolku;
+        this.muutettu = true;
     }
     
     
@@ -63,15 +96,15 @@ public class Osiot {
      * osiot.toString() === "0|resepti_osiot.dat";
      * Osio pizzapohja = osiot.lisaaOsio("Pizzapohja");
      * osiot.toString() === "1|resepti_osiot.dat";
-     * pizzapohja.toString() === "0|Pizzapohja";
+     * pizzapohja.toString() === "1|Pizzapohja";
      * 
      * Osio tomaattikastike = osiot.lisaaOsio("Tomaattikastike");
      * osiot.toString() === "2|resepti_osiot.dat";
-     * tomaattikastike.toString() === "1|Tomaattikastike";
+     * tomaattikastike.toString() === "2|Tomaattikastike";
      * 
      * Osio taytteet = osiot.lisaaOsio("Täytteet");
      * osiot.toString() === "3|resepti_osiot.dat";
-     * taytteet.toString() === "2|Täytteet";
+     * taytteet.toString() === "3|Täytteet";
      * 
      * osiot.lisaaOsio("Täytteet (vaihtoehto 2)");
      * osiot.toString() === "4|resepti_osiot.dat";
@@ -84,6 +117,7 @@ public class Osiot {
         Osio osio = new Osio(this.juoksevaId, nimi);
         osiot.add(osio);
         this.juoksevaId++;
+        this.muutettu = true;
         return osio;
     }
     
@@ -108,6 +142,7 @@ public class Osiot {
         if (osio == null) return;
         Osio lisattavaOsio = osio;
         this.osiot.add(lisattavaOsio);
+        this.muutettu = true;
     }
     
     
@@ -134,6 +169,7 @@ public class Osiot {
      */
     public void poistaOsio(Osio osio) {
         this.osiot.remove(osio);
+        this.muutettu = true;
     }
     
     
@@ -143,6 +179,91 @@ public class Osiot {
      */
     public Osio annaIndeksista(int indeksi) {
         return this.osiot.get(indeksi);
+    }
+    
+    
+    /**
+     * Lukee Osion tiedot tiedostosta
+     * 
+     * @throws SailoException jos tallennus epäonnistuu
+     */
+    public void lueTiedostosta() throws SailoException {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.polku + this.tiedostoNimi)))) {
+            while (fi.hasNext()) {
+                String rivi = fi.nextLine().strip();
+                
+                // skipataan tyhjät ja kommenttirivit
+                if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
+                
+                // käsketään osiota parsimaan tiedot ja lisätään nykyisiin osioihin
+                Osio osio = new Osio();
+                osio.parse(rivi);
+                lisaaOsio(osio);
+            }
+            
+            this.muutettu = false;
+            
+        } catch (FileNotFoundException exception) {
+            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
+        }
+    }
+    
+    
+    /**
+     * Tallentaa osiot tiedostoon.
+     * Varmuuskopioi tallennustiedoston ennen kuin tallentaa uudestaan osiot.
+     * Luo tallennustiedoston jos sellaista ei vielä ollut.
+     * 
+     * @throws SailoException jos tallennus epäonnistuu
+     */
+    public void tallenna() throws SailoException {
+        if (!this.muutettu) return;
+        
+        File tiedosto = new File(this.polku + this.tiedostoNimi);
+        File varmuuskopio = new File(this.polku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
+        
+        // koitetaan poistaa edellistä varmuuskopiota
+        // heitetään virhe jos sellainen on olemassa eikä voida poistaa
+        if (!varmuuskopio.delete() && varmuuskopio.exists()) {
+            throw new SailoException("Ei voida poistaa varmuuskopio-tiedostoa");
+        }
+        
+        // koitetaan luoda tiedosto jos sellaista ei vielä ole
+        if (!tiedosto.exists()) {
+            try {
+                tiedosto.createNewFile();
+                
+            } catch (IOException exception) {
+                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
+            }
+        }
+        
+        // koitetaan nimetä olemassaoleva tiedosto varmuuskopioksi
+        if (!tiedosto.renameTo(varmuuskopio)) {
+            throw new SailoException("Ei voida nimetä uudelleen tallennus-tiedostoa");
+        }
+        
+        try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
+            // syöttää jokaisen osion tiedot omalle rivilleen
+            for (int i = 0; i < this.getLkm(); i++) {
+                fo.print(this.reseptiId);
+                fo.print('|');
+                fo.println(annaIndeksista(i));
+            }
+        } catch (FileNotFoundException exception) {
+            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
+            
+        } catch (IOException exception) {
+            throw new SailoException("Tiedostoon \"" + this.polku + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
+            
+        }
+        
+        // käskee osioiden tallentamaan omat tietonsa
+        for (Osio osio : this.osiot) {
+            osio.tallenna();
+        }
+        
+        this.muutettu = false;
     }
     
     
@@ -307,5 +428,23 @@ public class Osiot {
         Osio tomaattikastike = pizzanOsiot.annaIndeksista(1);
         Osio taytteet = pizzanOsiot.annaIndeksista(2);
         System.out.println(pizzapohja + "\n" + tomaattikastike + "\n" + taytteet);
+        
+        pizzanOsiot = new Osiot();
+        
+        try {
+            pizzanOsiot.tallenna();
+        } catch (SailoException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        Osiot osiotTiedostosta = new Osiot();
+        
+        try {
+            osiotTiedostosta.lueTiedostosta();
+        } catch (SailoException e) {
+            System.out.println(e.getMessage());;
+        }
+        
+        System.out.println(osiotTiedostosta);
     }
 }

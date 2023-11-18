@@ -1,6 +1,8 @@
 package reseptihaku;
 
+import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
+import kanta.SailoException;
 
 /**
  * @author hakom
@@ -224,6 +226,51 @@ public class Osio {
      */
     public void poistaOhje(Ohje ohje) {
         this.ohjeet.poista(ohje);
+    }
+    
+    
+    /**
+     * Koittaa parsia osion tiedot annetusta rivistä
+     * 
+     * @param rivi mistä koitetaan lukea osion tiedot
+     * 
+     * @example
+     * <pre name="test">
+     * Osio osio = new Osio();
+     * osio.parse("1|1|Muropohja");
+     * osio.toString() === "1|Muropohja";
+     * 
+     * osio.parse("  5   |  2    |       Pizzapohja   ");
+     * osio.toString() === "2|Pizzapohja";
+     * 
+     * osio.parse("1|Muropohja");
+     * osio.toString() === "2|Pizzapohja";
+     * 
+     * osio.parse("1 1 Muropohja");
+     * osio.toString() === "2|Pizzapohja";
+     * </pre>
+     */
+    public void parse(String rivi) {
+        if (rivi == null || rivi.length() < 1) return;
+        
+        StringBuilder sb = new StringBuilder(rivi);
+        
+        // ei huomioida ensimmäisen kentän tietoja (resepti_id)
+        Mjonot.erota(sb, '|');
+        
+        this.osioId = Mjonot.erota(sb, '|', this.osioId);
+        this.nimi = Mjonot.erota(sb, '|', this.nimi);
+    }
+    
+    
+    /**
+     * tallentaa osion tiedot tiedostoihin
+     * 
+     * @throws SailoException jos tallentaminen epäonnistuu
+     */
+    public void tallenna() throws SailoException {
+        this.osionAinesosat.tallenna();
+        this.ohjeet.tallenna();
     }
     
     
