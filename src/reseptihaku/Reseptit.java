@@ -1,10 +1,15 @@
 package reseptihaku;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import kanta.Hajautus;
+import kanta.SailoException;
 
 /**
  * @author hakom
@@ -15,6 +20,8 @@ public class Reseptit {
 
     private ArrayList<Resepti> reseptit = new ArrayList<Resepti>();
     private String tiedostoNimi         = "reseptit.dat";
+    private String polku                = "reseptidata/";
+    private boolean muutettu            = true;
     private int lkm                     = 0;
     
     /**
@@ -60,6 +67,17 @@ public class Reseptit {
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
+    }
+    
+    
+    /**
+     * Asettaa reseptin tallennus polun
+     * 
+     * @param tiedostopolku mihin reseptit tallennetaan
+     */
+    public void setTiedostoPolku(String tiedostopolku) {
+        if (tiedostopolku == null) return;
+        this.polku = tiedostopolku;
     }
     
     
@@ -295,6 +313,49 @@ public class Reseptit {
     
     
     /**
+     * Lukee Reseptien tiedot tiedostosta
+     * 
+     * @throws SailoException jos tallennus epäonnistuu
+     */
+    public void lueTiedostosta() throws SailoException {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.polku + this.tiedostoNimi)))) {
+            while (fi.hasNext()) {
+                String rivi = fi.nextLine().strip();
+                
+                // skipataan tyhjät ja kommenttirivit
+                if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
+                
+                // käsketään reseptiä parsimaan tiedot ja lisätään nykyisiin resepteihin
+                Resepti resepti = new Resepti();
+                resepti.parse(rivi);
+                lisaa(resepti);
+            }
+            
+            this.muutettu = false;
+            
+        } catch (FileNotFoundException exception) {
+            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
+        }
+    }
+    
+    
+    /**
+     * Tallentaa reseptien tiedot tiedostoon
+     * 
+     * @throws SailoException jos tallentaminen epäonnistuu
+     */
+    public void tallenna() throws SailoException {
+        if (!this.muutettu) return;
+        
+        for (Resepti resepti : this.reseptit) {
+            resepti.tallenna(this.polku, this.tiedostoNimi);
+        }
+        
+        this.muutettu = false;
+    }
+    
+    
+    /**
      * Luo lisää mustikkapiirakan resepteihin testaamista varten.
      * TODO: poista kun ei enää tarvita
      * @return mustikkapiirakka resepti
@@ -474,5 +535,21 @@ public class Reseptit {
         
         System.out.println(reseptit.hashCode());
         System.out.println(kopioReseptit.hashCode());
+        
+        try {
+            reseptit.tallenna();
+        } catch (SailoException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        Reseptit reseptitTiedostosta = new Reseptit();
+        
+        try {
+            reseptitTiedostosta.lueTiedostosta();
+        } catch (SailoException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        System.out.println(reseptitTiedostosta);
     }
 }

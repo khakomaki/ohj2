@@ -79,6 +79,17 @@ public class Osiot {
     
     
     /**
+     * Asettaa reseptin tunnuksen, johon osio kuuluu
+     * 
+     * @param tunnus reseptin tunnus
+     */
+    public void setReseptiTunnus(int tunnus) {
+        this.reseptiId = tunnus;
+        this.muutettu = true;
+    }
+    
+    
+    /**
      * @return osioiden lukumäärä
      */
     public int getLkm() {
