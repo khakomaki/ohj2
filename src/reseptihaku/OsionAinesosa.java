@@ -1,5 +1,6 @@
 package reseptihaku;
 
+import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 
 /**
@@ -133,6 +134,39 @@ public class OsionAinesosa {
     public void setMaara(String maara) {
         if (maara == null) return;
         this.maara = maara;
+    }
+    
+    
+    /**
+     * Parsii osion ainesosat 
+     * 
+     * @param rivi mistä parsitaan osion ainesosan tiedot
+     * 
+     * @example
+     * <pre name="test">
+     * OsionAinesosa peruna = new OsionAinesosa();
+     * peruna.parse("peruna|300g");
+     * peruna.toString() === "peruna|300g";
+     * 
+     * peruna.parse(null);
+     * peruna.toString() === "peruna|300g";
+     * 
+     * peruna.parse("  keltainen peruna    |  1kg     ");
+     * peruna.toString() === "keltainen peruna|1kg";
+     * 
+     * peruna.parse("peruna 300g");
+     * peruna.toString() === "peruna 300g|1kg";
+     * 
+     * peruna.parse("|");
+     * peruna.toString() === "peruna 300g|1kg";
+     * </pre>
+     */
+    public void parse(String rivi) {
+        if (rivi == null || rivi.length() < 1) return;
+        
+        StringBuilder sb = new StringBuilder(rivi);
+        setAinesosa(Mjonot.erota(sb, '|', this.ainesosaNimi));
+        setMaara(Mjonot.erota(sb, '|', this.maara));
     }
     
     

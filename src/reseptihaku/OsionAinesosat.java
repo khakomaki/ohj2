@@ -1,9 +1,18 @@
 package reseptihaku;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.Scanner;
 
 import kanta.Hajautus;
+import kanta.MerkkijonoKasittely;
+import kanta.SailoException;
 import kanta.TietueHallitsija;
 
 /**
@@ -15,6 +24,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
     
     private String tiedostoNimi     = "osion_ainesosat.dat";
     private int osioId              = -1;
+    private boolean muutettu        = false;
     
     
     /**
@@ -59,6 +69,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
+        this.muutettu = true;
     }
     
     
@@ -84,6 +95,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
         if (osionAinesosa == null) return;
         
         lisaaOlio(osionAinesosa);
+        this.muutettu = true;
     }
     
     
@@ -94,6 +106,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
      */
     public void poista(OsionAinesosa osionAinesosa) {
         poistaOlio(osionAinesosa);
+        this.muutettu = true;
     }
     
     
@@ -132,6 +145,84 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
             out.print(osionAinesosa.getMaara());
             out.print("\n");
         }
+    }
+    
+    
+    /**
+     * Lukee Osion Ainesosien tiedot tiedostosta
+     * 
+     * @throws SailoException jos tallennus epäonnistuu
+     */
+    public void lueTiedostosta() throws SailoException {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostoNimi)))) {
+            while (fi.hasNext()) {
+                String rivi = fi.nextLine().strip();
+                
+                // skipataan tyhjät ja kommenttirivit
+                if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
+                
+                // käsketään osion ainesosan parsimaan tiedot ja lisätään nykyisiin ainesosiin
+                OsionAinesosa osionAinesosa = new OsionAinesosa();
+                osionAinesosa.parse(rivi);
+                lisaa(osionAinesosa);
+            }
+            
+            this.muutettu = false;
+            
+        } catch (FileNotFoundException exception) {
+            throw new SailoException("Tiedostoa \"" + this.tiedostoNimi + "\" ei saada avattua");
+        }
+    }
+    
+    
+    /**
+     * Tallentaa osion ainesosat tiedostoon.
+     * Varmuuskopioi tallennustiedoston ennen kuin tallentaa uudestaan ainesosat.
+     * Luo tallennustiedoston jos sellaista ei vielä ollut.
+     * 
+     * @throws SailoException jos tallennus epäonnistuu
+     */
+    public void tallenna() throws SailoException {
+        if (!this.muutettu) return;
+        
+        File tiedosto = new File(this.tiedostoNimi);
+        File varmuuskopio = new File(MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
+        
+        // koitetaan poistaa edellistä varmuuskopiota
+        // heitetään virhe jos sellainen on olemassa eikä voida poistaa
+        if (!varmuuskopio.delete() && varmuuskopio.exists()) {
+            throw new SailoException("Ei voida poistaa varmuuskopio-tiedostoa");
+        }
+        
+        // koitetaan luoda tiedosto jos sellaista ei vielä ole
+        if (!tiedosto.exists()) {
+            try {
+                tiedosto.createNewFile();
+                
+            } catch (IOException exception) {
+                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
+            }
+        }
+        
+        // koitetaan nimetä olemassaoleva tiedosto varmuuskopioksi
+        if (!tiedosto.renameTo(varmuuskopio)) {
+            throw new SailoException("Ei voida nimetä uudelleen tallennus-tiedostoa");
+        }
+        
+        try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
+            // syöttää jokaisen ohjeen tiedot omalle rivilleen
+            for (int i = 0; i < this.getLkm(); i++) {
+                fo.println(anna(i));
+            }
+        } catch (FileNotFoundException exception) {
+            throw new SailoException("Tiedostoa \"" + this.tiedostoNimi + "\" ei saada avattua");
+            
+        } catch (IOException exception) {
+            throw new SailoException("Tiedostoon \"" + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
+            
+        }
+        
+        this.muutettu = false;
     }
     
     
@@ -284,5 +375,19 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
         
         System.out.println("\nAinesosa tunnukset ja määrät:");
         osionAinesosat.tulostaOsionAinesosat(System.out);
+        
+        try {
+            osionAinesosat.tallenna();
+        } catch (SailoException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        OsionAinesosat tiedostosta = new OsionAinesosat();
+        tiedostosta.setTiedostoNimi("soppa.txt");
+        try {
+            tiedostosta.lueTiedostosta();
+        } catch (SailoException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

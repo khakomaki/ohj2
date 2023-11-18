@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import kanta.Hajautus;
+import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 
 /**
@@ -257,12 +258,11 @@ public class Ohjeet {
     /**
      * Lukee ohjeet tiedostosta
      * 
-     * @param tiedostonimi mistä tiedostosta yritetään lukea
      * @throws SailoException jos tiedoston lukeminen epäonnistuu
      */
-    public void lueTiedostosta(String tiedostonimi) throws SailoException {
+    public void lueTiedostosta() throws SailoException {
         
-        try (Scanner fi = new Scanner(new FileInputStream(new File(getPerusTiedostoNimi())))) {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostoNimi)))) {
             while (fi.hasNext()) {
                 String rivi = fi.nextLine().strip();
                 
@@ -278,18 +278,8 @@ public class Ohjeet {
             this.muutettu = false;
             
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + tiedostonimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.tiedostoNimi + "\" ei saada avattua");
         }
-    }
-    
-    
-    /**
-     * Lukee ohjeet aiemmin asetetusta tiedostosta
-     * 
-     * @throws SailoException jos tiedoston lukeminen epäonnistuu
-     */
-    public void lueTiedostosta() throws SailoException {
-        lueTiedostosta(this.getPerusTiedostoNimi());
     }
     
     
@@ -303,8 +293,8 @@ public class Ohjeet {
     public void tallenna() throws SailoException {
         if (!muutettu) return;
         
-        File tiedosto = new File(getPerusTiedostoNimi());
-        File varmuuskopio = new File(getVarmuuskopioNimi());
+        File tiedosto = new File(this.tiedostoNimi);
+        File varmuuskopio = new File(MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
         
         // koitetaan poistaa edellistä varmuuskopiota
         // heitetään virhe jos sellainen on olemassa eikä voida poistaa
@@ -337,57 +327,10 @@ public class Ohjeet {
             
         } catch (IOException exception) {
             throw new SailoException("Tiedostoon \"" + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
-            
+
         }
-    }
-    
-    
-    /**
-     * Palauttaa varmuuskopio-tiedoston nimen.
-     * Liimaa ".bak" tiedostopäätteen tilalle, sellainen löytyy.
-     * 
-     * @return varmuuskopio-tiedoston nimi
-     * 
-     * @example
-     * <pre name="test">
-     * Ohjeet ohjeet = new Ohjeet();
-     * ohjeet.getVarmuuskopioNimi() === "ohjeet.bak";
-     * 
-     * ohjeet.setTiedostoNimi("ohje.ohjeet.txt");
-     * ohjeet.getVarmuuskopioNimi() === "ohje.ohjeet.bak";
-     * 
-     * ohjeet.setTiedostoNimi("ohje");
-     * ohjeet.getVarmuuskopioNimi() === "ohje.bak";
-     * 
-     * ohjeet.setTiedostoNimi("");
-     * ohjeet.getVarmuuskopioNimi() === "ohje.bak";
-     * </pre>
-     */
-    public String getVarmuuskopioNimi() {
-        int tiedostopaate = this.tiedostoNimi.lastIndexOf('.');
-        if (tiedostopaate < 1) return this.tiedostoNimi + ".bak";
-        return this.tiedostoNimi.substring(0, tiedostopaate) + ".bak";
-    }
-    
-    
-    /**
-     * Palauttaa tallennus tiedoston nimen ilman päätettä.
-     * 
-     * @return tallennus tiedoston nimi ilman päätettä
-     * 
-     * @example
-     * <pre name="test">
-     * Ohjeet ohjeet = new Ohjeet();
-     * ohjeet.getPerusTiedostoNimi() === "ohjeet";
-     * 
-     * ohjeet.setTiedostoNimi("mun.ohjeet.tiedosto.txt");
-     * ohjeet.getPerusTiedostoNimi() === "mun.ohjeet.tiedosto";
-     * </pre>
-     */
-    public String getPerusTiedostoNimi() {
-        int tiedostopaate = this.tiedostoNimi.lastIndexOf('.');
-        if (tiedostopaate < 1) return this.tiedostoNimi;
-        return this.tiedostoNimi.substring(0, tiedostopaate);
+        
+        this.muutettu = false;
     }
     
     
