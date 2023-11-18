@@ -145,16 +145,19 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa peruna = new OsionAinesosa();
-     * peruna.parse("peruna|300g");
+     * peruna.parse("1|peruna|300g");
      * peruna.toString() === "peruna|300g";
      * 
      * peruna.parse(null);
      * peruna.toString() === "peruna|300g";
      * 
-     * peruna.parse("  keltainen peruna    |  1kg     ");
+     * peruna.parse("  15   |  keltainen peruna    |  1kg     ");
      * peruna.toString() === "keltainen peruna|1kg";
      * 
-     * peruna.parse("peruna 300g");
+     * peruna.parse("15|peruna 300g");
+     * peruna.toString() === "peruna 300g|1kg";
+     * 
+     * peruna.parse("17 pataatti 280g");
      * peruna.toString() === "peruna 300g|1kg";
      * 
      * peruna.parse("|");
@@ -165,6 +168,10 @@ public class OsionAinesosa {
         if (rivi == null || rivi.length() < 1) return;
         
         StringBuilder sb = new StringBuilder(rivi);
+        
+        // ei tallenna ensimmäisen kentän tietoja (osio_id)
+        Mjonot.erota(sb, '|');
+        
         setAinesosa(Mjonot.erota(sb, '|', this.ainesosaNimi));
         setMaara(Mjonot.erota(sb, '|', this.maara));
     }

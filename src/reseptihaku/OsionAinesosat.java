@@ -224,6 +224,8 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
             // syöttää jokaisen ohjeen tiedot omalle rivilleen
             for (int i = 0; i < this.getLkm(); i++) {
+                fo.print(this.osioId);
+                fo.print('|');
                 fo.println(anna(i));
             }
         } catch (FileNotFoundException exception) {
