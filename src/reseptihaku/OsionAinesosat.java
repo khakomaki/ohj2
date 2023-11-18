@@ -23,6 +23,7 @@ import kanta.TietueHallitsija;
 public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
     
     private String tiedostoNimi     = "osion_ainesosat.dat";
+    private String polku            = "reseptidata/";
     private int osioId              = -1;
     private boolean muutettu        = false;
     
@@ -69,6 +70,17 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
         this.tiedostoNimi = tiedostonimi;
+        this.muutettu = true;
+    }
+    
+    
+    /**
+     * Vaihtaa tiedostopolun
+     * 
+     * @param polku mihin polkuun tiedosto tallennetaan ja mistä sitä luetaan
+     */
+    public void setTiedostoPolku(String polku) {
+        if (polku == null) return;
         this.muutettu = true;
     }
     
@@ -154,7 +166,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
      * @throws SailoException jos tallennus epäonnistuu
      */
     public void lueTiedostosta() throws SailoException {
-        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostoNimi)))) {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.polku + this.tiedostoNimi)))) {
             while (fi.hasNext()) {
                 String rivi = fi.nextLine().strip();
                 
@@ -170,7 +182,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
             this.muutettu = false;
             
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
         }
     }
     
@@ -185,8 +197,8 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
     public void tallenna() throws SailoException {
         if (!this.muutettu) return;
         
-        File tiedosto = new File(this.tiedostoNimi);
-        File varmuuskopio = new File(MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
+        File tiedosto = new File(this.polku + this.tiedostoNimi);
+        File varmuuskopio = new File(this.polku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
         
         // koitetaan poistaa edellistä varmuuskopiota
         // heitetään virhe jos sellainen on olemassa eikä voida poistaa
@@ -215,10 +227,10 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
                 fo.println(anna(i));
             }
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
             
         } catch (IOException exception) {
-            throw new SailoException("Tiedostoon \"" + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
+            throw new SailoException("Tiedostoon \"" + this.polku + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
             
         }
         

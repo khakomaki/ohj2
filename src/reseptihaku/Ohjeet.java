@@ -23,6 +23,7 @@ import kanta.SailoException;
 public class Ohjeet {
 
     private String tiedostoNimi     = "ohjeet.dat";
+    private String tiedostoPolku    = "reseptidata/";
     private int osioId              = 0;
     private int lkm                 = 0;
     private ArrayList<Ohje> ohjeet  = new ArrayList<Ohje>();
@@ -256,13 +257,24 @@ public class Ohjeet {
     
     
     /**
+     * Asettaa tiedostopolun
+     * 
+     * @param polku mihin polkuun tiedosto tallennetaan
+     */
+    public void setTiedostoPolku(String polku) {
+        if (polku == null) return;
+        this.muutettu = true;
+    }
+    
+    
+    /**
      * Lukee ohjeet tiedostosta
      * 
      * @throws SailoException jos tiedoston lukeminen epäonnistuu
      */
     public void lueTiedostosta() throws SailoException {
         
-        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostoNimi)))) {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostoPolku + this.tiedostoNimi)))) {
             while (fi.hasNext()) {
                 String rivi = fi.nextLine().strip();
                 
@@ -278,7 +290,7 @@ public class Ohjeet {
             this.muutettu = false;
             
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.tiedostoPolku + this.tiedostoNimi + "\" ei saada avattua");
         }
     }
     
@@ -293,8 +305,8 @@ public class Ohjeet {
     public void tallenna() throws SailoException {
         if (!muutettu) return;
         
-        File tiedosto = new File(this.tiedostoNimi);
-        File varmuuskopio = new File(MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
+        File tiedosto = new File(this.tiedostoPolku + this.tiedostoNimi);
+        File varmuuskopio = new File(this.tiedostoPolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
         
         // koitetaan poistaa edellistä varmuuskopiota
         // heitetään virhe jos sellainen on olemassa eikä voida poistaa
@@ -323,10 +335,10 @@ public class Ohjeet {
                 fo.println(ohje);
             }
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.tiedostoPolku + this.tiedostoNimi + "\" ei saada avattua");
             
         } catch (IOException exception) {
-            throw new SailoException("Tiedostoon \"" + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
+            throw new SailoException("Tiedostoon \"" + this.tiedostoPolku + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
 
         }
         
