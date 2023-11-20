@@ -61,6 +61,16 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
     
     
     /**
+     * Asettaa osion tunnuksen, johon ainesosat kuuluvat
+     * 
+     * @param id osion tunnus, johon ainesosat kuuluvat
+     */
+    public void setOsioId(int id) {
+        this.osioId = id;
+    }
+    
+    
+    /**
      * Asettaa tallennustiedoston nimen.
      * Ei anna asettaa tyhjää merkkijonoa tai null-viitettä.
      * 

@@ -79,6 +79,11 @@ public class Osio {
     public int rekisteroi() {
         this.osioId = Osio.annettavaId;
         Osio.annettavaId++;
+        
+        // päivittää osio tunnuksen ohjeille ja ainesosille
+        this.ohjeet.setOsioId(this.osioId);
+        this.osionAinesosat.setOsioId(this.osioId);
+        
         return this.osioId;
     }
     

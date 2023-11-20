@@ -25,7 +25,7 @@ public class Ohjeet {
 
     private String tiedostoNimi     = "ohjeet.dat";
     private String tiedostoPolku    = "reseptidata/";
-    private int osioId              = 0;
+    private int osioId              = -1;
     private int lkm                 = 0;
     private ArrayList<Ohje> ohjeet  = new ArrayList<Ohje>();
     private boolean muutettu        = false;
@@ -58,6 +58,16 @@ public class Ohjeet {
      */
     public Ohjeet(int osioId) {
         this.osioId = osioId;
+    }
+    
+    
+    /**
+     * Asettaa osion tunnuksen johon ohjeet kuuluu
+     * 
+     * @param id osion tunnus, johon ohjeet kuuluu
+     */
+    public void setOsioId(int id) {
+        this.osioId = id;
     }
     
     

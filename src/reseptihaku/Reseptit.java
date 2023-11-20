@@ -540,8 +540,24 @@ public class Reseptit {
         Resepti m1 = new Resepti();
         m1.luoMustikkapiirakka();
         mm.lisaa(m1);
+        
         Resepti m2 = new Resepti();
-        m2.luoMustikkapiirakka();
+        m2.setHinta(2);
+        Osiot m2Osiot = m2.getOsiot();
+        Osio pizzapohja = m2Osiot.lisaaOsio("Pizzapohja");
+        Osio tomaattikastike = m2Osiot.lisaaOsio("Tomaattikastike");
+        pizzapohja.lisaaAinesosa("Vehnäjauhoja 00", "200g");
+        pizzapohja.lisaaAinesosa("kuivahiivaa", "1ps");
+        pizzapohja.lisaaAinesosa("Vettä", "1dl");
+        pizzapohja.lisaaOhje("Sekoita hiiva kädenlämpöiseen veteen");
+        pizzapohja.lisaaOhje("Sekoita vehnäjauhot veteen");
+        pizzapohja.lisaaOhje("Vaivaa käsin n. 10min");
+        tomaattikastike.lisaaAinesosa("Tomaattia", "4kpl");
+        tomaattikastike.lisaaAinesosa("Suolaa", "1tl");
+        tomaattikastike.lisaaAinesosa("Tomaattipyrettä", "1rkl");
+        tomaattikastike.lisaaOhje("Survo tomaatit");
+        tomaattikastike.lisaaOhje("Sekoita tomaattipyree tomaattisurvokseen");
+        tomaattikastike.lisaaOhje("Lisää suola");
         mm.lisaa(m2);
         
         try {
