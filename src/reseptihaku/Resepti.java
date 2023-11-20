@@ -1,6 +1,7 @@
 package reseptihaku;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
@@ -607,6 +609,25 @@ public class Resepti {
         }
         
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
+            
+            try (Scanner fi = new Scanner(new FileInputStream(varmuuskopio))) {
+                while (fi.hasNext()) {
+                    String rivi = fi.nextLine();
+                    
+                    // skipataan tyhjät ja kommenttirivit
+                    if (rivi.isBlank() || rivi.charAt(0) == ';') continue;
+                    
+                    // parsii rivin reseptiId:n, jos ei löydy niin asettaa arvoksi varmasti eri kuin nykyinen reseptiId
+                    StringBuilder riviTiedot = new StringBuilder(rivi);
+                    int rivinOsioId = Mjonot.erotaInt(riviTiedot, this.reseptiId - 1);
+                    
+                    // syöttää alkuperäisen rivin, jos ei ole sama resepti mitä ollaan tallentamassa
+                    if (rivinOsioId != this.reseptiId) {
+                        fo.println(rivi);
+                    }
+                }
+            }
+            // tulostaa nykyisen reseptin tiedot
             fo.print(this.reseptiId);
             fo.print('|');
             fo.print(this.nimi);
