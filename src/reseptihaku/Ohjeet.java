@@ -37,7 +37,7 @@ public class Ohjeet {
      * @example
      * <pre name="test">
      * Ohjeet ohjeet = new Ohjeet();
-     * ohjeet.toString() === "ohjeet.dat|0|0";
+     * ohjeet.toString() === "ohjeet.dat|-1|0";
      * </pre>
      */
     public Ohjeet() {
@@ -167,23 +167,23 @@ public class Ohjeet {
      * Ohje ohje3 = new Ohje("ohje 3"); ohjeet.lisaa(ohje3);
      * Ohje ohje4 = new Ohje("ohje 4"); ohjeet.lisaa(ohje4);
      * Ohje ohje5 = new Ohje("ohje 5"); ohjeet.lisaa(ohje5);
-     * ohjeet.toString() === "ohjeet.dat|0|5";
+     * ohjeet.toString() === "ohjeet.dat|-1|5";
      * 
      * ohjeet.anna(1).equals(ohje2) === true;
      * ohje2.getVaihe() === 2;
      * 
      * ohjeet.poista(ohje2);
-     * ohjeet.toString() === "ohjeet.dat|0|4";
+     * ohjeet.toString() === "ohjeet.dat|-1|4";
      * ohjeet.anna(1).equals(ohje2) === false;
      * 
      * ohjeet.poista(new Ohje("ohje 5"));
-     * ohjeet.toString() === "ohjeet.dat|0|4";
+     * ohjeet.toString() === "ohjeet.dat|-1|4";
      * 
      * ohjeet.poista(new Ohje("ohje 5", 4));
-     * ohjeet.toString() === "ohjeet.dat|0|3";
+     * ohjeet.toString() === "ohjeet.dat|-1|3";
      * 
      * ohjeet.poista(ohje2);
-     * ohjeet.toString() === "ohjeet.dat|0|3";
+     * ohjeet.toString() === "ohjeet.dat|-1|3";
      * </pre>
      */
     public int poista(Ohje poistettava) {
@@ -228,16 +228,16 @@ public class Ohjeet {
      * @example
      * <pre name="test">
      * Ohjeet ohjeet = new Ohjeet();
-     * ohjeet.toString() === "ohjeet.dat|0|0";
+     * ohjeet.toString() === "ohjeet.dat|-1|0";
      * 
      * ohjeet.setTiedostoNimi("ohjeistukset.txt");
-     * ohjeet.toString() === "ohjeistukset.txt|0|0";
+     * ohjeet.toString() === "ohjeistukset.txt|-1|0";
      * 
      * ohjeet.setTiedostoNimi("");
-     * ohjeet.toString() === "ohjeistukset.txt|0|0";
+     * ohjeet.toString() === "ohjeistukset.txt|-1|0";
      * 
      * ohjeet.setTiedostoNimi(null);
-     * ohjeet.toString() === "ohjeistukset.txt|0|0";
+     * ohjeet.toString() === "ohjeistukset.txt|-1|0";
      * </pre>
      */
     public void setTiedostoNimi(String tiedostonimi) {
