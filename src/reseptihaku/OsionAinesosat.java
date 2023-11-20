@@ -10,6 +10,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
@@ -173,6 +174,11 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
                 // skipataan tyhjät ja kommenttirivit
                 if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
                 
+                // skipataan jos rivin osioId ei ole sama kuin nykyisen
+                StringBuilder rivinTiedot = new StringBuilder(rivi);
+                int rivinOsioId = Mjonot.erota(rivinTiedot, '|', this.osioId - 1);
+                if (rivinOsioId != this.osioId) continue;
+                
                 // käsketään osion ainesosan parsimaan tiedot ja lisätään nykyisiin ainesosiin
                 OsionAinesosa osionAinesosa = new OsionAinesosa();
                 osionAinesosa.parse(rivi);
@@ -222,12 +228,32 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
         }
         
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
+            
+            // kopioidaan vanhan tiedoston rivit uuteen, jätetään nykyisen osion rivit huomioitta
+            try (Scanner fi = new Scanner(new FileInputStream(varmuuskopio))) {
+                while (fi.hasNext()) {
+                    String rivi = fi.nextLine();
+                    
+                    // skipataan tyhjät ja kommenttirivit
+                    if (rivi.isBlank() || rivi.charAt(0) == ';') continue;
+                    
+                    // parsii rivin osioId:n, jos ei löydy niin asettaa arvoksi varmasti eri kuin nykyinen osioId
+                    StringBuilder riviTiedot = new StringBuilder(rivi);
+                    int rivinOsioId = Mjonot.erotaInt(riviTiedot, this.osioId - 1);
+                    
+                    // syöttää alkuperäisen rivin, jos ei ole sama osio mitä ollaan tallentamassa
+                    if (rivinOsioId != this.osioId) {
+                        fo.println(rivi);
+                    }
+                }
+            }
             // syöttää jokaisen ohjeen tiedot omalle rivilleen
             for (int i = 0; i < this.getLkm(); i++) {
                 fo.print(this.osioId);
                 fo.print('|');
                 fo.println(anna(i));
             }
+            
         } catch (FileNotFoundException exception) {
             throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
             
