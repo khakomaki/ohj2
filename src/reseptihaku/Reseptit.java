@@ -536,8 +536,16 @@ public class Reseptit {
         System.out.println(reseptit.hashCode());
         System.out.println(kopioReseptit.hashCode());
         
+        Reseptit mm = new Reseptit();
+        Resepti m1 = new Resepti();
+        m1.luoMustikkapiirakka();
+        mm.lisaa(m1);
+        Resepti m2 = new Resepti();
+        m2.luoMustikkapiirakka();
+        mm.lisaa(m2);
+        
         try {
-            reseptit.tallenna();
+            mm.tallenna();
         } catch (SailoException e) {
             System.out.println(e.getMessage());
         }

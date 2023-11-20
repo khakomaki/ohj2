@@ -144,7 +144,7 @@ public class Ohje {
      * @example
      * <pre name="test">
      * Ohje ohje = new Ohje();
-     * ohje.parse("1|Lisää mansikat");
+     * ohje.parse("1|1|Lisää mansikat");
      * ohje.toString() === "1|Lisää mansikat";
      * 
      * ohje = new Ohje();
@@ -160,6 +160,10 @@ public class Ohje {
         if (rivi == null || rivi.length() < 1) return;
         
         StringBuilder sb = new StringBuilder(rivi);
+        
+        // jättää ensimmäisen kentän huomioitta (osioId)
+        Mjonot.erota(sb, '|');
+        
         setVaihe(Mjonot.erota(sb, '|', this.vaihe));
         setOhjeistus(Mjonot.erota(sb, '|'));
     }
