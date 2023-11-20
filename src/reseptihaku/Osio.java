@@ -11,12 +11,12 @@ import kanta.SailoException;
  */
 public class Osio {
     
-    private int osioId;
-    private String nimi;
+    private int osioId                      = -1;
+    private String nimi                     = "Osion nimi";
     private OsionAinesosat osionAinesosat;
     private Ohjeet ohjeet;
-    private final String oletusNimi = "Osion nimi";
     
+    private static int annettavaId          = 1;
     
     /**
      * @param id osion tunnus
@@ -31,7 +31,7 @@ public class Osio {
     public Osio(int id, String nimi) {
         this.osioId = id;
         this.ohjeet = new Ohjeet(this.osioId);
-        setNimi(nimi);
+        setUusiNimi(nimi);
         
         luoOsionAinesosat();
     }
@@ -44,12 +44,12 @@ public class Osio {
      * @example
      * <pre name="test">
      * Osio pizzapohja = new Osio("Pizzapohja");
-     * pizzapohja.toString() === "0|Pizzapohja";
+     * pizzapohja.toString() === "-1|Pizzapohja";
      * </pre>
      */
     public Osio(String nimi) {
         this.ohjeet = new Ohjeet(this.osioId);
-        setNimi(nimi);
+        setUusiNimi(nimi);
         
         luoOsionAinesosat();
     }
@@ -61,14 +61,25 @@ public class Osio {
      * @example
      * <pre name="test">
      * Osio osio = new Osio();
-     * osio.toString() === "0|Osion nimi";
+     * osio.toString() === "-1|Osion nimi";
      * </pre>
      */
     public Osio() {
-        setNimi(null);
         this.ohjeet = new Ohjeet(this.osioId);
         
         luoOsionAinesosat();
+    }
+    
+    
+    /**
+     * Antaa osiolle tunnuksen
+     * 
+     * @return annettu osion tunnus
+     */
+    public int rekisteroi() {
+        this.osioId = Osio.annettavaId;
+        Osio.annettavaId++;
+        return this.osioId;
     }
     
     
@@ -77,40 +88,6 @@ public class Osio {
      */
     private void luoOsionAinesosat() {
         this.osionAinesosat = new OsionAinesosat(this.osioId);
-    }
-    
-    
-    /**
-     * @param nimi osion nimi
-     * 
-     * @example
-     * <pre name="test">
-     * Osio kakkupohja = new Osio(8, "Kakkupohja");
-     * kakkupohja.toString() === "8|Kakkupohja";
-     * 
-     * kakkupohja = new Osio(8, "");
-     * kakkupohja.toString() === "8|Osion nimi";
-     * 
-     * kakkupohja = new Osio(8, null);
-     * kakkupohja.toString() === "8|Osion nimi";
-     * 
-     * kakkupohja = new Osio(8, "K");
-     * kakkupohja.toString() === "8|K";
-     * </pre>
-     */
-    private void setNimi(String nimi) {
-        // asettaa oletusnimen jos annettu nimi on null tai tyhjä merkkijono
-        if (nimi == null) { 
-            this.nimi = oletusNimi; 
-            return; 
-        }
-        
-        if (nimi.length() < 1) { 
-            this.nimi = oletusNimi; 
-            return; 
-        }
-        
-        this.nimi = nimi;
     }
     
     
@@ -269,6 +246,9 @@ public class Osio {
      * @throws SailoException jos tallentaminen epäonnistuu
      */
     public void tallenna() throws SailoException {
+        // rekisteröi osion jos sille ei ole annettu vielä omaa tunnusta
+        if (this.osioId == -1) rekisteroi();
+        
         this.osionAinesosat.tallenna();
         this.ohjeet.tallenna();
     }
@@ -279,7 +259,6 @@ public class Osio {
      * TODO: poista kun ei enää tarvita
      */
     public void luoMuropohja() {
-        this.osioId = 1;
         this.nimi = "Muropohja";
         lisaaAinesosa("voita", "100g");
         lisaaAinesosa("sokeria", "1dl");
@@ -300,7 +279,6 @@ public class Osio {
      * TODO: poista kun ei enää tarvita
      */
     public void luoTayte() {
-        this.osioId = 1;
         this.nimi = "Täyte";
         lisaaAinesosa("sokeria", "0,75dl");
         lisaaAinesosa("kananmunia", "1kpl");

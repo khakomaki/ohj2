@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
@@ -22,7 +23,6 @@ public class Osiot {
 
     private String tiedostoNimi     = "resepti_osiot.dat";
     private String polku            = "reseptidata/";
-    private int juoksevaId          = 1;
     private int reseptiId           = -1;
     private ArrayList<Osio> osiot   = new ArrayList<Osio>();
     private boolean muutettu        = true;
@@ -107,15 +107,15 @@ public class Osiot {
      * osiot.toString() === "0|resepti_osiot.dat";
      * Osio pizzapohja = osiot.lisaaOsio("Pizzapohja");
      * osiot.toString() === "1|resepti_osiot.dat";
-     * pizzapohja.toString() === "1|Pizzapohja";
+     * pizzapohja.toString() === "-1|Pizzapohja";
      * 
      * Osio tomaattikastike = osiot.lisaaOsio("Tomaattikastike");
      * osiot.toString() === "2|resepti_osiot.dat";
-     * tomaattikastike.toString() === "2|Tomaattikastike";
+     * tomaattikastike.toString() === "-1|Tomaattikastike";
      * 
      * Osio taytteet = osiot.lisaaOsio("Täytteet");
      * osiot.toString() === "3|resepti_osiot.dat";
-     * taytteet.toString() === "3|Täytteet";
+     * taytteet.toString() === "-1|Täytteet";
      * 
      * osiot.lisaaOsio("Täytteet (vaihtoehto 2)");
      * osiot.toString() === "4|resepti_osiot.dat";
@@ -125,9 +125,8 @@ public class Osiot {
      * </pre>
      */
     public Osio lisaaOsio(String nimi) {
-        Osio osio = new Osio(this.juoksevaId, nimi);
+        Osio osio = new Osio(nimi);
         osiot.add(osio);
-        this.juoksevaId++;
         this.muutettu = true;
         return osio;
     }
@@ -196,7 +195,7 @@ public class Osiot {
     /**
      * Lukee Osion tiedot tiedostosta
      * 
-     * @throws SailoException jos tallennus epäonnistuu
+     * @throws SailoException jos lukeminen epäonnistuu
      */
     public void lueTiedostosta() throws SailoException {
         try (Scanner fi = new Scanner(new FileInputStream(new File(this.polku + this.tiedostoNimi)))) {
@@ -205,6 +204,11 @@ public class Osiot {
                 
                 // skipataan tyhjät ja kommenttirivit
                 if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
+                
+                // skipataan jos rivin reseptiId ei ole sama kuin nykyisen
+                StringBuilder rivinTiedot = new StringBuilder(rivi);
+                int rivinOsioId = Mjonot.erota(rivinTiedot, '|', this.reseptiId - 1);
+                if (rivinOsioId != this.reseptiId) continue;
                 
                 // käsketään osiota parsimaan tiedot ja lisätään nykyisiin osioihin
                 Osio osio = new Osio();
@@ -229,6 +233,11 @@ public class Osiot {
      */
     public void tallenna() throws SailoException {
         if (!this.muutettu) return;
+        
+        // käskee osioiden tallentamaan omat tietonsa (varmistetaan myös että osiot ovat saaneet uniikit tunnuksensa)
+        for (Osio osio : this.osiot) {
+            osio.tallenna();
+        }
         
         File tiedosto = new File(this.polku + this.tiedostoNimi);
         File varmuuskopio = new File(this.polku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
@@ -255,6 +264,24 @@ public class Osiot {
         }
         
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
+            // kopioidaan vanhan tiedoston rivit uuteen, jätetään nykyisen osion rivit huomioitta
+            try (Scanner fi = new Scanner(new FileInputStream(varmuuskopio))) {
+                while (fi.hasNext()) {
+                    String rivi = fi.nextLine();
+                    
+                    // skipataan tyhjät ja kommenttirivit
+                    if (rivi.isBlank() || rivi.charAt(0) == ';') continue;
+                    
+                    // parsii rivin reseptiId:n, jos ei löydy niin asettaa arvoksi varmasti eri kuin nykyinen reseptiId
+                    StringBuilder riviTiedot = new StringBuilder(rivi);
+                    int rivinOsioId = Mjonot.erotaInt(riviTiedot, this.reseptiId - 1);
+                    
+                    // syöttää alkuperäisen rivin, jos ei ole sama resepti mitä ollaan tallentamassa
+                    if (rivinOsioId != this.reseptiId) {
+                        fo.println(rivi);
+                    }
+                }
+            }
             // syöttää jokaisen osion tiedot omalle rivilleen
             for (int i = 0; i < this.getLkm(); i++) {
                 fo.print(this.reseptiId);
@@ -267,11 +294,6 @@ public class Osiot {
         } catch (IOException exception) {
             throw new SailoException("Tiedostoon \"" + this.polku + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
             
-        }
-        
-        // käskee osioiden tallentamaan omat tietonsa
-        for (Osio osio : this.osiot) {
-            osio.tallenna();
         }
         
         this.muutettu = false;
@@ -315,7 +337,6 @@ public class Osiot {
      */
     public Osiot clone() {
         Osiot kopio = new Osiot();
-        kopio.juoksevaId = this.juoksevaId;
         kopio.tiedostoNimi = this.tiedostoNimi;
         
         // kopioidaan yksittäiset osiot
@@ -354,7 +375,6 @@ public class Osiot {
         if (verrattava == null) return false;
         if (verrattava.getClass() != this.getClass()) return false;
         Osiot verrattavaOsiot = (Osiot)verrattava;
-        if (verrattavaOsiot.juoksevaId != this.juoksevaId) return false;
         if (!verrattavaOsiot.tiedostoNimi.equals(this.tiedostoNimi)) return false;
         if (verrattavaOsiot.osiot.size() != this.osiot.size()) return false;
         
@@ -392,7 +412,6 @@ public class Osiot {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.juoksevaId);
         hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
         
         for (int i = 0; i < this.osiot.size(); i++) {

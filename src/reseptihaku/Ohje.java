@@ -153,7 +153,7 @@ public class Ohje {
      * 
      * ohje = new Ohje();
      * ohje.parse("Lisää mansikat|1");
-     * ohje.toString() === "1|1";
+     * ohje.toString() === "1|";
      * </pre>
      */
     public void parse(String rivi) {

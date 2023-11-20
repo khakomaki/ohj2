@@ -579,6 +579,9 @@ public class Resepti {
         if (tiedostoPolku == null || tiedostoNimi == null) throw new SailoException("Tiedoston nimessä tai polussa ongelmia");
         if (!this.muutettu) return;
         
+        // antaa reseptille uniikin tunnuksen jos ollaan tallentamassa
+        if (this.reseptiId == -1) rekisteroi();
+        
         File tiedosto = new File(tiedostoPolku + tiedostoNimi);
         File varmuuskopio = new File(tiedostoPolku + MerkkijonoKasittely.vaihdaTiedostopaate(tiedostoNimi, "bak"));
         
