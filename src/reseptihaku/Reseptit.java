@@ -547,8 +547,8 @@ public class Reseptit implements Hallitsija<Resepti> {
         Resepti m2 = new Resepti();
         m2.setHinta(2);
         Osiot m2Osiot = m2.getOsiot();
-        Osio pizzapohja = m2Osiot.lisaaOsio("Pizzapohja");
-        Osio tomaattikastike = m2Osiot.lisaaOsio("Tomaattikastike");
+        Osio pizzapohja = m2Osiot.lisaa("Pizzapohja");
+        Osio tomaattikastike = m2Osiot.lisaa("Tomaattikastike");
         pizzapohja.lisaaAinesosa("Vehnäjauhoja 00", "200g");
         pizzapohja.lisaaAinesosa("kuivahiivaa", "1ps");
         pizzapohja.lisaaAinesosa("Vettä", "1dl");

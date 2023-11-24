@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
+import kanta.Hallitsija;
 import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 
@@ -19,7 +20,7 @@ import kanta.SailoException;
  * @version 19 Oct 2023
  *
  */
-public class Osiot {
+public class Osiot implements Hallitsija<Osio> {
 
     private String tiedostoNimi     = "resepti_osiot.dat";
     private String polku            = "reseptidata/";
@@ -105,26 +106,26 @@ public class Osiot {
      * <pre name="test">
      * Osiot osiot = new Osiot();
      * osiot.toString() === "0|resepti_osiot.dat";
-     * Osio pizzapohja = osiot.lisaaOsio("Pizzapohja");
+     * Osio pizzapohja = osiot.lisaa("Pizzapohja");
      * osiot.toString() === "1|resepti_osiot.dat";
      * pizzapohja.toString() === "-1|Pizzapohja";
      * 
-     * Osio tomaattikastike = osiot.lisaaOsio("Tomaattikastike");
+     * Osio tomaattikastike = osiot.lisaa("Tomaattikastike");
      * osiot.toString() === "2|resepti_osiot.dat";
      * tomaattikastike.toString() === "-1|Tomaattikastike";
      * 
-     * Osio taytteet = osiot.lisaaOsio("Täytteet");
+     * Osio taytteet = osiot.lisaa("Täytteet");
      * osiot.toString() === "3|resepti_osiot.dat";
      * taytteet.toString() === "-1|Täytteet";
      * 
-     * osiot.lisaaOsio("Täytteet (vaihtoehto 2)");
+     * osiot.lisaa("Täytteet (vaihtoehto 2)");
      * osiot.toString() === "4|resepti_osiot.dat";
      * 
-     * osiot.lisaaOsio("Täytteet (vaihtoehto 3)");
+     * osiot.lisaa("Täytteet (vaihtoehto 3)");
      * osiot.toString() === "5|resepti_osiot.dat";
      * </pre>
      */
-    public Osio lisaaOsio(String nimi) {
+    public Osio lisaa(String nimi) {
         Osio osio = new Osio(nimi);
         osiot.add(osio);
         this.muutettu = true;
@@ -144,11 +145,12 @@ public class Osiot {
      * osiot.toString() === "0|resepti_osiot.dat";
      * 
      * Osio kastike = new Osio("Kastike");
-     * osiot.lisaaOsio(kastike);
+     * osiot.lisaa(kastike);
      * osiot.toString() === "1|resepti_osiot.dat";
      * </pre>
      */
-    public void lisaaOsio(Osio osio) {
+    @Override
+    public void lisaa(Osio osio) {
         if (osio == null) return;
         Osio lisattavaOsio = osio;
         this.osiot.add(lisattavaOsio);
@@ -164,20 +166,21 @@ public class Osiot {
      * @example
      * <pre name="test">
      * Osiot osiot = new Osiot();
-     * osiot.lisaaOsio("Pohja");
+     * osiot.lisaa("Pohja");
      * Osio tayte = new Osio("Täyte");
-     * osiot.lisaaOsio(tayte);
-     * osiot.lisaaOsio("Kuorrute");
+     * osiot.lisaa(tayte);
+     * osiot.lisaa("Kuorrute");
      * osiot.toString() === "3|resepti_osiot.dat";
      * 
-     * osiot.poistaOsio(tayte);
+     * osiot.poista(tayte);
      * osiot.toString() === "2|resepti_osiot.dat";
      * 
-     * osiot.poistaOsio(tayte);
+     * osiot.poista(tayte);
      * osiot.toString() === "2|resepti_osiot.dat";
      * </pre>
      */
-    public void poistaOsio(Osio osio) {
+    @Override
+    public void poista(Osio osio) {
         this.osiot.remove(osio);
         this.muutettu = true;
     }
@@ -213,7 +216,7 @@ public class Osiot {
                 // käsketään osiota parsimaan tiedot ja lisätään nykyisiin osioihin
                 Osio osio = new Osio();
                 osio.parse(rivi);
-                lisaaOsio(osio);
+                lisaa(osio);
             }
             
             this.muutettu = false;
@@ -305,10 +308,10 @@ public class Osiot {
      * TODO: poista kun ei enää tarvita
      */
     public void luoMustikkapiirakanOsiot() {
-        Osio muropohja = lisaaOsio("Muropohja");
+        Osio muropohja = lisaa("Muropohja");
         muropohja.luoMuropohja();
         
-        Osio tayte = lisaaOsio("Täyte");
+        Osio tayte = lisaa("Täyte");
         tayte.luoTayte();
     }
     
@@ -319,9 +322,9 @@ public class Osiot {
      * <pre name="test">
      * Osiot osiot = new Osiot();
      * osiot.setTiedostoNimi("pizza_osiot.txt");
-     * osiot.lisaaOsio(new Osio("Pizzapohja"));
-     * osiot.lisaaOsio(new Osio("Tomaattikastike"));
-     * osiot.lisaaOsio(new Osio("Täytteet"));
+     * osiot.lisaa(new Osio("Pizzapohja"));
+     * osiot.lisaa(new Osio("Tomaattikastike"));
+     * osiot.lisaa(new Osio("Täytteet"));
      * 
      * Osiot kopioOsiot = osiot.clone();
      * kopioOsiot.toString().equals(osiot.toString()) === true;
@@ -362,12 +365,12 @@ public class Osiot {
      * osiot2.setTiedostoNimi("pizza_osiot.txt");
      * osiot1.equals(osiot2) === true;
      * 
-     * osiot1.lisaaOsio(new Osio("Pizzapohja"));
-     * osiot1.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot1.lisaa(new Osio("Pizzapohja"));
+     * osiot1.lisaa(new Osio("Tomaattikastike"));
      * osiot1.equals(osiot2) === false;
      * 
-     * osiot2.lisaaOsio(new Osio("Pizzapohja"));
-     * osiot2.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot2.lisaa(new Osio("Pizzapohja"));
+     * osiot2.lisaa(new Osio("Tomaattikastike"));
      * osiot1.equals(osiot2) === true;
      * </pre>
      */
@@ -401,12 +404,12 @@ public class Osiot {
      * osiot2.setTiedostoNimi("pizza_osiot.txt");
      * osiot1.hashCode() == osiot2.hashCode() === true;
      * 
-     * osiot1.lisaaOsio(new Osio("Pizzapohja"));
-     * osiot1.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot1.lisaa(new Osio("Pizzapohja"));
+     * osiot1.lisaa(new Osio("Tomaattikastike"));
      * osiot1.hashCode() == osiot2.hashCode() === false;
      * 
-     * osiot2.lisaaOsio(new Osio("Pizzapohja"));
-     * osiot2.lisaaOsio(new Osio("Tomaattikastike"));
+     * osiot2.lisaa(new Osio("Pizzapohja"));
+     * osiot2.lisaa(new Osio("Tomaattikastike"));
      * osiot1.hashCode() == osiot2.hashCode() === true;
      * </pre>
      */
@@ -447,11 +450,11 @@ public class Osiot {
     public static void main(String[] args) {
         Osiot pizzanOsiot = new Osiot();
         System.out.println(pizzanOsiot.toString());
-        pizzanOsiot.lisaaOsio("Pizzapohja");
+        pizzanOsiot.lisaa("Pizzapohja");
         System.out.println(pizzanOsiot.toString());
-        pizzanOsiot.lisaaOsio("Tomaatti kastike");
+        pizzanOsiot.lisaa("Tomaatti kastike");
         System.out.println(pizzanOsiot.toString());
-        pizzanOsiot.lisaaOsio("Täytteet");
+        pizzanOsiot.lisaa("Täytteet");
         System.out.println(pizzanOsiot.toString());
         
         Osio pizzapohja = pizzanOsiot.annaIndeksista(0);

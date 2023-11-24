@@ -325,7 +325,7 @@ public class Resepti {
      */
     public void lisaaOsio(Osio osio) {
         if (osio == null) return;
-        this.osiot.lisaaOsio(osio);
+        this.osiot.lisaa(osio);
         this.muutettu = true;
     }
     
@@ -336,7 +336,7 @@ public class Resepti {
      * @param osio poistettava osio
      */
     public void poistaOsio(Osio osio) {
-        this.osiot.poistaOsio(osio);
+        this.osiot.poista(osio);
         this.muutettu = true;
     }
 
