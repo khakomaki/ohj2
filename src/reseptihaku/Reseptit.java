@@ -139,6 +139,16 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
+     * Luo reseptin.
+     * Ei vielä lisää resepteihin.
+     */
+    @Override
+    public Resepti luo() {
+        return new Resepti();
+    }
+    
+    
+    /**
      * Antaa annetussa indeksissä olevan reseptin.
      * Palauttaa null jos indeksi ei ollut mieluisa.
      * 

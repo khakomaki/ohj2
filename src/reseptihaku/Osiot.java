@@ -160,6 +160,16 @@ public class Osiot implements Hallitsija<Osio> {
     
     
     /**
+     * Luo osion.
+     * Ei vielä lisää osioihin.
+     */
+    @Override
+    public Osio luo() {
+        return new Osio();
+    }
+    
+    
+    /**
      * Poistaa annetun osion
      * 
      * @param osio poistettava osio

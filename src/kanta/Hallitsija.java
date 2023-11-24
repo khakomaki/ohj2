@@ -19,6 +19,14 @@ public interface Hallitsija<T> {
     
     
     /**
+     * Luo uuden olion
+     * 
+     * @return luotu olio
+     */
+    public T luo();
+    
+    
+    /**
      * Poistaa annetun olion
      * 
      * @param olio poistettava luokan hallitsema olio

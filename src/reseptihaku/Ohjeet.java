@@ -117,6 +117,16 @@ public class Ohjeet implements Hallitsija<Ohje> {
     
     
     /**
+     * Luo uuden ohjeen.
+     * Ei lisää vielä ohjeisiin.
+     */
+    @Override
+    public Ohje luo() {
+        return new Ohje();
+    }
+    
+    
+    /**
      * Poistaa indeksistä löytyvän ohjeen ohjeista.
      * 
      * @param indeksi mistä indeksistä poistetaan

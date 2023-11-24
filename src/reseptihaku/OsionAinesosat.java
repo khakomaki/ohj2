@@ -126,6 +126,16 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     
     
     /**
+     * Luo osion ainesosan.
+     * Ei lisää vielä osion ainesosiin.
+     */
+    @Override
+    public OsionAinesosa luo() {
+        return new OsionAinesosa();
+    }
+    
+    
+    /**
      * Poistaa osion ainesosan, jos annettu ainesosa löytyy.
      * 
      * @param osionAinesosa poistettava osion ainesosa
