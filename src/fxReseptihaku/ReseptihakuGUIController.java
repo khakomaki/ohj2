@@ -2,6 +2,7 @@ package fxReseptihaku;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import fi.jyu.mit.fxgui.ComboBoxChooser;
@@ -57,8 +58,8 @@ public class ReseptihakuGUIController implements Initializable {
       
       private final String hakutuloksetOtsikko = "reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso\n";
       private Reseptit reseptit;
-      private ArrayList<ComboBoxChooser<String>> suodatinValinnat = new ArrayList<>();
-      private ArrayList<Resepti> hakuReseptit = new ArrayList<Resepti>();
+      private List<ComboBoxChooser<String>> suodatinValinnat = new ArrayList<>();
+      private List<Resepti> hakuReseptit = new ArrayList<Resepti>();
       
       private void sulje() {
           Platform.exit();

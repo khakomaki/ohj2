@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import fi.jyu.mit.ohj2.Mjonot;
@@ -25,7 +26,7 @@ public class Osiot implements Hallitsija<Osio> {
     private String tiedostoNimi     = "resepti_osiot.dat";
     private String polku            = "reseptidata/";
     private int reseptiId           = -1;
-    private ArrayList<Osio> osiot   = new ArrayList<Osio>();
+    private List<Osio> osiot        = new ArrayList<Osio>();
     private boolean muutettu        = true;
     
     /**
@@ -192,6 +193,15 @@ public class Osiot implements Hallitsija<Osio> {
      */
     public Osio annaIndeksista(int indeksi) {
         return this.osiot.get(indeksi);
+    }
+    
+    
+    /**
+     * Antaa osiot listana
+     */
+    @Override
+    public List<Osio> anna() {
+        return this.osiot;
     }
     
     

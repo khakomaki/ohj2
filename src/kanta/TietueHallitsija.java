@@ -1,5 +1,8 @@
 package kanta;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author hakom
  * @version 18 Oct 2023
@@ -81,6 +84,22 @@ public class TietueHallitsija<T> {
         // palautetaan null jos yritetään ottaa määrittelemättömästä paikasta
         if (this.lkm < indeksi || indeksi < 0) return null;
         return this.oliot[indeksi];
+    }
+    
+    
+    /**
+     * Antaa oliot listana
+     * 
+     * @return lista olioista
+     */
+    public List<T> getOliotListana() {
+        List<T> olioLista = new ArrayList<T>();
+        
+        for (int i = 0; i < this.lkm; i++) {
+            olioLista.add(this.oliot[i]);
+        }
+        
+        return olioLista;
     }
     
     

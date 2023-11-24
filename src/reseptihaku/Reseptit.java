@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import kanta.Hajautus;
@@ -19,7 +20,7 @@ import kanta.SailoException;
  */
 public class Reseptit implements Hallitsija<Resepti> {
 
-    private ArrayList<Resepti> reseptit = new ArrayList<Resepti>();
+    private List<Resepti> reseptit      = new ArrayList<Resepti>();
     private String tiedostoNimi         = "reseptit.dat";
     private String polku                = "reseptidata/";
     private boolean muutettu            = true;
@@ -165,6 +166,15 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
+     * Antaa reseptit listana
+     */
+    @Override
+    public List<Resepti> anna() {
+        return this.reseptit;
+    }
+    
+    
+    /**
      * Vaihtaa vanhan resepti-viitteen tilalle uuden.
      * Ei tee mitään jos jompi kumpi resepteistä on null-viite tai vaihdettavaa reseptiä ei löydy.
      * 
@@ -299,12 +309,12 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @param hakusana millä hakusanalla haetaan kaikki reseptit jotka sisältävät kyseisen sanan
      * @return kaikki reseptit jotka sisältävät hakusanan
      */
-    public ArrayList<Resepti> etsiNimella(String hakusana) {
+    public List<Resepti> etsiNimella(String hakusana) {
         ArrayList<Resepti> loydetytReseptit = new ArrayList<Resepti>();
         String kaytettavaHakusana = hakusana.strip();
         
         // tyhjällä hakusanalla palautetaan kaikki reseptit
-        if (kaytettavaHakusana.isBlank()) return this.reseptit;
+        if (kaytettavaHakusana.isBlank()) return anna();
         
         for (int i = 0; i < this.lkm; i++) {
             Resepti resepti = anna(i);

@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,7 +29,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
     private String tiedostoPolku    = "reseptidata/";
     private int osioId              = -1;
     private int lkm                 = 0;
-    private ArrayList<Ohje> ohjeet  = new ArrayList<Ohje>();
+    private List<Ohje> ohjeet       = new ArrayList<Ohje>();
     private boolean muutettu        = false;
     
     
@@ -217,6 +218,15 @@ public class Ohjeet implements Hallitsija<Ohje> {
     public Ohje anna(int indeksi) {
         if (indeksi < 0 || this.lkm <= indeksi) return null;
         return ohjeet.get(indeksi);
+    }
+    
+    
+    /**
+     * Antaa ohjeet listana
+     */
+    @Override
+    public List<Ohje> anna() {
+        return this.ohjeet;
     }
     
     

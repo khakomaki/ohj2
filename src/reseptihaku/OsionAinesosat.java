@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Scanner;
 
 import fi.jyu.mit.ohj2.Mjonot;
@@ -152,6 +153,15 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      */
     public OsionAinesosa anna(int indeksi) {
         return getOlio(indeksi);
+    }
+    
+    
+    /**
+     * Antaa osion ainesosat listana
+     */
+    @Override
+    public List<OsionAinesosa> anna() {
+        return getOliotListana();
     }
     
     
