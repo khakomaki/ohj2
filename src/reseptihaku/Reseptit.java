@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import kanta.Hajautus;
+import kanta.Hallitsija;
 import kanta.SailoException;
 
 /**
@@ -16,7 +17,7 @@ import kanta.SailoException;
  * @version 19 Oct 2023
  *
  */
-public class Reseptit {
+public class Reseptit implements Hallitsija<Resepti> {
 
     private ArrayList<Resepti> reseptit = new ArrayList<Resepti>();
     private String tiedostoNimi         = "reseptit.dat";
@@ -127,6 +128,7 @@ public class Reseptit {
      * reseptit.toString() === "2|reseptit.dat";
      * </pre>
      */
+    @Override
     public void lisaa(Resepti resepti) {
         if (resepti == null) return;
         Resepti lisattavaResepti = resepti;
@@ -278,6 +280,7 @@ public class Reseptit {
      * reseptit.toString() === "0|reseptit.dat";
      * </pre>
      */
+    @Override
     public void poista(Resepti resepti) {
         int poistettavanIndeksi = reseptit.indexOf(resepti);
         

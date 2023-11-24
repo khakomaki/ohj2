@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
+import kanta.Hallitsija;
 import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 
@@ -21,7 +22,7 @@ import kanta.SailoException;
  * @version 30 Oct 2023
  *
  */
-public class Ohjeet {
+public class Ohjeet implements Hallitsija<Ohje> {
 
     private String tiedostoNimi     = "ohjeet.dat";
     private String tiedostoPolku    = "reseptidata/";
@@ -100,6 +101,7 @@ public class Ohjeet {
      * ohjeet.toString() === "ohjeet.dat|15|5";
      * </pre>
      */
+    @Override
     public void lisaa(Ohje ohje) {
         Ohje lisattavaOhje = ohje;
         
@@ -157,7 +159,6 @@ public class Ohjeet {
     
     /**
      * @param poistettava mikä ohje poistetaan
-     * @return ohjeiden lukumäärä mahdollisen poiston jälkeen
      * 
      * @example
      * <pre name="test">
@@ -186,7 +187,8 @@ public class Ohjeet {
      * ohjeet.toString() === "ohjeet.dat|-1|3";
      * </pre>
      */
-    public int poista(Ohje poistettava) {
+    @Override
+    public void poista(Ohje poistettava) {
         for (int i = 0; i < this.lkm; i++) {
             if (this.ohjeet.get(i).equals(poistettava)) {
                 ohjeet.remove(i);
@@ -196,7 +198,6 @@ public class Ohjeet {
                 break;
             }
         }
-        return this.lkm;
     }
     
     

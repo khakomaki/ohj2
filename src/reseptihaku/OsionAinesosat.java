@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
+import kanta.Hallitsija;
 import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 import kanta.TietueHallitsija;
@@ -21,7 +22,7 @@ import kanta.TietueHallitsija;
  * @version 15 Oct 2023
  *
  */
-public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
+public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements Hallitsija<OsionAinesosa> {
     
     private String tiedostoNimi     = "osion_ainesosat.dat";
     private String polku            = "reseptidata/";
@@ -114,6 +115,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
      * muropohjaAinesosat.anna(1).getMaara() === "1dl";
      * </pre>
      */
+    @Override
     public void lisaa(OsionAinesosa osionAinesosa) {
         if (osionAinesosa == null) return;
         
@@ -127,6 +129,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> {
      * 
      * @param osionAinesosa poistettava osion ainesosa
      */
+    @Override
     public void poista(OsionAinesosa osionAinesosa) {
         poistaOlio(osionAinesosa);
         this.muutettu = true;
