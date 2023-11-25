@@ -176,7 +176,7 @@
                                           <Font name="System Bold" size="16.0" />
                                        </font>
                                     </TextField>
-                                    <Button mnemonicParsing="false" text="x" onAction="#handlePoistaOsio">
+                                    <Button mnemonicParsing="false" text="x">
                                        <font>
                                           <Font name="System Bold" size="16.0" />
                                        </font>
@@ -277,7 +277,7 @@
                                                       <Insets />
                                                    </GridPane.margin>
                                                 </TextField>
-                                                <Button mnemonicParsing="false" text="+" GridPane.columnIndex="2" GridPane.rowIndex="7" onAction="#handleLisaaAinesosa">
+                                                <Button mnemonicParsing="false" text="+" GridPane.columnIndex="2" GridPane.rowIndex="7">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
@@ -285,22 +285,22 @@
                                                       <Insets top="5.0" />
                                                    </GridPane.margin>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="1" onAction="#handlePoistaAinesosa">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="2" onAction="#handlePoistaAinesosa">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="3" onAction="#handlePoistaAinesosa">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="3">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="6" onAction="#handlePoistaAinesosa">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="6">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
@@ -309,12 +309,12 @@
                                                 <TextField alignment="CENTER" text="vehnäjauhoja" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                 <TextField alignment="CENTER" text="1tl" GridPane.rowIndex="5" />
                                                 <TextField alignment="CENTER" text="leivinjauhetta" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="4" onAction="#handlePoistaAinesosa">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="4">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="5" onAction="#handlePoistaAinesosa">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="5">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
@@ -384,22 +384,22 @@
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                    </padding>
                                                 </Label>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="1" onAction="#handlePoistaOhje">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="2" onAction="#handlePoistaOhje">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="3" onAction="#handlePoistaOhje">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="3">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="+" GridPane.columnIndex="2" GridPane.rowIndex="7" onAction="#handleLisaaOhje">
+                                                <Button mnemonicParsing="false" text="+" GridPane.columnIndex="2" GridPane.rowIndex="7">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
@@ -413,17 +413,17 @@
                                                 <Label text="5" GridPane.rowIndex="5" />
                                                 <Label text="6" GridPane.rowIndex="6" />
                                                 <TextArea minWidth="250.0" prefColumnCount="0" prefRowCount="2" promptText="ohje" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="4" onAction="#handlePoistaOhje">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="4">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="5" onAction="#handlePoistaOhje">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="5">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Button>
-                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="6" onAction="#handlePoistaOhje">
+                                                <Button mnemonicParsing="false" text="x" GridPane.columnIndex="2" GridPane.rowIndex="6">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>

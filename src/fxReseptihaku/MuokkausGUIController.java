@@ -1,19 +1,24 @@
 package fxReseptihaku;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fi.jyu.mit.fxgui.ComboBoxChooser;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
+import fxKanta.DynaaminenGridPane;
+import fxKanta.NodeKasittely;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -46,11 +51,6 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     @FXML private void handleTallenna() { tallenna(); }
     @FXML private void handleLisaaOsio() { lisaaOsio(); }
     @FXML private void handlePoistaResepti() { poistaResepti(); }
-    @FXML private void handlePoistaOsio() { poistaOsio(null, null); }
-    @FXML private void handlePoistaAinesosa() { poistaAinesosa(null, 0, null, null); }
-    @FXML private void handleLisaaAinesosa() { lisaaAinesosa(null, null, null); }
-    @FXML private void handlePoistaOhje() { poistaOhje(null, 0, null, null); }
-    @FXML private void handleLisaaOhje() { lisaaOhje(null, null, null); }
     
     // ====================================================================================================
     
@@ -149,55 +149,31 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         HBox osionSisaltoHBox = new HBox();
         
-        ColumnConstraints ainesosaConstraints = luoRajoitteet(140, Priority.SOMETIMES, HPos.CENTER);
-        ColumnConstraints painikeConstraints = luoRajoitteet(30, Priority.NEVER, HPos.CENTER);
-        ColumnConstraints vaiheConstraints = luoRajoitteet(50, Priority.NEVER, HPos.CENTER);
-        ColumnConstraints ohjeConstraints = luoRajoitteet(250, Priority.ALWAYS, HPos.LEFT);
+        ColumnConstraints ainesosaConstraints = NodeKasittely.luoSarakeRajoitteet(140, Priority.SOMETIMES, HPos.CENTER);
+        ColumnConstraints painikeConstraints = NodeKasittely.luoSarakeRajoitteet(30, Priority.NEVER, HPos.CENTER);
+        ColumnConstraints vaiheConstraints = NodeKasittely.luoSarakeRajoitteet(50, Priority.NEVER, HPos.CENTER);
+        ColumnConstraints ohjeConstraints = NodeKasittely.luoSarakeRajoitteet(250, Priority.ALWAYS, HPos.LEFT);
         
         // ==================== näytetään ainesosat ====================
         
         VBox ainesosatVBox = new VBox();
         ainesosatVBox.setPadding(PEHMUSTE_ISO);
+        OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
         
         // luo ainesosien otsikon
         Label ainesosatLabel = new Label("Ainesosat");
         ainesosatLabel.setFont(kirjasin14);
         
         // luodaan GridPane ja otsikot
-        GridPane ainesosatGridPane = new GridPane();
-        Label maaraLabel = new Label("määrä"); maaraLabel.setPadding(PEHMUSTE_PIENI);
-        Label ainesosaLabel = new Label("ainesosa"); ainesosaLabel.setPadding(PEHMUSTE_PIENI);
-        ainesosatGridPane.add(maaraLabel, 0, 0);
-        ainesosatGridPane.add(ainesosaLabel, 1, 0);
-        
-        // määritellään rajoitteet GridPanen sarakkeille
+        DynaaminenGridPane<OsionAinesosa> ainesosatGridPane = new DynaaminenGridPane<OsionAinesosa>(osionAinesosat, ainesosa -> luoAinesosaNodet(ainesosa));
         ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
         ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
         ainesosatGridPane.getColumnConstraints().add(painikeConstraints);
-        
-        // lisätään osion ainesosat yksi kerralla käyttöliittymään
-        OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
-        for (int i = 0; i < osionAinesosat.getLkm(); i++) {
-            int ainesosanRivi = i + 1;
-            
-            // luo ja lisää TextField-elementit GridPaneen
-            OsionAinesosa oa = osionAinesosat.anna(i);
-            TextField maaraTextField = new TextField(oa.getMaara());
-            maaraTextField.setAlignment(Pos.CENTER);
-            TextField ainesosaTextField = new TextField(oa.getAinesosa());
-            ainesosaTextField.setAlignment(Pos.CENTER);
-            
-            ainesosatGridPane.add(maaraTextField, 0, ainesosanRivi);
-            ainesosatGridPane.add(ainesosaTextField, 1, ainesosanRivi);
-            
-            Button ainesosaPoisto = new Button("x");
-            ainesosaPoisto.setOnAction(e -> poistaAinesosa(ainesosatGridPane, ainesosanRivi, osio, oa));
-            ainesosatGridPane.add(ainesosaPoisto, 2, ainesosanRivi);
-        }
-        
-        // lisätään tyhjä ainesosa
-        ainesosatGridPane.add(new Label(), 0, ainesosatGridPane.getRowCount() + 1);
-        lisaaAinesosa(ainesosatGridPane, osio, new OsionAinesosa());
+        Label maara = new Label("määrä"); maara.setPadding(PEHMUSTE_PIENI);
+        Label ainesosa = new Label("ainesosa"); ainesosa.setPadding(PEHMUSTE_PIENI);
+        List<Label> ainesosaOtsikot = List.of(maara, ainesosa);
+        ainesosatGridPane.lisaaOtsikot(ainesosaOtsikot);
+        ainesosatGridPane.paivita();
         
         // lisätään otsikko ja GridPane ainesosien VBox-elementtiin
         ainesosatVBox.getChildren().add(ainesosatLabel);
@@ -209,6 +185,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // ==================== näytetään ohjeet ====================
         
         VBox ohjeetVBox = new VBox();
+        ohjeetVBox.setPadding(PEHMUSTE_ISO);
+        Ohjeet osionOhjeet = osio.annaOsionOhjeet();
         
         // luo ohjeiden otsikon
         Label ohjeetLabel = new Label("Ohjeet");
@@ -216,38 +194,15 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ohjeetLabel.setPadding(PEHMUSTE_ISO);
         
         // luodaan GridPane ja otsikot
-        GridPane ohjeetGridPane = new GridPane();
-        Label vaiheLabel = new Label("vaihe"); vaiheLabel.setPadding(PEHMUSTE_PIENI);
-        Label ohjeLabel = new Label("ohje"); ohjeLabel.setPadding(PEHMUSTE_PIENI);
-        ohjeetGridPane.add(vaiheLabel, 0, 0);
-        ohjeetGridPane.add(ohjeLabel, 1, 0);
-        
-        // määritellään rajoitteet GridPanen sarakkeille
+        DynaaminenGridPane<Ohje> ohjeetGridPane = new DynaaminenGridPane<Ohje>(osionOhjeet, ohje -> luoOhjeNodet(ohje));
         ohjeetGridPane.getColumnConstraints().add(vaiheConstraints);
         ohjeetGridPane.getColumnConstraints().add(ohjeConstraints);
         ohjeetGridPane.getColumnConstraints().add(painikeConstraints);
-        
-        // lisätään osion ohjeet yksi kerralla käyttöliittymään
-        Ohjeet osionOhjeet = osio.annaOsionOhjeet();
-        for (int i = 0; i < osionOhjeet.getLkm(); i++) {
-            int ohjeenRivi = i + 1;
-            
-            Ohje oo = osionOhjeet.anna(i);
-            
-            Label riviNumeroLabel = new Label("" + ohjeenRivi);
-            TextArea ohjeTextArea = luoOhjeTextArea(oo.getOhjeistus());
-            
-            ohjeetGridPane.add(riviNumeroLabel, 0, ohjeenRivi);
-            ohjeetGridPane.add(ohjeTextArea, 1, ohjeenRivi);
-            
-            Button ohjePoisto = new Button("x");
-            ohjePoisto.setOnAction(e -> poistaOhje(ohjeetGridPane, ohjeenRivi, osio, oo));
-            ohjeetGridPane.add(ohjePoisto, 2, ohjeenRivi);
-        }
-        
-        // lisätään tyhjä ohje
-        ohjeetGridPane.add(new Label(), 0, ohjeetGridPane.getRowCount() + 1);
-        lisaaOhje(ohjeetGridPane, null, null);
+        Label vaihe = new Label("vaihe"); vaihe.setPadding(PEHMUSTE_PIENI);
+        Label ohjeistus = new Label("ohjeistus"); ohjeistus.setPadding(PEHMUSTE_PIENI);
+        List<Label> ohjeOtsikot = List.of(vaihe, ohjeistus);
+        ohjeetGridPane.lisaaOtsikot(ohjeOtsikot);
+        ohjeetGridPane.paivita();
         
         // lisätään otsikko ja GridPane ohjeiden VBox-elementtiin
         ohjeetVBox.getChildren().add(ohjeetLabel);
@@ -264,22 +219,44 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
-    private ColumnConstraints luoRajoitteet(int minimiLeveys, Priority leveydenKasvu, HPos ryhmitys) {
-        ColumnConstraints rajoite = new ColumnConstraints();
-        rajoite.setMinWidth(minimiLeveys);
-        rajoite.setHgrow(leveydenKasvu);
-        rajoite.setHalignment(ryhmitys);
-        return rajoite;
+    private List<Node> luoOhjeNodet(Ohje ohje) {
+        List<Node> nodet = new ArrayList<Node>();
+        
+        // vaihe
+        Label vaihe = new Label("" + ohje.getVaihe());
+        nodet.add(vaihe);
+        
+        // ohjeistus
+        TextArea ohjeistus = new TextArea(ohje.getOhjeistus());
+        ohjeistus.minWidth(250);
+        ohjeistus.setPrefColumnCount(0);
+        ohjeistus.setPrefRowCount(2);
+        ohjeistus.setWrapText(true);
+        
+        
+        ohjeistus.setOnKeyTyped( e -> {ohje.setOhjeistus(ohjeistus.getText()); } );
+        nodet.add(ohjeistus);
+        
+        return nodet;
     }
     
     
-    private TextArea luoOhjeTextArea(String ohjeteksti) {
-        TextArea textArea = new TextArea(ohjeteksti);
-        textArea.minWidth(250);
-        textArea.setPrefColumnCount(0);
-        textArea.setPrefRowCount(2);
-        textArea.setWrapText(true);
-        return textArea;
+    private List<Node> luoAinesosaNodet(OsionAinesosa osionAinesosa) {
+        List<Node> nodet = new ArrayList<Node>();
+        
+        // määrä
+        TextField maaraTextField = new TextField(osionAinesosa.getMaara());
+        maaraTextField.setAlignment(Pos.CENTER);
+        maaraTextField.setOnKeyTyped( e -> {osionAinesosa.setMaara(maaraTextField.getText()); } );
+        nodet.add(maaraTextField);
+        
+        // ainesosa
+        TextField ainesosaTextField = new TextField(osionAinesosa.getAinesosa());
+        ainesosaTextField.setAlignment(Pos.CENTER);
+        ainesosaTextField.setOnKeyTyped( e -> {osionAinesosa.setAinesosa(ainesosaTextField.getText()); } );
+        nodet.add(ainesosaTextField);
+        
+        return nodet;
     }
     
     
@@ -342,92 +319,6 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         }
         
         this.valittuResepti.poistaOsio(osio);
-    }
-    
-    
-    private void poistaAinesosa(GridPane paneeli, int rivi, Osio osio, OsionAinesosa ainesosa) {
-        // ei yritetä poistaa null paneelista
-        if (paneeli == null) { return; }
-        
-        // poistaa kaikki nodet kyseiseltä riviltä
-        paneeli.getChildren().removeIf(node -> GridPane.getRowIndex(node) == rivi);
-        
-        // jos osio ei ole null, yritetään poistaa siitä annettu ainesosa
-        if (osio == null) { return; }
-        osio.poistaAinesosa(ainesosa);
-    }
-    
-    
-    private void lisaaAinesosa(GridPane paneeli, Osio osio, OsionAinesosa osionAinesosa) {
-        if (paneeli == null || osio == null || osionAinesosa == null) { return; }
-        
-        final int riviLkm = paneeli.getRowCount();
-        
-        // poistetaan kaikki viimeisteltä riviltä (lisäys painike)
-        poistaAinesosa(paneeli, riviLkm - 1, null, null);
-        
-        // lisätään syöttökentät
-        paneeli.add(new TextField(), 0, riviLkm);
-        paneeli.add(new TextField(), 1, riviLkm);
-        
-        // lisätään ainesosa osioon
-        osio.lisaaAinesosa(osionAinesosa);
-        
-        // lisätään rivin poisto painike
-        Button ainesosaPoisto = new Button("x");
-        ainesosaPoisto.setOnAction(e -> poistaAinesosa(paneeli, riviLkm, osio, osionAinesosa));
-        paneeli.add(ainesosaPoisto, 2, riviLkm);
-        
-        // lisätään rivien lisäys painike seuraavalle riville
-        Button ainesosaLisays = new Button("+");
-        
-        // luo samaan paneeliin, samaan osioon tyhjän ainesosan ja määrän
-        ainesosaLisays.setOnAction(e -> lisaaAinesosa(paneeli, osio, new OsionAinesosa())); 
-        paneeli.add(ainesosaLisays, 2, riviLkm + 1);
-    }
-    
-    
-    private void poistaOhje(GridPane paneeli, int rivi, Osio osio, Ohje ohje) {
-        // vältetään null viitteet
-        if (paneeli == null) { return; }
-        
-        // poistaa kaikki nodet kyseiseltä riviltä
-        paneeli.getChildren().removeIf(node -> GridPane.getRowIndex(node) == rivi);
-        
-        // jos osio ei ole null, yritetään poistaa siitä annettu ohje
-        if (osio == null) { return; }
-        osio.poistaOhje(ohje);
-    }
-    
-    
-    private void lisaaOhje(GridPane paneeli, Osio osio, Ohje ohje) {
-        // vältetään null viitteet
-        if (paneeli == null) { return; }
-        
-        final int riviLkm = paneeli.getRowCount();
-        
-        // poistetaan kaikki viimeisteltä riviltä (lisäys painike)
-        poistaOhje(paneeli, riviLkm - 1, null, null);
-        
-        // lisätään teksti ja syöttökenttä
-        paneeli.add(new Label(""), 0, riviLkm);
-        paneeli.add(luoOhjeTextArea(""), 1, riviLkm);
-        
-        // lisätään rivin poisto painike
-        Button ohjePoisto = new Button("x");
-        ohjePoisto.setOnAction(e -> poistaOhje(paneeli, riviLkm, osio, ohje));
-        paneeli.add(ohjePoisto, 2, riviLkm);
-        
-        // lisätään rivien lisäys painike seuraavalle riville
-        Button ohjeLisaysButton = luoOhjeenLisaysPainike(paneeli, osio, ohje);
-        paneeli.add(ohjeLisaysButton, 2, paneeli.getRowCount() + 1);
-    }
-    
-    
-    private Button luoOhjeenLisaysPainike(GridPane paneeli, Osio osio, Ohje ohje) {
-        Button ohjeLisays = new Button("+");
-        ohjeLisays.setOnAction(e -> lisaaOhje(paneeli, osio, ohje));
-        return ohjeLisays;
     }
     
     
