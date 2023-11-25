@@ -1,15 +1,19 @@
 package fxReseptihaku;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
+import fxKanta.DynaaminenGridPane;
+import fxKanta.NodeKasittely;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
@@ -49,7 +53,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     private Resepti valittuResepti;
     private final Insets PEHMUSTE_ISO = new Insets(10, 10, 10, 10);
     private RowConstraints rivirajoitteet = new RowConstraints();
-    private final Font kirjasin14 = new Font(14);
+    private final Font kirjasin14 = new Font("Arial Bold", 14);
     
     @Override
     public Resepti getResult() { 
@@ -100,22 +104,40 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
-    private void naytaReseptinAinesosat(Osio osio) {    
+    private void naytaReseptinAinesosat(Osio osio) {
+        OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
+        if (osionAinesosat.getLkm() < 1) return; // ei näytetä jos ei yhtään ainesosaa
+        
         // lisätään osion nimi -Label
         Label osionNimi = luoOtsikko(osio.getNimi());
         ainesosatVBox.getChildren().add(osionNimi);
         ainesosatVBox.setPadding(PEHMUSTE_ISO);
         
         // luodaan GridPane ainesosille
-        GridPane ainesosatGridPane = luoAinesosaGridPane();
-        
-        OsionAinesosat ainesosat = osio.annaOsionAinesosat();
-        for (int i = 0; i < ainesosat.getLkm(); i++) {
-            OsionAinesosa ainesosa = ainesosat.anna(i);
-            lisaaAinesosaGridPaneen(ainesosatGridPane, ainesosa, i);
-        }
+        DynaaminenGridPane<OsionAinesosa> ainesosatGridPane = new DynaaminenGridPane<OsionAinesosa>(osionAinesosat, ainesosa -> luoAinesosaNodet(ainesosa), false);
+        ainesosatGridPane.asetaRiviRajoitteet(rivirajoitteet);
+        ainesosatGridPane.getColumnConstraints().add(NodeKasittely.luoSarakeRajoitteet(50, Priority.NEVER, HPos.RIGHT));
+        ainesosatGridPane.getColumnConstraints().add(NodeKasittely.luoSarakeRajoitteet(125, Priority.SOMETIMES, HPos.LEFT));
+        ainesosatGridPane.setHgap(5);
+        ainesosatGridPane.setVgap(5);
+        ainesosatGridPane.paivita();
         
         ainesosatVBox.getChildren().add(ainesosatGridPane);
+    }
+    
+    
+    private List<Node> luoAinesosaNodet(OsionAinesosa osionAinesosa) {
+        List<Node> nodet = new ArrayList<Node>();
+        
+        // määrä
+        Label maaraLabel = new Label(osionAinesosa.getMaara());
+        nodet.add(maaraLabel);
+        
+        // ainesosa
+        Label ainesosaLabel = new Label(osionAinesosa.getAinesosa());
+        nodet.add(ainesosaLabel);
+        
+        return nodet;
     }
     
     
@@ -127,80 +149,53 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
-    private GridPane luoAinesosaGridPane() {
-        GridPane ainesosatGridPane = new GridPane();
-        ainesosatGridPane.getColumnConstraints().add(luoRajoitteet(50, Priority.NEVER, HPos.RIGHT));
-        ainesosatGridPane.getColumnConstraints().add(luoRajoitteet(125, Priority.SOMETIMES, HPos.LEFT));
-        ainesosatGridPane.setHgap(5);
-        ainesosatGridPane.setVgap(5);
-        return ainesosatGridPane;
-    }
-    
-    
-    private void lisaaAinesosaGridPaneen(GridPane paneeli, OsionAinesosa ainesosa, int rivi) {
-        Label maaraLabel = new Label(ainesosa.getMaara());
-        Label ainesosaLabel = new Label(ainesosa.getAinesosa());
-        
-        paneeli.getRowConstraints().add(rivirajoitteet);
-        paneeli.add(maaraLabel, 0, rivi);
-        paneeli.add(ainesosaLabel, 1, rivi);
-    }
-    
-    
     private void naytaOsionOhjeet(Osio osio) {
+        Ohjeet osionOhjeet = osio.annaOsionOhjeet();
+        if (osionOhjeet.getLkm() < 1) return; // ei näytetä jos ei yhtään ohjetta
+        
         // lisätään osion nimi -Label
         Label OsionNimi = luoOtsikko(osio.getNimi());
         ohjeetVBox.getChildren().add(OsionNimi);
         ohjeetVBox.setPadding(PEHMUSTE_ISO);
         
-        GridPane ohjeetGridPane = luoOhjeetGridPane();
-        
-        Ohjeet ohjeet = osio.annaOsionOhjeet();
-        for (int i = 0; i < ohjeet.getLkm(); i++) {
-            Ohje ohje = ohjeet.anna(i);
-            lisaaOhjeGridPaneen(ohjeetGridPane, ohje, i);
-        }
+        // luodaan GridPane ohjeille
+        DynaaminenGridPane<Ohje> ohjeetGridPane = new DynaaminenGridPane<Ohje>(osionOhjeet, ohje -> luoOhjeNodet(ohje), false);
+        ohjeetGridPane.asetaRiviRajoitteet(this.rivirajoitteet);
+        ohjeetGridPane.getColumnConstraints().add(NodeKasittely.luoSarakeRajoitteet(30, Priority.NEVER, HPos.CENTER));
+        ohjeetGridPane.getColumnConstraints().add(NodeKasittely.luoSarakeRajoitteet(30, Priority.NEVER, HPos.CENTER));
+        ohjeetGridPane.getColumnConstraints().add(NodeKasittely.luoSarakeRajoitteet(125, Priority.SOMETIMES, HPos.LEFT));
+        ohjeetGridPane.setHgap(5);
+        ohjeetGridPane.setVgap(5);
+        ohjeetGridPane.paivita();
         
         ohjeetVBox.getChildren().add(ohjeetGridPane);
     }
     
     
-    private GridPane luoOhjeetGridPane() {
-        GridPane ohjeetGridPane = new GridPane();
-        ohjeetGridPane.getColumnConstraints().add(luoRajoitteet(30, Priority.NEVER, HPos.CENTER));
-        ohjeetGridPane.getColumnConstraints().add(luoRajoitteet(30, Priority.NEVER, HPos.CENTER));
-        ohjeetGridPane.getColumnConstraints().add(luoRajoitteet(125, Priority.SOMETIMES, HPos.LEFT));
-        ohjeetGridPane.setHgap(5);
-        ohjeetGridPane.setVgap(5);
-        return ohjeetGridPane;
-    }
-    
-    
-    private void lisaaOhjeGridPaneen(GridPane paneeli, Ohje ohje, int rivi) {
+    private List<Node> luoOhjeNodet(Ohje ohje) {
+        List<Node> nodet = new ArrayList<Node>();
+        
+        // vaihe
         Label vaiheLabel = new Label("" + ohje.getVaihe());
+        
+        // ohjeistus
         Label ohjeistusLabel = new Label(ohje.getOhjeistus());
+        
+        // piilotuspainike
         CheckBox piilotusPainike = new CheckBox();
         piilotusPainike.setOnAction( e -> vaihdaNakyvyys(ohjeistusLabel) );
         
-        paneeli.getRowConstraints().add(rivirajoitteet);
-        paneeli.add(piilotusPainike, 0, rivi);
-        paneeli.add(vaiheLabel, 1, rivi);
-        paneeli.add(ohjeistusLabel, 2, rivi);
+        nodet.add(piilotusPainike);
+        nodet.add(vaiheLabel);
+        nodet.add(ohjeistusLabel);
+        
+        return nodet;
     }
     
     
     private void vaihdaNakyvyys(Label teksti) {
         if (teksti.isVisible()) teksti.setVisible(false);
         else teksti.setVisible(true);
-    }
-        
-    
-    private ColumnConstraints luoRajoitteet(int minimiLeveys, Priority leveydenKasvu, HPos ryhmitys) {
-        ColumnConstraints rajoite = new ColumnConstraints();
-        rajoite.setMinWidth(minimiLeveys);
-        rajoite.setHgrow(leveydenKasvu);
-        rajoite.setHalignment(ryhmitys);
-        return rajoite;
     }
     
     

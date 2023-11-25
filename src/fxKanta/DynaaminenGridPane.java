@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import kanta.Hallitsija;
 
 /**
@@ -20,20 +21,26 @@ public class DynaaminenGridPane<T> extends GridPane {
     private NodeLuonti<T> nodeluonti;
     private List<Label> otsikot;
     
-    private int leveimmanRivinLeveys;
+    private RowConstraints riviRajoitteet   = new RowConstraints();
+    private int leveimmanRivinLeveys        = 0;
+    private boolean muokattava              = true;
     
     /**
      * Luo dynaamisen GridPanen.
      * Päivittää GridPanen käskettäessä tai alkiota lisättäessä ja poistettaessa.
+     * Voidaan valita tuleeko lisäys- ja poistopainikkeet.
      * 
      * @param hallitsijaLuokka luokka jonka hallitsemia olioita ollaan käsittelemässä
      * @param nodeluonti mitkä nodet luodaan oliota lisättäessä
+     * @param muokattava ovatko oliot muokattavissa lisäys- ja poistopainikkeilla
      */
-    public DynaaminenGridPane(Hallitsija<T> hallitsijaLuokka, NodeLuonti<T> nodeluonti) {
+    public DynaaminenGridPane(Hallitsija<T> hallitsijaLuokka, NodeLuonti<T> nodeluonti, boolean muokattava) {
         this.hallitsijaLuokka = hallitsijaLuokka;
         this.nodeluonti = nodeluonti;
+        this.muokattava = muokattava;
+        
         this.otsikot = new ArrayList<Label>();
-        this.leveimmanRivinLeveys = 1; // vähintään painikerivi
+        if (muokattava) this.leveimmanRivinLeveys = 1; // vähintään painikerivi
     }
     
     
@@ -65,12 +72,13 @@ public class DynaaminenGridPane<T> extends GridPane {
     public void paivita() {
         this.getChildren().clear(); // tyhjentää GridPanen
         
-        // lisää otsikot
-        for (int i = 0; i < this.otsikot.size(); i++) {
-            this.add(this.otsikot.get(i), i, 0);
+        // otsikot
+        if (0 < this.otsikot.size()) {
+            for (int i = 0; i < this.otsikot.size(); i++) {
+                this.add(this.otsikot.get(i), i, 0);
+            }
+            this.add(new Label(""), this.otsikot.size() + 1, 0); // tyhjä otsikko poistopainikkeille
         }
-        this.add(new Label(""), this.otsikot.size() + 1, 0); // tyhjä otsikko poistopainikkeille
-        
         
         // lisää rivit paneeliin
         int rivi = 1;
@@ -79,9 +87,11 @@ public class DynaaminenGridPane<T> extends GridPane {
         }
         
         // olion lisäyspainike
-        Button lisaysPainike = new Button("+");
-        lisaysPainike.setOnAction(e -> lisaa(this.hallitsijaLuokka.luo()));
-        this.add(lisaysPainike, this.leveimmanRivinLeveys, rivi++);
+        if (muokattava) {
+            Button lisaysPainike = new Button("+");
+            lisaysPainike.setOnAction(e -> lisaa(this.hallitsijaLuokka.luo()));
+            this.add(lisaysPainike, this.leveimmanRivinLeveys, rivi++);
+        }
     }
     
     
@@ -98,6 +108,16 @@ public class DynaaminenGridPane<T> extends GridPane {
     
     
     /**
+     * Asettaa rivirajoitteet kaikille riveille
+     * 
+     * @param rajoitteet asetettavat rajoitteet
+     */
+    public void asetaRiviRajoitteet(RowConstraints rajoitteet) {
+        this.riviRajoitteet = rajoitteet;
+    }
+    
+    
+    /**
      * Lisää olion riville
      * 
      * @param olio lisättävän rivin olio
@@ -105,6 +125,7 @@ public class DynaaminenGridPane<T> extends GridPane {
      */
     private void lisaaRiviGridPaneen(T olio, int rivi) {
         int sarake = 0;
+        this.getRowConstraints().add(this.riviRajoitteet);
         
         // luo rivin nodet
         List<Node> rivinNodet = this.nodeluonti.luoNodet(olio);
@@ -118,9 +139,11 @@ public class DynaaminenGridPane<T> extends GridPane {
         }
         
         // lisätään poistopainike viimeiseen sarakkeeseen
-        Button poistoPainike = new Button("x");
-        poistoPainike.setOnAction(e -> poista(olio));
-        this.add(poistoPainike, this.leveimmanRivinLeveys, rivi);
+        if (muokattava) {
+            Button poistoPainike = new Button("x");
+            poistoPainike.setOnAction(e -> poista(olio));
+            this.add(poistoPainike, this.leveimmanRivinLeveys, rivi);
+        }
     }
     
     

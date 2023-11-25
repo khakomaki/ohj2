@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import kanta.Satunnaisluku;
+import reseptihaku.Osio;
 import reseptihaku.Resepti;
 import reseptihaku.Reseptit;
 
@@ -257,15 +258,63 @@ public class ReseptihakuGUIController implements Initializable {
       */
       public void setReseptit(Reseptit reseptit) {
           this.reseptit = reseptit;
-          // TODO: ota nämä pois kun ei enää tarvitse
-          for (int i = 0; i < 10; i++) {
-              Resepti uusiResepti = this.reseptit.lisaaMustikkapiirakka();
-              uusiResepti.satunnaisetAttribuutit();
-          }
-          
-          reseptit.lisaa(new Resepti("Juustokakku"));
+          luoTestiReseptit();
       }
       
       
-      
+      /**
+       * Luo reseptejä testaamista varten
+       * TODO: poista kun ei enää tarvitse
+       */
+      public void luoTestiReseptit() {
+          // 10 mustikkapiirakka reseptiä satunnaisilla attribuuteilla
+          for (int i = 0; i < 5; i++) {
+              Resepti testiMustikkapiirakka = this.reseptit.lisaaMustikkapiirakka();
+              testiMustikkapiirakka.satunnaisetAttribuutit();
+          }
+          
+          // lihapiirakka resepti
+          Resepti lihapiirakka = new Resepti("Lihapiirakka");
+          this.reseptit.lisaa(lihapiirakka);
+          lihapiirakka.satunnaisetAttribuutit();
+          
+          Osio taikina = new Osio("Taikina");
+          lihapiirakka.lisaaOsio(taikina);
+          taikina.lisaaAinesosa("50g", "hiivaa");
+          taikina.lisaaAinesosa("6dl", "maitoa");
+          taikina.lisaaAinesosa("1tl", "suolaa");
+          taikina.lisaaAinesosa("2rkl", "sokeria");
+          taikina.lisaaAinesosa("2kpl", "kananmunia");
+          taikina.lisaaAinesosa("10dl", "vehnäjauhoja");
+          taikina.lisaaAinesosa("100g", "voita");
+          taikina.lisaaOhje("Sekoita hiiva maitoon");
+          taikina.lisaaOhje("Lisää kananmunat, suola ja sokeri");
+          taikina.lisaaOhje("Lisää jauhot ja voi");
+          taikina.lisaaOhje("Anna kohota");
+          
+          Osio tayte = new Osio("Täyte");
+          lihapiirakka.lisaaOsio(tayte);
+          tayte.lisaaAinesosa("400g", "jauhelihaa");
+          tayte.lisaaAinesosa("1kpl", "sipuli");
+          tayte.lisaaAinesosa("1,5dl", "riisiä");
+          tayte.lisaaAinesosa("1tl", "suolaa");
+          tayte.lisaaAinesosa("1tl", "mustapippuria");
+          tayte.lisaaAinesosa("2dl", "vettä");
+          tayte.lisaaOhje("Lisää riisi, jauheliha, sipuli ja vesi kattilaan");
+          tayte.lisaaOhje("Paista kunnes riisit kypsyvät");
+          
+          Osio piirakat = new Osio("Piirakat");
+          lihapiirakka.lisaaOsio(piirakat);
+          piirakat.lisaaOhje("Jaa taikina n.10 osaan ja muotoile");
+          piirakat.lisaaOhje("Lisää täyte taikinapalojen keskelle");
+          piirakat.lisaaOhje("Taita taikina taskuksi");
+          piirakat.lisaaOhje("Painele taskujen reunat kiinni haarukalla");
+          
+          Osio paistaminen = new Osio("Paistaminen");
+          lihapiirakka.lisaaOsio(paistaminen);
+          paistaminen.lisaaAinesosa("1.5l", "rypsiöljyä");
+          paistaminen.lisaaOhje("Kuumenna öljy kattilassa 175°C");
+          paistaminen.lisaaOhje("Paista lihapiirakoita, kunnes molemmat puolet ovat kauniin ruskeita");
+          paistaminen.lisaaOhje("Nosta kuivumaan talouspaperille tai ritilälle");
+      }
 }

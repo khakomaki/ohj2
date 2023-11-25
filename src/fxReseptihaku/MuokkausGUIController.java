@@ -165,7 +165,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ainesosatLabel.setFont(kirjasin14);
         
         // luodaan GridPane ja otsikot
-        DynaaminenGridPane<OsionAinesosa> ainesosatGridPane = new DynaaminenGridPane<OsionAinesosa>(osionAinesosat, ainesosa -> luoAinesosaNodet(ainesosa));
+        DynaaminenGridPane<OsionAinesosa> ainesosatGridPane = new DynaaminenGridPane<OsionAinesosa>(osionAinesosat, ainesosa -> luoAinesosaNodet(ainesosa), true);
         ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
         ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
         ainesosatGridPane.getColumnConstraints().add(painikeConstraints);
@@ -194,7 +194,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ohjeetLabel.setPadding(PEHMUSTE_ISO);
         
         // luodaan GridPane ja otsikot
-        DynaaminenGridPane<Ohje> ohjeetGridPane = new DynaaminenGridPane<Ohje>(osionOhjeet, ohje -> luoOhjeNodet(ohje));
+        DynaaminenGridPane<Ohje> ohjeetGridPane = new DynaaminenGridPane<Ohje>(osionOhjeet, ohje -> luoOhjeNodet(ohje), true);
         ohjeetGridPane.getColumnConstraints().add(vaiheConstraints);
         ohjeetGridPane.getColumnConstraints().add(ohjeConstraints);
         ohjeetGridPane.getColumnConstraints().add(painikeConstraints);
@@ -232,8 +232,6 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ohjeistus.setPrefColumnCount(0);
         ohjeistus.setPrefRowCount(2);
         ohjeistus.setWrapText(true);
-        
-        
         ohjeistus.setOnKeyTyped( e -> {ohje.setOhjeistus(ohjeistus.getText()); } );
         nodet.add(ohjeistus);
         
