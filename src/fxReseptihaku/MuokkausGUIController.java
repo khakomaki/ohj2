@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import kanta.SailoException;
 import reseptihaku.Ohje;
 import reseptihaku.Ohjeet;
 import reseptihaku.Osio;
@@ -80,8 +81,11 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     public void setDefault(Resepti oletus) {
         this.alkuperainenResepti = oletus;
         // luodaan Reseptipohja jos annettu Resepti on null, muuten luodaan kopio annetusta
-        if (oletus == null) { this.valittuResepti = new Resepti(); }
-        else { this.valittuResepti = oletus.clone(); }
+        if (oletus == null) { 
+            this.valittuResepti = new Resepti(); 
+        } else { 
+            this.valittuResepti = oletus.clone(); 
+        }
         
         naytaReseptinOminaisuudet();
         
@@ -264,7 +268,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         if (tulikoMuutoksia()) { 
             tallennetaanko = Dialogs.showQuestionDialog("Reseptin tallennus", "Sinulla on tallentamattomia muutoksia. Haluatko tallentaa?", "Tallenna", "Sulje");
         }
-        if (tallennetaanko) { tallenna(); }
+        if (tallennetaanko) tallenna();
         suljeTallentamatta();
     }
     
@@ -276,10 +280,14 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     private void tallenna() {
         // ei tallenneta turhaan jos ei ole tullut muutoksia
-        if (!tulikoMuutoksia()) { return; }
+        if (!tulikoMuutoksia()) return;
         
         this.alkuperainenResepti = this.valittuResepti;
-        // TODO: tallenna tiedostoon
+        try {
+            this.alkuperainenResepti.tallenna();
+        } catch (SailoException exception) {
+            Dialogs.showMessageDialog("Tallentamisessa ongelmia: " + exception.getMessage());
+        }
     }
     
     
@@ -294,7 +302,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     private void lisaaOsio() {
         String osioTeksti = osioTekstiKentta.getText();
-        if (osioTeksti.isEmpty()) { osioTeksti = ""; }
+        if (osioTeksti.isEmpty()) osioTeksti = "";
         
         // Luodaan uusi osio ja näytetään se käyttöliittymään
         Osio osio = new Osio(osioTeksti);

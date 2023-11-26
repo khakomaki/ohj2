@@ -76,9 +76,12 @@ public class Reseptit implements Hallitsija<Resepti> {
      * Asettaa reseptin tallennus polun
      * 
      * @param tiedostopolku mihin reseptit tallennetaan
+     * @throws SailoException jos polun asettaminen aiheuttaa ongelmia
      */
-    public void setTiedostoPolku(String tiedostopolku) {
-        if (tiedostopolku == null) return;
+    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
+        // ei tee mitään jos null tai sama kuin oli
+        if (tiedostopolku == null || tiedostopolku.equals(this.polku));
+        
         this.polku = tiedostopolku;
         
         // luo tiedostopolun siltä varalta että sitä ei ole
@@ -88,6 +91,9 @@ public class Reseptit implements Hallitsija<Resepti> {
         for (Resepti resepti : this.reseptit) {
             resepti.setTiedostopolku(tiedostopolku);
         }
+        
+        this.muutettu = true;
+        tallenna();
     }
     
     
@@ -383,7 +389,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         if (!this.muutettu) return;
         
         for (Resepti resepti : this.reseptit) {
-            resepti.tallenna(this.polku, this.tiedostoNimi);
+            resepti.tallenna();
         }
         
         this.muutettu = false;

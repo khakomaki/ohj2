@@ -74,7 +74,9 @@ public class Osiot implements Hallitsija<Osio> {
      * @param tiedostopolku mihin osion tiedot tallennetaan
      */
     public void setTiedostoPolku(String tiedostopolku) {
-        if (tiedostopolku == null) return;
+        // ei tee mitään jos null tai sama kuin oli
+        if (tiedostopolku == null || tiedostopolku.equals(this.polku));
+        
         this.polku = tiedostopolku;
         
         for (Osio osio : this.osiot) {

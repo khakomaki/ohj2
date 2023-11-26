@@ -35,6 +35,8 @@ public class Resepti {
     private int valmistusaika       = -1;
     private int tahdet              = -1;
     private int vaativuus           = -1;
+    private String tiedostonimi     = "reseptit.dat";
+    private String tiedostopolku    = "reseptidata/";
     
     private static int annettavaId  = 1;
     
@@ -296,11 +298,16 @@ public class Resepti {
     
     
     /**
-     * Asettaa tiedostopolun
+     * Asettaa tiedostopolun ja tallentaa
      * 
      * @param tiedostopolku mihin polkuun tietoja tallennetaan ja luetaan
+     * @throws SailoException jos polun vaihtamisessa tulee ongelmia
      */
-    public void setTiedostopolku(String tiedostopolku) {
+    public void setTiedostopolku(String tiedostopolku) throws SailoException {
+        // ei tee mitään jos null tai sama kuin oli
+        if (tiedostopolku == null || tiedostopolku.equals(this.tiedostopolku));
+        
+        this.muutettu = true;
         this.osiot.setTiedostoPolku(tiedostopolku);
     }
     
@@ -604,20 +611,16 @@ public class Resepti {
     /**
      * Tallentaa reseptin tiedot tiedostoon
      * 
-     * @param tiedostoPolku mihin polkuun tallennetaan
-     * @param tiedostoNimi minkä nimiseen tiedostoon tallennetaan
-     * 
      * @throws SailoException jos tallentaminen epäonnistuu
      */
-    public void tallenna(String tiedostoPolku, String tiedostoNimi) throws SailoException {
-        if (tiedostoPolku == null || tiedostoNimi == null) throw new SailoException("Tiedoston nimessä tai polussa ongelmia");
+    public void tallenna() throws SailoException {
         if (!this.muutettu) return;
         
         // antaa reseptille uniikin tunnuksen jos ollaan tallentamassa
         if (this.reseptiId < 0) rekisteroi();
         
-        File tiedosto = new File(tiedostoPolku + tiedostoNimi);
-        File varmuuskopio = new File(tiedostoPolku + MerkkijonoKasittely.vaihdaTiedostopaate(tiedostoNimi, "bak"));
+        File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
+        File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
         
         // koitetaan poistaa edellistä varmuuskopiota
         // heitetään virhe jos sellainen on olemassa eikä voida poistaa
@@ -676,10 +679,10 @@ public class Resepti {
             fo.println();
 
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + tiedostoPolku + tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
             
         } catch (IOException exception) {
-            throw new SailoException("Tiedostoon \"" + tiedostoPolku + tiedostoNimi + "\" kirjoittamisessa ongelma");
+            throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
             
         }
         this.muutettu = false;
@@ -1019,7 +1022,7 @@ public class Resepti {
         System.out.println(lihapiirakka);
         
         try {
-            lihapiirakka.tallenna("reseptidata/", "reseptit.dat");
+            lihapiirakka.tallenna();
         } catch (SailoException e) {
             System.out.println(e.getMessage());
         }

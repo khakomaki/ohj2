@@ -90,11 +90,13 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     /**
      * Vaihtaa tiedostopolun
      * 
-     * @param polku mihin polkuun tiedosto tallennetaan ja mistä sitä luetaan
+     * @param tiedostopolku mihin polkuun tiedosto tallennetaan ja mistä sitä luetaan
      */
-    public void setTiedostoPolku(String polku) {
-        if (polku == null) return;
-        this.polku = polku;
+    public void setTiedostoPolku(String tiedostopolku) {
+        // ei tee mitään jos null tai sama kuin oli
+        if (tiedostopolku == null || tiedostopolku.equals(this.polku));
+        
+        this.polku = tiedostopolku;
         this.muutettu = true;
     }
     

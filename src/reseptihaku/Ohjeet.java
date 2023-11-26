@@ -291,11 +291,13 @@ public class Ohjeet implements Hallitsija<Ohje> {
     /**
      * Asettaa tiedostopolun
      * 
-     * @param polku mihin polkuun tiedosto tallennetaan
+     * @param tiedostopolku mihin polkuun tiedosto tallennetaan
      */
-    public void setTiedostoPolku(String polku) {
-        if (polku == null) return;
-        this.tiedostoPolku = polku;
+    public void setTiedostoPolku(String tiedostopolku) {
+        // ei tee mitään jos null tai sama kuin oli
+        if (tiedostopolku == null || tiedostopolku.equals(this.tiedostoPolku));
+
+        this.tiedostoPolku = tiedostopolku;
         this.muutettu = true;
     }
     
