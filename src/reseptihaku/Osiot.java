@@ -76,6 +76,11 @@ public class Osiot implements Hallitsija<Osio> {
     public void setTiedostoPolku(String tiedostopolku) {
         if (tiedostopolku == null) return;
         this.polku = tiedostopolku;
+        
+        for (Osio osio : this.osiot) {
+            osio.setTiedostopolku(tiedostopolku);
+        }
+        
         this.muutettu = true;
     }
     
@@ -230,13 +235,17 @@ public class Osiot implements Hallitsija<Osio> {
                 
                 // skipataan jos rivin reseptiId ei ole sama kuin nykyisen
                 StringBuilder rivinTiedot = new StringBuilder(rivi);
-                int rivinOsioId = Mjonot.erota(rivinTiedot, '|', this.reseptiId - 1);
-                if (rivinOsioId != this.reseptiId) continue;
+                int rivinReseptiId = Mjonot.erota(rivinTiedot, '|', this.reseptiId - 1);
+                if (rivinReseptiId != this.reseptiId) continue;
                 
                 // käsketään osiota parsimaan tiedot ja lisätään nykyisiin osioihin
                 Osio osio = new Osio();
                 osio.parse(rivi);
                 lisaa(osio);
+                
+                // käsketään osiota lukemaan omat tietonsa (ainesosat ja ohjeet)
+                osio.setTiedostopolku(this.polku);
+                osio.lueTiedostosta();
             }
             
             this.muutettu = false;

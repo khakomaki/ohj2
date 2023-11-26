@@ -80,6 +80,14 @@ public class Reseptit implements Hallitsija<Resepti> {
     public void setTiedostoPolku(String tiedostopolku) {
         if (tiedostopolku == null) return;
         this.polku = tiedostopolku;
+        
+        // luo tiedostopolun siltä varalta että sitä ei ole
+        File dir = new File(this.polku);
+        dir.mkdirs();
+        
+        for (Resepti resepti : this.reseptit) {
+            resepti.setTiedostopolku(tiedostopolku);
+        }
     }
     
     
@@ -352,6 +360,10 @@ public class Reseptit implements Hallitsija<Resepti> {
                 Resepti resepti = new Resepti();
                 resepti.parse(rivi);
                 lisaa(resepti);
+                
+                // käsketään reseptin lukemaan tietonsa
+                resepti.setTiedostopolku(this.polku);
+                resepti.lueTiedostosta();
             }
             
             this.muutettu = false;

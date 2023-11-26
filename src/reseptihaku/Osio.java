@@ -78,6 +78,8 @@ public class Osio {
      */
     public int rekisteroi() {
         this.osioId = Osio.annettavaId;
+        this.ohjeet.setOsioId(this.osioId);
+        this.osionAinesosat.setOsioId(this.osioId);
         Osio.annettavaId++;
         
         // päivittää osio tunnuksen ohjeille ja ainesosille
@@ -85,6 +87,18 @@ public class Osio {
         this.osionAinesosat.setOsioId(this.osioId);
         
         return this.osioId;
+    }
+    
+    
+    /**
+     * Antaa osiolle tunnuksen
+     * 
+     * @param id mikä tunnus yritetään laittaa
+     * @return mikä tunnus laitettiin
+     */
+    public int rekisteroi(int id) {
+        if (id < Osio.annettavaId) Osio.annettavaId = id;
+        return rekisteroi();
     }
     
     
@@ -133,6 +147,17 @@ public class Osio {
      */
     public String getNimi() {
         return this.nimi;
+    }
+    
+    
+    /**
+     * Asettaa tiedostopolun
+     * 
+     * @param tiedostopolku mihin tallennetaan ja luetaan
+     */
+    public void setTiedostopolku(String tiedostopolku) {
+        this.ohjeet.setTiedostoPolku(tiedostopolku);
+        this.osionAinesosat.setTiedostoPolku(tiedostopolku);
     }
     
     
@@ -240,8 +265,19 @@ public class Osio {
         // ei huomioida ensimmäisen kentän tietoja (resepti_id)
         Mjonot.erota(sb, '|');
         
-        this.osioId = Mjonot.erota(sb, '|', this.osioId);
+        rekisteroi(Mjonot.erota(sb, '|', this.osioId));
         this.nimi = Mjonot.erota(sb, '|', this.nimi);
+    }
+    
+    
+    /**
+     * Lukee osion tiedot tiedostosta
+     * 
+     * @throws SailoException jos tiedoston lukeminen ei onnistu
+     */
+    public void lueTiedostosta() throws SailoException {
+        this.osionAinesosat.lueTiedostosta();
+        this.ohjeet.lueTiedostosta();
     }
     
     
@@ -252,7 +288,7 @@ public class Osio {
      */
     public void tallenna() throws SailoException {
         // rekisteröi osion jos sille ei ole annettu vielä omaa tunnusta
-        if (this.osioId == -1) rekisteroi();
+        if (this.osioId < 0) rekisteroi();
         
         this.osionAinesosat.tallenna();
         this.ohjeet.tallenna();

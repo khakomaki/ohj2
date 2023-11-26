@@ -94,6 +94,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      */
     public void setTiedostoPolku(String polku) {
         if (polku == null) return;
+        this.polku = polku;
         this.muutettu = true;
     }
     

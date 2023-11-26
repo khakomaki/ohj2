@@ -14,8 +14,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import kanta.SailoException;
 import kanta.Satunnaisluku;
-import reseptihaku.Osio;
 import reseptihaku.Resepti;
 import reseptihaku.Reseptit;
 
@@ -254,28 +254,48 @@ public class ReseptihakuGUIController implements Initializable {
       
       
       /**
-      * @param reseptit käytettävät Reseptit
-      */
+       * Asettaa käytettävät reseptit
+       * 
+       * @param reseptit käytettävät Reseptit
+       */
       public void setReseptit(Reseptit reseptit) {
           this.reseptit = reseptit;
-          luoTestiReseptit();
+          // luoTestiReseptit();
       }
       
       
       /**
-       * Luo reseptejä testaamista varten
-       * TODO: poista kun ei enää tarvitse
+       * Lukee käsiteltävät reseptit tiedostosta
        */
+      public void lueTiedostosta() {
+          try {
+              // this.reseptit.lueTiedostosta();
+              // lukee reseptit testidata-tiedostosta ja vaihtaa reseptidata-tiedostoon
+              // TODO testidata pois kuin ei enää tarvita
+              this.reseptit.setTiedostoPolku("testidata/");
+              this.reseptit.lueTiedostosta();
+              this.reseptit.setTiedostoPolku("reseptidata/");
+          } catch (SailoException exception) {
+              Dialogs.showMessageDialog("Tiedoston luvussa ongelmia: " + exception.getMessage());
+          }
+      }
+      
+      
+      /*
+      
       public void luoTestiReseptit() {
+          Reseptit testiReseptit = new Reseptit();
+          
+          
           // 10 mustikkapiirakka reseptiä satunnaisilla attribuuteilla
           for (int i = 0; i < 5; i++) {
-              Resepti testiMustikkapiirakka = this.reseptit.lisaaMustikkapiirakka();
+              Resepti testiMustikkapiirakka = testiReseptit.lisaaMustikkapiirakka();
               testiMustikkapiirakka.satunnaisetAttribuutit();
           }
           
           // lihapiirakka resepti
           Resepti lihapiirakka = new Resepti("Lihapiirakka");
-          this.reseptit.lisaa(lihapiirakka);
+          testiReseptit.lisaa(lihapiirakka);
           lihapiirakka.satunnaisetAttribuutit();
           
           Osio taikina = new Osio("Taikina");
@@ -316,5 +336,16 @@ public class ReseptihakuGUIController implements Initializable {
           paistaminen.lisaaOhje("Kuumenna öljy kattilassa 175°C");
           paistaminen.lisaaOhje("Paista lihapiirakoita, kunnes molemmat puolet ovat kauniin ruskeita");
           paistaminen.lisaaOhje("Nosta kuivumaan talouspaperille tai ritilälle");
+          
+          try {
+              testiReseptit.setTiedostoPolku("testidata/");
+              testiReseptit.tallenna();
+          } catch (SailoException exception) {
+              Dialogs.showMessageDialog("Testidataa ei saada tallennettua: " + exception.getMessage());
+          }
+          
+          
       }
+      
+      */
 }

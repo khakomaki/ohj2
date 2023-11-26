@@ -295,6 +295,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public void setTiedostoPolku(String polku) {
         if (polku == null) return;
+        this.tiedostoPolku = polku;
         this.muutettu = true;
     }
     

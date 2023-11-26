@@ -116,7 +116,7 @@ public class Resepti {
     
     
     /**
-     * Luo reseptille id:n ja tallentaa
+     * Luo reseptille id:n
      * 
      * @return reseptin tunnus
      * 
@@ -136,6 +136,18 @@ public class Resepti {
         Resepti.annettavaId++;
         this.muutettu = true;
         return this.reseptiId;
+    }
+    
+    
+    /**
+     * Yrittää asettaa reseptille annetun tunnuksen
+     * 
+     * @param id mikä tunnus yritetään laittaa
+     * @return asetettu reseptin tunnus
+     */
+    public int rekisteroi(int id) {
+        if (id < Resepti.annettavaId) Resepti.annettavaId = id;
+        return rekisteroi();
     }
     
     
@@ -280,6 +292,16 @@ public class Resepti {
      */
     public int getTunnus() {
         return this.reseptiId;
+    }
+    
+    
+    /**
+     * Asettaa tiedostopolun
+     * 
+     * @param tiedostopolku mihin polkuun tietoja tallennetaan ja luetaan
+     */
+    public void setTiedostopolku(String tiedostopolku) {
+        this.osiot.setTiedostoPolku(tiedostopolku);
     }
     
     
@@ -570,6 +592,16 @@ public class Resepti {
     
     
     /**
+     * Lukee reseptin tiedot tiedostosta
+     * 
+     * @throws SailoException jos tietoja ei saada luettua
+     */
+    public void lueTiedostosta() throws SailoException {
+        this.osiot.lueTiedostosta();
+    }
+    
+    
+    /**
      * Tallentaa reseptin tiedot tiedostoon
      * 
      * @param tiedostoPolku mihin polkuun tallennetaan
@@ -582,7 +614,7 @@ public class Resepti {
         if (!this.muutettu) return;
         
         // antaa reseptille uniikin tunnuksen jos ollaan tallentamassa
-        if (this.reseptiId == -1) rekisteroi();
+        if (this.reseptiId < 0) rekisteroi();
         
         File tiedosto = new File(tiedostoPolku + tiedostoNimi);
         File varmuuskopio = new File(tiedostoPolku + MerkkijonoKasittely.vaihdaTiedostopaate(tiedostoNimi, "bak"));
@@ -619,10 +651,10 @@ public class Resepti {
                     
                     // parsii rivin reseptiId:n, jos ei löydy niin asettaa arvoksi varmasti eri kuin nykyinen reseptiId
                     StringBuilder riviTiedot = new StringBuilder(rivi);
-                    int rivinOsioId = Mjonot.erotaInt(riviTiedot, this.reseptiId - 1);
+                    int rivinReseptiId = Mjonot.erotaInt(riviTiedot, this.reseptiId - 1);
                     
                     // syöttää alkuperäisen rivin, jos ei ole sama resepti mitä ollaan tallentamassa
-                    if (rivinOsioId != this.reseptiId) {
+                    if (rivinReseptiId != this.reseptiId) {
                         fo.println(rivi);
                     }
                 }
@@ -685,7 +717,7 @@ public class Resepti {
         
         StringBuilder sb = new StringBuilder(rivi);
         
-        this.reseptiId = Mjonot.erota(sb, '|', this.reseptiId);
+        rekisteroi(Mjonot.erota(sb, '|', this.reseptiId));
         this.nimi = Mjonot.erota(sb, '|', this.nimi);
         this.kuvaus = Mjonot.erota(sb, '|', this.kuvaus);
         this.hinta = Mjonot.erota(sb, '|', this.hinta);
@@ -882,7 +914,7 @@ public class Resepti {
      * TODO: poista kun ei enää tarvita
      */
     public void satunnaisetAttribuutit() {
-        this.reseptiId = Satunnaisluku.rand(1, 999);
+        rekisteroi();
         
         setHinta(Satunnaisluku.rand(1, 3));
         setValmistusaika(Satunnaisluku.rand(1, 5));

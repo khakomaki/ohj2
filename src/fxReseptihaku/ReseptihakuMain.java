@@ -30,6 +30,8 @@ public class ReseptihakuMain extends Application {
             Reseptit reseptit = new Reseptit();
             reseptihakuCtrl.setReseptit(reseptit);
             
+            reseptihakuCtrl.lueTiedostosta();
+            
         } catch(Exception e) {
             e.printStackTrace();
         }
