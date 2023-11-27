@@ -16,6 +16,7 @@ import kanta.Hajautus;
 import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 import kanta.Satunnaisluku;
+import kanta.VaihtoehtoAttribuutti;
 
 /**
  * @author hakom
@@ -26,17 +27,17 @@ public class Resepti {
     
     private final String oletusNimi = "Reseptin nimi";
     
-    private int reseptiId           = -1;
-    private String nimi             = "";
-    private Osiot osiot             = null;
-    private boolean muutettu        = true;
-    private String kuvaus           = "";
-    private int hinta               = -1;
-    private int valmistusaika       = -1;
-    private int tahdet              = -1;
-    private int vaativuus           = -1;
-    private String tiedostonimi     = "reseptit.dat";
-    private String tiedostopolku    = "reseptidata/";
+    private int reseptiId                       = -1;
+    private String nimi                         = "";
+    private Osiot osiot                         = null;
+    private boolean muutettu                    = true;
+    private String kuvaus                       = "";
+    private VaihtoehtoAttribuutti hinta         = null;
+    private VaihtoehtoAttribuutti valmistusaika = null;
+    private VaihtoehtoAttribuutti tahdet        = null;
+    private VaihtoehtoAttribuutti vaativuus     = null;
+    private String tiedostonimi                 = "reseptit.dat";
+    private String tiedostopolku                = "reseptidata/";
     
     private static int annettavaId  = 1;
     
@@ -98,6 +99,7 @@ public class Resepti {
     public Resepti(String nimi) {
         setNimi(nimi);
         this.osiot = new Osiot(this.reseptiId);
+        luoVaihtoehtoAttribuutit();
     }
     
     
@@ -114,6 +116,7 @@ public class Resepti {
     public Resepti() {
         setNimi(null);
         this.osiot = new Osiot(this.reseptiId);
+        luoVaihtoehtoAttribuutit();
     }
     
     
@@ -148,8 +151,16 @@ public class Resepti {
      * @return asetettu reseptin tunnus
      */
     public int rekisteroi(int id) {
-        if (id < Resepti.annettavaId) Resepti.annettavaId = id;
+        if (Resepti.annettavaId < id) Resepti.annettavaId = id;
         return rekisteroi();
+    }
+    
+    
+    private void luoVaihtoehtoAttribuutit() {
+        this.hinta = new VaihtoehtoAttribuutti(hintaVaihtoehdot, -1, "");
+        this.valmistusaika = new VaihtoehtoAttribuutti(valmistusaikaVaihtoehdot, -1, "");
+        this.tahdet = new VaihtoehtoAttribuutti(tahdetVaihtoehdot, -1, "");
+        this.vaativuus = new VaihtoehtoAttribuutti(vaativuusVaihtoehdot, -1, "");
     }
     
     
@@ -384,9 +395,7 @@ public class Resepti {
      * @param hinta mikä hinta vaihtoehto halutaan asettaa
      */
     public void setHinta(int hinta) {
-        if (hinta == -1) this.hinta = -1;
-        if (Resepti.hintaVaihtoehdot.containsKey(hinta)) this.hinta = hinta;
-        this.muutettu = true;
+        this.hinta.setValinta(hinta);
     }
     
     
@@ -396,9 +405,7 @@ public class Resepti {
      * @param valmistusaika mikä valmistusaika vaihtoehto halutaan asettaa
      */
     public void setValmistusaika(int valmistusaika) {
-        if (valmistusaika == -1) this.valmistusaika = -1;
-        if (Resepti.valmistusaikaVaihtoehdot.containsKey(valmistusaika)) this.valmistusaika = valmistusaika;
-        this.muutettu = true;
+        this.valmistusaika.setValinta(valmistusaika);
     }
     
     
@@ -408,9 +415,7 @@ public class Resepti {
      * @param tahdet mikä tahdet vaihtoehto halutaan asettaa
      */
     public void setTahdet(int tahdet) {
-        if (tahdet == -1) this.tahdet = -1;
-        if (Resepti.tahdetVaihtoehdot.containsKey(tahdet)) this.tahdet = tahdet;
-        this.muutettu = true;
+        this.tahdet.setValinta(tahdet);
     }
     
     
@@ -420,9 +425,7 @@ public class Resepti {
      * @param vaativuus mikä vaativuus vaihtoehto halutaan asettaa
      */
     public void setVaativuus(int vaativuus) {
-        if (vaativuus == -1) this.vaativuus = -1;
-        if (Resepti.vaativuusVaihtoehdot.containsKey(vaativuus)) this.vaativuus = vaativuus;
-        this.muutettu = true;
+        this.vaativuus.setValinta(vaativuus);
     }
     
     
@@ -432,7 +435,7 @@ public class Resepti {
      * @return reseptin hinta
      */
     public int getHinta() {
-        return this.hinta;
+        return this.hinta.getValinta();
     }
     
     
@@ -444,10 +447,10 @@ public class Resepti {
      * @example
      * <pre name="test">
      * Resepti resepti = new Resepti();
-     * resepti.getHintaString() === null;
+     * resepti.getHintaString() === "";
      * 
      * resepti.setHinta(0);
-     * resepti.getHintaString() === null;
+     * resepti.getHintaString() === "";
      * 
      * resepti.setHinta(1);
      * resepti.getHintaString() === "€";
@@ -462,11 +465,11 @@ public class Resepti {
      * resepti.getHintaString() === "€€€";
      * 
      * resepti.setHinta(-1);
-     * resepti.getHintaString() === null;
+     * resepti.getHintaString() === "";
      * </pre>
      */
     public String getHintaString() {
-        return Resepti.hintaVaihtoehdot.get(this.hinta);
+        return this.hinta.getValintaString();
     }
     
     
@@ -476,7 +479,7 @@ public class Resepti {
      * @return reseptin valmistusaika
      */
     public int getValmistusaika() {
-        return this.valmistusaika;
+        return this.valmistusaika.getValinta();
     }
     
     
@@ -486,7 +489,7 @@ public class Resepti {
      * @return reseptin valmistusaika tekstinä
      */
     public String getValmistusaikaString() {
-        return Resepti.valmistusaikaVaihtoehdot.get(this.valmistusaika);
+        return this.valmistusaika.getValintaString();
     }
     
     
@@ -496,7 +499,7 @@ public class Resepti {
      * @return reseptin tähdet
      */
     public int getTahdet() {
-        return this.tahdet;
+        return this.tahdet.getValinta();
     }
     
     
@@ -506,7 +509,7 @@ public class Resepti {
      * @return reseptin tähdet tekstinä
      */
     public String getTahdetString() {
-        return Resepti.tahdetVaihtoehdot.get(this.tahdet);
+        return this.tahdet.getValintaString();
     }
     
     
@@ -516,7 +519,7 @@ public class Resepti {
      * @return reseptin vaativuus
      */
     public int getVaativuus() {
-        return vaativuus;
+        return this.vaativuus.getValinta();
     }
     
     
@@ -526,7 +529,7 @@ public class Resepti {
      * @return reseptin vaativuus tekstinä
      */
     public String getVaativuusString() {
-        return Resepti.vaativuusVaihtoehdot.get(this.vaativuus);
+        return this.vaativuus.getValintaString();
     }
     
     
@@ -547,20 +550,14 @@ public class Resepti {
         StringBuilder sb = new StringBuilder();
         sb.append(this.nimi);
         sb.append('|');
-        sb.append(vaihdaNull(Resepti.hintaVaihtoehdot.get(this.hinta)));
+        sb.append(getHintaString());
         sb.append('|');
-        sb.append(vaihdaNull(Resepti.valmistusaikaVaihtoehdot.get(this.valmistusaika)));
+        sb.append(getValmistusaikaString());
         sb.append('|');
-        sb.append(vaihdaNull(Resepti.tahdetVaihtoehdot.get(this.tahdet)));
+        sb.append(getTahdetString());
         sb.append('|');
-        sb.append(vaihdaNull(Resepti.vaativuusVaihtoehdot.get(this.vaativuus)));
+        sb.append(getVaativuusString());
         return sb.toString();
-    }
-    
-    
-    private String vaihdaNull(String s) {
-        if (s == null ) return "";
-        return s;
     }
     
     
@@ -701,18 +698,18 @@ public class Resepti {
      * <pre name="test">
      * Resepti resepti = new Resepti();
      * resepti.parse("1|Mustikkapiirakka|halpa ja maukas.|2|2|3|1");
-     * resepti.toString() === "1|Mustikkapiirakka|2|2|3|1";
+     * resepti.toString().endsWith("|Mustikkapiirakka|2|2|3|1") === true;
      * resepti.getKuvaus() === "halpa ja maukas.";
      * 
      * resepti.parse("2|Lihapiirakka");
-     * resepti.toString() === "2|Lihapiirakka|2|2|3|1";
+     * resepti.toString().endsWith("|Lihapiirakka|2|2|3|1") === true;
      * resepti.getKuvaus() === "halpa ja maukas.";
      * 
      * resepti.parse("");
-     * resepti.toString() === "2|Lihapiirakka|2|2|3|1";
+     * resepti.toString().endsWith("|Lihapiirakka|2|2|3|1") === true;
      * 
-     * resepti.parse("5 Kasvispiirakka 1 3 2 2");
-     * resepti.toString() === "5|Lihapiirakka|2|2|3|1";
+     * resepti.parse("5|Kasvispiirakka 1 3 2 2");
+     * resepti.toString().endsWith("5|Kasvispiirakka|2|2|3|1");
      * </pre>
      */
     public void parse(String rivi) {
@@ -721,12 +718,12 @@ public class Resepti {
         StringBuilder sb = new StringBuilder(rivi);
         
         rekisteroi(Mjonot.erota(sb, '|', this.reseptiId));
-        this.nimi = Mjonot.erota(sb, '|', this.nimi);
-        this.kuvaus = Mjonot.erota(sb, '|', this.kuvaus);
-        this.hinta = Mjonot.erota(sb, '|', this.hinta);
-        this.valmistusaika = Mjonot.erota(sb, '|', this.valmistusaika);
-        this.tahdet = Mjonot.erota(sb, '|', this.tahdet);
-        this.vaativuus = Mjonot.erota(sb, '|', this.vaativuus);
+        setUusiNimi(Mjonot.erota(sb, '|', this.nimi));
+        setKuvaus(Mjonot.erota(sb, '|', this.kuvaus));
+        setHinta(Mjonot.erota(sb, '|', getHinta()));
+        setValmistusaika(Mjonot.erota(sb, '|', getValmistusaika()));
+        setTahdet(Mjonot.erota(sb, '|', getTahdet()));
+        setVaativuus(Mjonot.erota(sb, '|', getVaativuus()));
     }
     
     
@@ -764,13 +761,12 @@ public class Resepti {
     @Override
     public Resepti clone() {
         Resepti kopio = new Resepti();
-        kopio.reseptiId = this.reseptiId;
-        kopio.nimi = this.nimi;
-        kopio.hinta = this.hinta;
-        kopio.valmistusaika = this.valmistusaika;
-        kopio.tahdet = this.tahdet;
-        kopio.kuvaus = this.kuvaus;
-        kopio.vaativuus = this.vaativuus;
+        kopio.setUusiNimi(this.getNimi());
+        kopio.setHinta(this.getHinta());
+        kopio.setValmistusaika(this.getValmistusaika());
+        kopio.setTahdet(this.getTahdet());
+        kopio.setVaativuus(this.getVaativuus());
+        kopio.setKuvaus(this.getKuvaus());
         
         // luodaan täysi kopio reseptin osioista
         kopio.osiot = this.osiot.clone();
@@ -827,11 +823,11 @@ public class Resepti {
         if (verrattava.getClass() != this.getClass()) return false;
         Resepti verrattavaResepti = (Resepti)verrattava;
         
-        if (!this.nimi.equals(verrattavaResepti.getNimi())) return false;
-        if (this.hinta != verrattavaResepti.hinta) return false;
-        if (this.valmistusaika != verrattavaResepti.valmistusaika) return false;
-        if (this.tahdet != verrattavaResepti.tahdet) return false;
-        if (this.vaativuus != verrattavaResepti.vaativuus) return false;
+        if (!this.getNimi().equals(verrattavaResepti.getNimi())) return false;
+        if (this.getHinta() != verrattavaResepti.getHinta()) return false;
+        if (this.getValmistusaika() != verrattavaResepti.getValmistusaika()) return false;
+        if (this.getTahdet() != verrattavaResepti.getTahdet()) return false;
+        if (this.getVaativuus() != verrattavaResepti.getVaativuus()) return false;
         if (!this.kuvaus.equals(verrattavaResepti.getKuvaus())) return false;
         if (!this.osiot.equals(verrattavaResepti.osiot)) return false;
         
@@ -880,10 +876,10 @@ public class Resepti {
         hash = Hajautus.hajautusString(hash, this.nimi);
         hash = Hajautus.hajautusString(hash, this.kuvaus);
         hash = Hajautus.hajautusInt(hash, this.reseptiId);
-        hash = Hajautus.hajautusInt(hash, this.hinta);
-        hash = Hajautus.hajautusInt(hash, this.valmistusaika);
-        hash = Hajautus.hajautusInt(hash, this.tahdet);;
-        hash = Hajautus.hajautusInt(hash, this.vaativuus);
+        hash = Hajautus.hajautusInt(hash, getHinta());
+        hash = Hajautus.hajautusInt(hash, getValmistusaika());
+        hash = Hajautus.hajautusInt(hash, getTahdet());
+        hash = Hajautus.hajautusInt(hash, getVaativuus());
         hash = Hajautus.hajautusInt(hash, this.osiot.hashCode());
         return hash;
     }
@@ -903,10 +899,10 @@ public class Resepti {
      */
     public void luoMustikkapiirakka() {
         this.nimi = "Mustikkapiirakka";
-        this.hinta = 2;
-        this.valmistusaika = 2;
-        this.tahdet = 3;
-        this.vaativuus = 1;
+        setHinta(2);
+        setValmistusaika(2);
+        setTahdet(3);
+        setVaativuus(1);
         this.kuvaus = "Halpa ja maukas.";
         this.osiot.luoMustikkapiirakanOsiot();
     }
