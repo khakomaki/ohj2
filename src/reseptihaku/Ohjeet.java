@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 import kanta.Hallitsija;
 import kanta.MerkkijonoKasittely;
@@ -25,8 +24,8 @@ import kanta.SailoException;
  */
 public class Ohjeet implements Hallitsija<Ohje> {
 
-    private String tiedostoNimi     = "ohjeet.dat";
-    private String tiedostoPolku    = "reseptidata/";
+    private String tiedostonimi     = "ohjeet.dat";
+    private String tiedostopolku    = "reseptidata/Reseptin nimi/Osion nimi/";
     private int osioId              = -1;
     private int lkm                 = 0;
     private List<Ohje> ohjeet       = new ArrayList<Ohje>();
@@ -265,7 +264,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
         // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
-        this.tiedostoNimi = tiedostonimi;
+        this.tiedostonimi = tiedostonimi;
         
         this.muutettu = true;
     }
@@ -284,7 +283,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * </pre>
      */
     public String getTiedostonimi() {
-        return this.tiedostoNimi;
+        return this.tiedostonimi;
     }
     
     
@@ -295,9 +294,9 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public void setTiedostoPolku(String tiedostopolku) {
         // ei tee mitään jos null tai sama kuin oli
-        if (tiedostopolku == null || tiedostopolku.equals(this.tiedostoPolku));
+        if (tiedostopolku == null) return;
 
-        this.tiedostoPolku = tiedostopolku;
+        this.tiedostopolku = tiedostopolku; // esim. reseptidata/Mustikkapiirakka/Muropohja/
         this.muutettu = true;
     }
     
@@ -309,17 +308,12 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public void lueTiedostosta() throws SailoException {
         
-        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostoPolku + this.tiedostoNimi)))) {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostopolku + this.tiedostonimi)))) {
             while (fi.hasNext()) {
                 String rivi = fi.nextLine().strip();
                 
                 // skipataan tyhjät ja kommenttirivit
                 if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
-                
-                // skipataan jos rivin osioId ei ole sama kuin nykyisen
-                StringBuilder rivinTiedot = new StringBuilder(rivi);
-                int rivinOsioId = Mjonot.erota(rivinTiedot, '|', this.osioId - 1);
-                if (rivinOsioId != this.osioId) continue;
                 
                 // käsketään ohjeen parsimaan tiedot ja lisätään ohjeisiin
                 Ohje ohje = new Ohje();
@@ -330,7 +324,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             this.muutettu = false;
             
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostoPolku + this.tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         }
     }
     
@@ -345,8 +339,8 @@ public class Ohjeet implements Hallitsija<Ohje> {
     public void tallenna() throws SailoException {
         if (!muutettu) return;
         
-        File tiedosto = new File(this.tiedostoPolku + this.tiedostoNimi);
-        File varmuuskopio = new File(this.tiedostoPolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
+        File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
+        File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
         
         // koitetaan poistaa edellistä varmuuskopiota
         // heitetään virhe jos sellainen on olemassa eikä voida poistaa
@@ -358,7 +352,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
         if (!tiedosto.exists()) {
             try {
                 tiedosto.createNewFile();
-                
             } catch (IOException exception) {
                 throw new SailoException("Ei voida luoda tallennus-tiedostoa");
             }
@@ -370,38 +363,16 @@ public class Ohjeet implements Hallitsija<Ohje> {
         }
         
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
-            
-            // kopioidaan vanhan tiedoston rivit uuteen, jätetään nykyisen osion rivit huomioitta
-            try (Scanner fi = new Scanner(new FileInputStream(varmuuskopio))) {
-                while (fi.hasNext()) {
-                    String rivi = fi.nextLine();
-                    
-                    // skipataan tyhjät ja kommenttirivit
-                    if (rivi.isBlank() || rivi.charAt(0) == ';') continue;
-                    
-                    // parsii rivin osioId:n, jos ei löydy niin asettaa arvoksi varmasti eri kuin nykyinen osioId
-                    StringBuilder riviTiedot = new StringBuilder(rivi);
-                    int rivinOsioId = Mjonot.erotaInt(riviTiedot, this.osioId - 1);
-                    
-                    // syöttää alkuperäisen rivin, jos ei ole sama osio mitä ollaan tallentamassa
-                    if (rivinOsioId != this.osioId) {
-                        fo.println(rivi);
-                    }
-                }
-            }
-            // syöttää uudet tallennettavan osion ohjeiden tiedot
+            // ohjeiden tiedot kirjoittajaan
             for (Ohje ohje : this.ohjeet) {
                 fo.print(this.osioId);
                 fo.print('|');
                 fo.println(ohje);
             }
-            
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostoPolku + this.tiedostoNimi + "\" ei saada avattua");
-            
+            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         } catch (IOException exception) {
-            throw new SailoException("Tiedostoon \"" + this.tiedostoPolku + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
-
+            throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
         }
         
         this.muutettu = false;
@@ -501,7 +472,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
         Ohjeet kopio = new Ohjeet();
         kopio.lkm = this.lkm;
         kopio.osioId = this.osioId;
-        kopio.tiedostoNimi = this.tiedostoNimi;
+        kopio.tiedostonimi = this.tiedostonimi;
         
         for (int i = 0; i < this.lkm; i++) {
             kopio.ohjeet.add(this.ohjeet.get(i).clone());
@@ -541,7 +512,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
         Ohjeet verrattavaOhjeet = (Ohjeet)verrattava;
         if (verrattavaOhjeet.lkm != this.lkm) return false;
         if (verrattavaOhjeet.osioId != this.osioId) return false;
-        if (!verrattavaOhjeet.tiedostoNimi.equals(this.tiedostoNimi)) return false;
+        if (!verrattavaOhjeet.tiedostonimi.equals(this.tiedostonimi)) return false;
         
         // verrataan yksittäiset ohjeet
         for (int i = 0; i < this.lkm; i++) {
@@ -579,7 +550,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
     public int hashCode() {
         int hash = 1;
         hash = Hajautus.hajautusInt(hash, this.osioId);
-        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        hash = Hajautus.hajautusString(hash, this.tiedostonimi);
         
         for (int i = 0; i < this.lkm; i++) {
             hash = Hajautus.hajautusInt(hash, this.ohjeet.get(i).hashCode());
@@ -601,7 +572,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.tiedostoNimi);
+        sb.append(this.tiedostonimi);
         sb.append('|');
         sb.append(this.osioId);
         sb.append('|');

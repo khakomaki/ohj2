@@ -3,6 +3,7 @@ package reseptihaku;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Scanner;
 
 import kanta.Hajautus;
 import kanta.Hallitsija;
+import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 import kanta.VaihtoehtoAttribuutti;
 
@@ -22,8 +24,8 @@ import kanta.VaihtoehtoAttribuutti;
 public class Reseptit implements Hallitsija<Resepti> {
 
     private List<Resepti> reseptit      = new ArrayList<Resepti>();
-    private String tiedostoNimi         = "reseptit.dat";
-    private String polku                = "reseptidata/";
+    private String tiedostonimi         = "reseptit.dat";
+    private String tiedostopolku        = "reseptidata/";
     private boolean muutettu            = true;
     private int lkm                     = 0;
     
@@ -71,7 +73,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
-        this.tiedostoNimi = tiedostonimi;
+        this.tiedostonimi = tiedostonimi;
     }
     
     
@@ -83,20 +85,19 @@ public class Reseptit implements Hallitsija<Resepti> {
      */
     public void setTiedostoPolku(String tiedostopolku) throws SailoException {
         // ei tee mitään jos null tai sama kuin oli
-        if (tiedostopolku == null || tiedostopolku.equals(this.polku));
+        if (tiedostopolku == null) return;
         
-        this.polku = tiedostopolku;
+        this.tiedostopolku = tiedostopolku; // esim. reseptidata/
         
         // luo tiedostopolun siltä varalta että sitä ei ole
-        File dir = new File(this.polku);
+        File dir = new File(this.tiedostopolku);
         dir.mkdirs();
         
         for (Resepti resepti : this.reseptit) {
-            resepti.setTiedostopolku(tiedostopolku);
+            resepti.setTiedostopolku(this.tiedostopolku);
         }
         
         this.muutettu = true;
-        tallenna();
     }
     
     
@@ -124,6 +125,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         Resepti resepti = new Resepti(nimi);
         reseptit.add(resepti);
         this.lkm++;
+        this.muutettu = true;
         return resepti;
     }
     
@@ -152,6 +154,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         Resepti lisattavaResepti = resepti;
         reseptit.add(lisattavaResepti);
         this.lkm++;
+        this.muutettu = true;
     }
     
     
@@ -249,6 +252,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         if (vanhaReseptiIndeksi < 0) return;
         
         this.reseptit.set(vanhaReseptiIndeksi, vaihdettavaResepti);
+        this.muutettu = true;
     }
     
     
@@ -326,6 +330,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         
         this.reseptit.remove(poistettavanIndeksi);
         this.lkm--;
+        this.muutettu = true;
     }
     
     
@@ -410,7 +415,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @throws SailoException jos tallennus epäonnistuu
      */
     public void lueTiedostosta() throws SailoException {
-        try (Scanner fi = new Scanner(new FileInputStream(new File(this.polku + this.tiedostoNimi)))) {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostopolku + this.tiedostonimi)))) {
             while (fi.hasNext()) {
                 String rivi = fi.nextLine().strip();
                 
@@ -423,14 +428,14 @@ public class Reseptit implements Hallitsija<Resepti> {
                 lisaa(resepti);
                 
                 // käsketään reseptin lukemaan tietonsa
-                resepti.setTiedostopolku(this.polku);
+                resepti.setTiedostopolku(this.tiedostopolku);
                 resepti.lueTiedostosta();
             }
             
             this.muutettu = false;
             
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         }
     }
     
@@ -442,6 +447,27 @@ public class Reseptit implements Hallitsija<Resepti> {
      */
     public void tallenna() throws SailoException {
         if (!this.muutettu) return;
+        
+        // vaihdetaan nykyinen tiedosto varmuuskopioksi
+        File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
+        File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
+        // koitetaan poistaa edellistä varmuuskopiota
+        // heitetään virhe jos sellainen on olemassa eikä voida poistaa
+        if (!varmuuskopio.delete() && varmuuskopio.exists()) {
+            throw new SailoException("Ei voida poistaa varmuuskopio-tiedostoa");
+        }
+        // koitetaan luoda tiedosto jos sellaista ei vielä ole
+        if (!tiedosto.exists()) {
+            try {
+                tiedosto.createNewFile();
+            } catch (IOException exception) {
+                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
+            }
+        }
+        // koitetaan nimetä olemassaoleva tiedosto varmuuskopioksi
+        if (!tiedosto.renameTo(varmuuskopio)) {
+            throw new SailoException("Ei voida nimetä uudelleen tallennus-tiedostoa");
+        }
         
         for (Resepti resepti : this.reseptit) {
             resepti.tallenna();
@@ -486,7 +512,7 @@ public class Reseptit implements Hallitsija<Resepti> {
     public Reseptit clone() {
         Reseptit kopio = new Reseptit();
         kopio.lkm = this.lkm;
-        kopio.tiedostoNimi = this.tiedostoNimi;
+        kopio.tiedostonimi = this.tiedostonimi;
         
         // kopioidaan kaikki yksittäiset reseptit kopioon
         for (int i = 0; i < this.lkm; i++) {
@@ -529,7 +555,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         Reseptit verrattavaReseptit = (Reseptit)verrattava;
         
         if (verrattavaReseptit.lkm != this.lkm) return false;
-        if (!verrattavaReseptit.tiedostoNimi.equals(this.tiedostoNimi)) return false;
+        if (!verrattavaReseptit.tiedostonimi.equals(this.tiedostonimi)) return false;
         
         // verrataan yksittäisiä reseptejä toisiinsa
         for (int i = 0; i < this.lkm; i++) {
@@ -567,7 +593,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        hash = Hajautus.hajautusString(hash, this.tiedostonimi);
         hash = Hajautus.hajautusInt(hash, this.lkm);
         
         for (int i = 0; i < this.lkm; i++) {
@@ -592,7 +618,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         StringBuilder sb = new StringBuilder();
         sb.append(this.lkm);
         sb.append('|');
-        sb.append(this.tiedostoNimi);
+        sb.append(this.tiedostonimi);
         return sb.toString();
     }
     

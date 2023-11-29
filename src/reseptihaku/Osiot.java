@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 import kanta.Hallitsija;
 import kanta.MerkkijonoKasittely;
@@ -23,8 +22,8 @@ import kanta.SailoException;
  */
 public class Osiot implements Hallitsija<Osio> {
 
-    private String tiedostoNimi     = "resepti_osiot.dat";
-    private String polku            = "reseptidata/";
+    private String tiedostonimi     = "resepti_osiot.dat";
+    private String tiedostopolku    = "reseptidata/Reseptin nimi/";
     private int reseptiId           = -1;
     private List<Osio> osiot        = new ArrayList<Osio>();
     private boolean muutettu        = true;
@@ -63,7 +62,7 @@ public class Osiot implements Hallitsija<Osio> {
         // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
-        this.tiedostoNimi = tiedostonimi;
+        this.tiedostonimi = tiedostonimi;
         this.muutettu = true;
     }
     
@@ -75,12 +74,12 @@ public class Osiot implements Hallitsija<Osio> {
      */
     public void setTiedostoPolku(String tiedostopolku) {
         // ei tee mitään jos null tai sama kuin oli
-        if (tiedostopolku == null || tiedostopolku.equals(this.polku));
+        if (tiedostopolku == null) return;
         
-        this.polku = tiedostopolku;
+        this.tiedostopolku = tiedostopolku; // esim. reseptidata/Mustikkapiirakka/
         
         for (Osio osio : this.osiot) {
-            osio.setTiedostopolku(tiedostopolku);
+            osio.setTiedostopolku(this.tiedostopolku);
         }
         
         this.muutettu = true;
@@ -228,17 +227,12 @@ public class Osiot implements Hallitsija<Osio> {
      * @throws SailoException jos lukeminen epäonnistuu
      */
     public void lueTiedostosta() throws SailoException {
-        try (Scanner fi = new Scanner(new FileInputStream(new File(this.polku + this.tiedostoNimi)))) {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostopolku + this.tiedostonimi)))) {
             while (fi.hasNext()) {
                 String rivi = fi.nextLine().strip();
                 
                 // skipataan tyhjät ja kommenttirivit
                 if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
-                
-                // skipataan jos rivin reseptiId ei ole sama kuin nykyisen
-                StringBuilder rivinTiedot = new StringBuilder(rivi);
-                int rivinReseptiId = Mjonot.erota(rivinTiedot, '|', this.reseptiId - 1);
-                if (rivinReseptiId != this.reseptiId) continue;
                 
                 // käsketään osiota parsimaan tiedot ja lisätään nykyisiin osioihin
                 Osio osio = new Osio();
@@ -246,14 +240,14 @@ public class Osiot implements Hallitsija<Osio> {
                 lisaa(osio);
                 
                 // käsketään osiota lukemaan omat tietonsa (ainesosat ja ohjeet)
-                osio.setTiedostopolku(this.polku);
+                osio.setTiedostopolku(this.tiedostopolku);
                 osio.lueTiedostosta();
             }
             
             this.muutettu = false;
             
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         }
     }
     
@@ -270,11 +264,12 @@ public class Osiot implements Hallitsija<Osio> {
         
         // käskee osioiden tallentamaan omat tietonsa (varmistetaan myös että osiot ovat saaneet uniikit tunnuksensa)
         for (Osio osio : this.osiot) {
+            osio.setTiedostopolku(this.tiedostopolku);
             osio.tallenna();
         }
         
-        File tiedosto = new File(this.polku + this.tiedostoNimi);
-        File varmuuskopio = new File(this.polku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
+        File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
+        File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
         
         // koitetaan poistaa edellistä varmuuskopiota
         // heitetään virhe jos sellainen on olemassa eikä voida poistaa
@@ -286,7 +281,6 @@ public class Osiot implements Hallitsija<Osio> {
         if (!tiedosto.exists()) {
             try {
                 tiedosto.createNewFile();
-                
             } catch (IOException exception) {
                 throw new SailoException("Ei voida luoda tallennus-tiedostoa");
             }
@@ -298,36 +292,16 @@ public class Osiot implements Hallitsija<Osio> {
         }
         
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
-            // kopioidaan vanhan tiedoston rivit uuteen, jätetään nykyisen osion rivit huomioitta
-            try (Scanner fi = new Scanner(new FileInputStream(varmuuskopio))) {
-                while (fi.hasNext()) {
-                    String rivi = fi.nextLine();
-                    
-                    // skipataan tyhjät ja kommenttirivit
-                    if (rivi.isBlank() || rivi.charAt(0) == ';') continue;
-                    
-                    // parsii rivin reseptiId:n, jos ei löydy niin asettaa arvoksi varmasti eri kuin nykyinen reseptiId
-                    StringBuilder riviTiedot = new StringBuilder(rivi);
-                    int rivinOsioId = Mjonot.erotaInt(riviTiedot, this.reseptiId - 1);
-                    
-                    // syöttää alkuperäisen rivin, jos ei ole sama resepti mitä ollaan tallentamassa
-                    if (rivinOsioId != this.reseptiId) {
-                        fo.println(rivi);
-                    }
-                }
-            }
-            // syöttää jokaisen osion tiedot omalle rivilleen
+            // osioiden tiedot kirjoittajaan
             for (int i = 0; i < this.getLkm(); i++) {
                 fo.print(this.reseptiId);
                 fo.print('|');
                 fo.println(annaIndeksista(i));
             }
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
-            
+            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         } catch (IOException exception) {
-            throw new SailoException("Tiedostoon \"" + this.polku + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
-            
+            throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
         }
         
         this.muutettu = false;
@@ -371,7 +345,8 @@ public class Osiot implements Hallitsija<Osio> {
      */
     public Osiot clone() {
         Osiot kopio = new Osiot();
-        kopio.tiedostoNimi = this.tiedostoNimi;
+        kopio.reseptiId = this.reseptiId;
+        kopio.tiedostonimi = this.tiedostonimi;
         
         // kopioidaan yksittäiset osiot
         for (int i = 0; i < this.osiot.size(); i++) {
@@ -409,7 +384,7 @@ public class Osiot implements Hallitsija<Osio> {
         if (verrattava == null) return false;
         if (verrattava.getClass() != this.getClass()) return false;
         Osiot verrattavaOsiot = (Osiot)verrattava;
-        if (!verrattavaOsiot.tiedostoNimi.equals(this.tiedostoNimi)) return false;
+        if (!verrattavaOsiot.tiedostonimi.equals(this.tiedostonimi)) return false;
         if (verrattavaOsiot.osiot.size() != this.osiot.size()) return false;
         
         // käsketään yksittäisten osioiden vertaamaan toisiaan keskenään
@@ -446,7 +421,7 @@ public class Osiot implements Hallitsija<Osio> {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        hash = Hajautus.hajautusString(hash, this.tiedostonimi);
         
         for (int i = 0; i < this.osiot.size(); i++) {
             hash = Hajautus.hajautusInt(hash, this.osiot.get(i).hashCode());
@@ -470,7 +445,7 @@ public class Osiot implements Hallitsija<Osio> {
         StringBuilder sb = new StringBuilder();
         sb.append(this.osiot.size());
         sb.append('|');
-        sb.append(this.tiedostoNimi);
+        sb.append(this.tiedostonimi);
         return sb.toString();
     }
     

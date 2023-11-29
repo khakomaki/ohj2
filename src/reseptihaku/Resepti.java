@@ -138,6 +138,8 @@ public class Resepti {
      * </pre>
      */
     public int rekisteroi() {
+        if (0 < this.reseptiId) return this.reseptiId; // jos on jo rekisteröity
+        
         this.reseptiId = Resepti.annettavaId;
         this.osiot.setReseptiTunnus(this.reseptiId);
         Resepti.annettavaId++;
@@ -153,6 +155,8 @@ public class Resepti {
      * @return asetettu reseptin tunnus
      */
     public int rekisteroi(int id) {
+        if (0 < this.reseptiId) return this.reseptiId; // jos on jo rekisteröity
+        
         if (Resepti.annettavaId < id) Resepti.annettavaId = id;
         return rekisteroi();
     }
@@ -338,10 +342,43 @@ public class Resepti {
      */
     public void setTiedostopolku(String tiedostopolku) throws SailoException {
         // ei tee mitään jos null tai sama kuin oli
-        if (tiedostopolku == null || tiedostopolku.equals(this.tiedostopolku));
+        if (tiedostopolku == null) return;
+        
+        this.tiedostopolku = tiedostopolku; // esim. reseptidata/
+        
+        // luo tiedostopolun siltä varalta että sitä ei ole
+        File dir = new File(this.tiedostopolku);
+        dir.mkdirs();
         
         this.muutettu = true;
-        this.osiot.setTiedostoPolku(tiedostopolku);
+        this.osiot.setTiedostoPolku(getAlihakemistoPolku()); // esim. reseptidata/Mustikkapiirakka/
+    }
+    
+    
+    /**
+     * Antaa reseptin alihakemistopolun. (muotoa "reseptidata/Reseptin nimi/")
+     * 
+     * @return alihakemistopolku
+     * 
+     * @example
+     * <pre name="test">
+     * #THROWS SailoException
+     * #import kanta.SailoException;
+     * 
+     * Resepti resepti = new Resepti();
+     * resepti.getAlihakemistoPolku() === "reseptidata/Reseptin nimi/";
+     * 
+     * resepti.setTiedostopolku("jälkiruokareseptit/");
+     * resepti.setUusiNimi("Suklaakakku");
+     * resepti.getAlihakemistoPolku() === "jälkiruokareseptit/Suklaakakku/";
+     * </pre>
+     */
+    public String getAlihakemistoPolku() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.tiedostopolku);
+        sb.append(getNimi());
+        sb.append("/");
+        return sb.toString();
     }
     
     
@@ -623,6 +660,7 @@ public class Resepti {
      * @throws SailoException jos tietoja ei saada luettua
      */
     public void lueTiedostosta() throws SailoException {
+        this.osiot.setTiedostoPolku(getAlihakemistoPolku());
         this.osiot.lueTiedostosta();
     }
     
@@ -651,7 +689,6 @@ public class Resepti {
         if (!tiedosto.exists()) {
             try {
                 tiedosto.createNewFile();
-                
             } catch (IOException exception) {
                 throw new SailoException("Ei voida luoda tallennus-tiedostoa");
             }
@@ -665,6 +702,9 @@ public class Resepti {
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
             
             try (Scanner fi = new Scanner(new FileInputStream(varmuuskopio))) {
+                
+                boolean omatTiedotKirjoitettu = false;
+                
                 while (fi.hasNext()) {
                     String rivi = fi.nextLine();
                     
@@ -678,36 +718,52 @@ public class Resepti {
                     // syöttää alkuperäisen rivin, jos ei ole sama resepti mitä ollaan tallentamassa
                     if (rivinReseptiId != this.reseptiId) {
                         fo.println(rivi);
+                    } else {
+                        // ylikirjoittaa tiedot aiempien päälle
+                        tulostaOmatTiedot(fo);
+                        omatTiedotKirjoitettu = true;
                     }
                 }
+                
+                // jos tietoja ei ylikirjoitettu
+                if (!omatTiedotKirjoitettu) {
+                    tulostaOmatTiedot(fo);
+                    omatTiedotKirjoitettu = true;
+                }
             }
-            // tulostaa nykyisen reseptin tiedot
-            fo.print(this.reseptiId);
-            fo.print('|');
-            fo.print(this.nimi);
-            fo.print('|');
-            fo.print(this.kuvaus);
-            fo.print('|');
-            fo.print(this.hinta);
-            fo.print('|');
-            fo.print(this.valmistusaika);
-            fo.print('|');
-            fo.print(this.tahdet);
-            fo.print('|');
-            fo.print(this.vaativuus);
-            fo.println();
-
         } catch (FileNotFoundException exception) {
             throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
-            
         } catch (IOException exception) {
             throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
-            
         }
         this.muutettu = false;
         
         // käskee osioita tallentamaan
+        this.osiot.setTiedostoPolku(getAlihakemistoPolku());
         this.osiot.tallenna();
+    }
+    
+    
+    /**
+     * Tulostaa reseptin tiedot annettuun virtaan
+     * 
+     * @param fo kirjoittaja
+     */
+    public void tulostaOmatTiedot(PrintWriter fo) {
+        fo.print(this.reseptiId);
+        fo.print('|');
+        fo.print(this.getNimi());
+        fo.print('|');
+        fo.print(this.getKuvaus());
+        fo.print('|');
+        fo.print(this.getHinta());
+        fo.print('|');
+        fo.print(this.getValmistusaika());
+        fo.print('|');
+        fo.print(this.getTahdet());
+        fo.print('|');
+        fo.print(this.getVaativuus());
+        fo.println();
     }
     
     
@@ -740,8 +796,8 @@ public class Resepti {
         StringBuilder sb = new StringBuilder(rivi);
         
         rekisteroi(Mjonot.erota(sb, '|', this.reseptiId));
-        setUusiNimi(Mjonot.erota(sb, '|', this.nimi));
-        setKuvaus(Mjonot.erota(sb, '|', this.kuvaus));
+        setUusiNimi(Mjonot.erota(sb, '|', getNimi()));
+        setKuvaus(Mjonot.erota(sb, '|', getKuvaus()));
         setHinta(Mjonot.erota(sb, '|', getHinta()));
         setValmistusaika(Mjonot.erota(sb, '|', getValmistusaika()));
         setTahdet(Mjonot.erota(sb, '|', getTahdet()));
@@ -783,6 +839,7 @@ public class Resepti {
     @Override
     public Resepti clone() {
         Resepti kopio = new Resepti();
+        kopio.reseptiId = this.reseptiId;
         kopio.setUusiNimi(this.getNimi());
         kopio.setHinta(this.getHinta());
         kopio.setValmistusaika(this.getValmistusaika());
@@ -850,7 +907,7 @@ public class Resepti {
         if (this.getValmistusaika() != verrattavaResepti.getValmistusaika()) return false;
         if (this.getTahdet() != verrattavaResepti.getTahdet()) return false;
         if (this.getVaativuus() != verrattavaResepti.getVaativuus()) return false;
-        if (!this.kuvaus.equals(verrattavaResepti.getKuvaus())) return false;
+        if (!this.getKuvaus().equals(verrattavaResepti.getKuvaus())) return false;
         if (!this.osiot.equals(verrattavaResepti.osiot)) return false;
         
         return true;

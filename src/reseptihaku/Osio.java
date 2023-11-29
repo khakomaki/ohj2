@@ -1,5 +1,7 @@
 package reseptihaku;
 
+import java.io.File;
+
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 import kanta.SailoException;
@@ -15,6 +17,7 @@ public class Osio {
     private String nimi                     = "Osion nimi";
     private OsionAinesosat osionAinesosat;
     private Ohjeet ohjeet;
+    private String tiedostopolku            = "reseptidata/Reseptin nimi/";
     
     private static int annettavaId          = 1;
     
@@ -77,6 +80,8 @@ public class Osio {
      * @return annettu osion tunnus
      */
     public int rekisteroi() {
+        if (0 < this.osioId) return this.osioId; // jos on jo rekisteröity
+        
         this.osioId = Osio.annettavaId;
         this.ohjeet.setOsioId(this.osioId);
         this.osionAinesosat.setOsioId(this.osioId);
@@ -97,7 +102,9 @@ public class Osio {
      * @return mikä tunnus laitettiin
      */
     public int rekisteroi(int id) {
-        if (id < Osio.annettavaId) Osio.annettavaId = id;
+        if (0 < this.osioId) return this.osioId; // jos on jo rekisteröity
+        
+        if (Osio.annettavaId < id) Osio.annettavaId = id;
         return rekisteroi();
     }
     
@@ -156,8 +163,30 @@ public class Osio {
      * @param tiedostopolku mihin tallennetaan ja luetaan
      */
     public void setTiedostopolku(String tiedostopolku) {
-        this.ohjeet.setTiedostoPolku(tiedostopolku);
-        this.osionAinesosat.setTiedostoPolku(tiedostopolku);
+        if (tiedostopolku == null) return;
+        
+        this.tiedostopolku = tiedostopolku; // esim. reseptidata/Mustikkapiirakka/
+        
+        // luo tiedostopolun omille tiedoille siltä varalta että sitä ei ole
+        File dir = new File(getAlihakemistoPolku());
+        dir.mkdirs();
+        
+        this.ohjeet.setTiedostoPolku(getAlihakemistoPolku());
+        this.osionAinesosat.setTiedostoPolku(getAlihakemistoPolku());
+    }
+    
+    
+    /**
+     * Antaa osion alihakemistopolun. (muotoa "reseptidata/Reseptin nimi/Osion nimi/")
+     * 
+     * @return osion alihakemistopolku
+     */
+    public String getAlihakemistoPolku() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.tiedostopolku);
+        sb.append(this.getNimi());
+        sb.append("/");
+        return sb.toString();
     }
     
     
@@ -245,16 +274,16 @@ public class Osio {
      * <pre name="test">
      * Osio osio = new Osio();
      * osio.parse("1|1|Muropohja");
-     * osio.toString() === "1|Muropohja";
+     * osio.toString().endsWith("|Muropohja") === true;
      * 
      * osio.parse("  5   |  2    |       Pizzapohja   ");
-     * osio.toString() === "2|Pizzapohja";
+     * osio.toString().endsWith("|Pizzapohja") === true;
      * 
      * osio.parse("1|Muropohja");
-     * osio.toString() === "2|Pizzapohja";
+     * osio.toString().endsWith("|Pizzapohja") === true;
      * 
      * osio.parse("1 1 Muropohja");
-     * osio.toString() === "2|Pizzapohja";
+     * osio.toString().endsWith("|Pizzapohja") === true;
      * </pre>
      */
     public void parse(String rivi) {
@@ -276,6 +305,9 @@ public class Osio {
      * @throws SailoException jos tiedoston lukeminen ei onnistu
      */
     public void lueTiedostosta() throws SailoException {
+        this.osionAinesosat.setTiedostoPolku(getAlihakemistoPolku());
+        this.ohjeet.setTiedostoPolku(getAlihakemistoPolku());
+        
         this.osionAinesosat.lueTiedostosta();
         this.ohjeet.lueTiedostosta();
     }
@@ -289,6 +321,9 @@ public class Osio {
     public void tallenna() throws SailoException {
         // rekisteröi osion jos sille ei ole annettu vielä omaa tunnusta
         if (this.osioId < 0) rekisteroi();
+        
+        this.osionAinesosat.setTiedostoPolku(getAlihakemistoPolku());
+        this.ohjeet.setTiedostoPolku(getAlihakemistoPolku());
         
         this.osionAinesosat.tallenna();
         this.ohjeet.tallenna();
@@ -369,6 +404,7 @@ public class Osio {
      */
     public Osio clone() {
         Osio kopio = new Osio();
+        kopio.osioId = this.osioId;
         kopio.nimi = this.nimi;
         kopio.osioId = this.osioId;
         

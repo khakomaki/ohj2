@@ -11,7 +11,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Scanner;
 
-import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 import kanta.Hallitsija;
 import kanta.MerkkijonoKasittely;
@@ -25,8 +24,8 @@ import kanta.TietueHallitsija;
  */
 public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements Hallitsija<OsionAinesosa> {
     
-    private String tiedostoNimi     = "osion_ainesosat.dat";
-    private String polku            = "reseptidata/";
+    private String tiedostonimi     = "osion_ainesosat.dat";
+    private String tiedostopolku    = "reseptidata/Reseptin nimi/Osion nimi/";
     private int osioId              = -1;
     private boolean muutettu        = false;
     
@@ -82,7 +81,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         // varmistetaan ettei annettu nimi ole null tai tyhjä merkkijono
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
-        this.tiedostoNimi = tiedostonimi;
+        this.tiedostonimi = tiedostonimi;
         this.muutettu = true;
     }
     
@@ -93,10 +92,9 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @param tiedostopolku mihin polkuun tiedosto tallennetaan ja mistä sitä luetaan
      */
     public void setTiedostoPolku(String tiedostopolku) {
-        // ei tee mitään jos null tai sama kuin oli
-        if (tiedostopolku == null || tiedostopolku.equals(this.polku));
+        if (tiedostopolku == null) return;
         
-        this.polku = tiedostopolku;
+        this.tiedostopolku = tiedostopolku; // esim. reseptidata/Mustikkapiirakka/Muropohja/
         this.muutettu = true;
     }
     
@@ -203,17 +201,12 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @throws SailoException jos tallennus epäonnistuu
      */
     public void lueTiedostosta() throws SailoException {
-        try (Scanner fi = new Scanner(new FileInputStream(new File(this.polku + this.tiedostoNimi)))) {
+        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostopolku + this.tiedostonimi)))) {
             while (fi.hasNext()) {
                 String rivi = fi.nextLine().strip();
                 
                 // skipataan tyhjät ja kommenttirivit
                 if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
-                
-                // skipataan jos rivin osioId ei ole sama kuin nykyisen
-                StringBuilder rivinTiedot = new StringBuilder(rivi);
-                int rivinOsioId = Mjonot.erota(rivinTiedot, '|', this.osioId - 1);
-                if (rivinOsioId != this.osioId) continue;
                 
                 // käsketään osion ainesosan parsimaan tiedot ja lisätään nykyisiin ainesosiin
                 OsionAinesosa osionAinesosa = new OsionAinesosa();
@@ -224,7 +217,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
             this.muutettu = false;
             
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
+            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         }
     }
     
@@ -239,8 +232,8 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     public void tallenna() throws SailoException {
         if (!this.muutettu) return;
         
-        File tiedosto = new File(this.polku + this.tiedostoNimi);
-        File varmuuskopio = new File(this.polku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostoNimi, "bak"));
+        File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
+        File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
         
         // koitetaan poistaa edellistä varmuuskopiota
         // heitetään virhe jos sellainen on olemassa eikä voida poistaa
@@ -252,7 +245,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         if (!tiedosto.exists()) {
             try {
                 tiedosto.createNewFile();
-                
             } catch (IOException exception) {
                 throw new SailoException("Ei voida luoda tallennus-tiedostoa");
             }
@@ -264,38 +256,16 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         }
         
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
-            
-            // kopioidaan vanhan tiedoston rivit uuteen, jätetään nykyisen osion rivit huomioitta
-            try (Scanner fi = new Scanner(new FileInputStream(varmuuskopio))) {
-                while (fi.hasNext()) {
-                    String rivi = fi.nextLine();
-                    
-                    // skipataan tyhjät ja kommenttirivit
-                    if (rivi.isBlank() || rivi.charAt(0) == ';') continue;
-                    
-                    // parsii rivin osioId:n, jos ei löydy niin asettaa arvoksi varmasti eri kuin nykyinen osioId
-                    StringBuilder riviTiedot = new StringBuilder(rivi);
-                    int rivinOsioId = Mjonot.erotaInt(riviTiedot, this.osioId - 1);
-                    
-                    // syöttää alkuperäisen rivin, jos ei ole sama osio mitä ollaan tallentamassa
-                    if (rivinOsioId != this.osioId) {
-                        fo.println(rivi);
-                    }
-                }
-            }
-            // syöttää jokaisen ohjeen tiedot omalle rivilleen
+            // ainesosien tiedot kirjoittajaan
             for (int i = 0; i < this.getLkm(); i++) {
                 fo.print(this.osioId);
                 fo.print('|');
                 fo.println(anna(i));
             }
-            
         } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.polku + this.tiedostoNimi + "\" ei saada avattua");
-            
+            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         } catch (IOException exception) {
-            throw new SailoException("Tiedostoon \"" + this.polku + this.tiedostoNimi + "\" kirjoittamisessa ongelma");
-            
+            throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
         }
         
         this.muutettu = false;
@@ -324,7 +294,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     public OsionAinesosat clone() {
         OsionAinesosat kopio = new OsionAinesosat();
         kopio.osioId = this.osioId;
-        kopio.tiedostoNimi = this.tiedostoNimi;
+        kopio.tiedostonimi = this.tiedostonimi;
         
         // kopioidaan kaikki alkiot kopioon
         // TODO: käske TietueHallitsijan kopioimaan
@@ -363,7 +333,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         
         OsionAinesosat verrattavaOA = (OsionAinesosat)verrattava;
         if (verrattavaOA.osioId != this.osioId) return false;
-        if (!verrattavaOA.tiedostoNimi.equals(this.tiedostoNimi)) return false;
+        if (!verrattavaOA.tiedostonimi.equals(this.tiedostonimi)) return false;
         if (verrattavaOA.getLkm() != this.getLkm()) return false;
         
         // verrataan alkioita keskenään
@@ -401,7 +371,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     public int hashCode() {
         int hash = 1;
         hash = Hajautus.hajautusInt(hash, this.osioId);
-        hash = Hajautus.hajautusString(hash, this.tiedostoNimi);
+        hash = Hajautus.hajautusString(hash, this.tiedostonimi);
         
         for (int i = 0; i < this.getLkm(); i++) {
             hash = Hajautus.hajautusInt(hash, this.anna(i).hashCode());
@@ -426,7 +396,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         StringBuilder sb = new StringBuilder();
         sb.append(this.osioId);
         sb.append('|');
-        sb.append(this.tiedostoNimi);
+        sb.append(this.tiedostonimi);
         sb.append('|');
         sb.append(getLkm());
         return sb.toString();

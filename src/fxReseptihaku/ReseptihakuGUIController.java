@@ -1,5 +1,6 @@
 package fxReseptihaku;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -188,6 +189,11 @@ public class ReseptihakuGUIController implements Initializable {
           // poistaa reseptin resepteistä jos palautetaan null viite (resepti on poistettu muokkausnäkymässä)
           if (muokattuResepti == null) {
               reseptit.poista(muokattavaResepti);
+              try {
+                  reseptit.tallenna();
+              } catch (SailoException exception) {
+                  Dialogs.showMessageDialog("Poistossa ongelmia: " + exception.getMessage());
+              }
               haeReseptit();
               return;
           }
@@ -213,6 +219,11 @@ public class ReseptihakuGUIController implements Initializable {
           // poistaa reseptin resepteistä jos palautetaan null viite (resepti on poistettu avausnäkymässä)
           if (muokattuResepti == null) {
               reseptit.poista(avattavaResepti);
+              try {
+                  reseptit.tallenna();
+              } catch (SailoException exception) {
+                  Dialogs.showMessageDialog("Poistossa ongelmia: " + exception.getMessage());
+              }
               haeReseptit();
               return;
           }
@@ -244,6 +255,11 @@ public class ReseptihakuGUIController implements Initializable {
           boolean vastaus = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
           if (vastaus) { 
               reseptit.poista(hakuReseptit.get(valittuResepti));
+              try {
+                  reseptit.tallenna();
+              } catch (SailoException exception) {
+                  Dialogs.showMessageDialog("Poistossa ongelmia: " + exception.getMessage());
+              }
               haeReseptit();
           }
       }
@@ -293,13 +309,82 @@ public class ReseptihakuGUIController implements Initializable {
       public void lueTiedostosta() {
           try {
               // this.reseptit.lueTiedostosta();
-              // lukee reseptit testidata-tiedostosta ja vaihtaa reseptidata-tiedostoon
               // TODO testidata pois kuin ei enää tarvita
-              this.reseptit.setTiedostoPolku("testidata/");
-              this.reseptit.lueTiedostosta();
-              this.reseptit.setTiedostoPolku("reseptidata/");
+              File reseptidata = new File("reseptidata/");
+              if (!reseptidata.exists()) {
+                  this.reseptit.setTiedostoPolku("testidata/");
+                  this.reseptit.lueTiedostosta();
+                  this.reseptit.setTiedostoPolku("reseptidata/");
+                  this.reseptit.tallenna();
+              } else {
+                  this.reseptit.setTiedostoPolku("reseptidata/");
+                  this.reseptit.lueTiedostosta();
+              }
+              
           } catch (SailoException exception) {
-              Dialogs.showMessageDialog("Tiedoston luvussa ongelmia: " + exception.getMessage());
+              Dialogs.showMessageDialog("Tiedoston lukemisessa ongelmia: " + exception.getMessage());
           }
       }
+      
+      
+      /*
+      private void luoTestiReseptit() {
+          Reseptit testiReseptit = new Reseptit();
+          
+          Resepti mustikkapiirakka = testiReseptit.lisaaMustikkapiirakka();
+          mustikkapiirakka.satunnaisetAttribuutit();
+          
+          // lihapiirakka resepti
+          Resepti lihapiirakka = new Resepti("Lihapiirakka");
+          testiReseptit.lisaa(lihapiirakka);
+          lihapiirakka.satunnaisetAttribuutit();
+          
+          Osio taikina = new Osio("Taikina");
+          lihapiirakka.lisaaOsio(taikina);
+          taikina.lisaaAinesosa("50g", "hiivaa");
+          taikina.lisaaAinesosa("6dl", "maitoa");
+          taikina.lisaaAinesosa("1tl", "suolaa");
+          taikina.lisaaAinesosa("2rkl", "sokeria");
+          taikina.lisaaAinesosa("2kpl", "kananmunia");
+          taikina.lisaaAinesosa("10dl", "vehnäjauhoja");
+          taikina.lisaaAinesosa("100g", "voita");
+          taikina.lisaaOhje("Sekoita hiiva maitoon");
+          taikina.lisaaOhje("Lisää kananmunat, suola ja sokeri");
+          taikina.lisaaOhje("Lisää jauhot ja voi");
+          taikina.lisaaOhje("Anna kohota");
+          
+          Osio tayte = new Osio("Täyte");
+          lihapiirakka.lisaaOsio(tayte);
+          tayte.lisaaAinesosa("400g", "jauhelihaa");
+          tayte.lisaaAinesosa("1kpl", "sipuli");
+          tayte.lisaaAinesosa("1,5dl", "riisiä");
+          tayte.lisaaAinesosa("1tl", "suolaa");
+          tayte.lisaaAinesosa("1tl", "mustapippuria");
+          tayte.lisaaAinesosa("2dl", "vettä");
+          tayte.lisaaOhje("Lisää riisi, jauheliha, sipuli ja vesi kattilaan");
+          tayte.lisaaOhje("Paista kunnes riisit kypsyvät");
+          
+          Osio piirakat = new Osio("Piirakat");
+          lihapiirakka.lisaaOsio(piirakat);
+          piirakat.lisaaOhje("Jaa taikina n.10 osaan ja muotoile");
+          piirakat.lisaaOhje("Lisää täyte taikinapalojen keskelle");
+          piirakat.lisaaOhje("Taita taikina taskuksi");
+          piirakat.lisaaOhje("Painele taskujen reunat kiinni haarukalla");
+          
+          Osio paistaminen = new Osio("Paistaminen");
+          lihapiirakka.lisaaOsio(paistaminen);
+          paistaminen.lisaaAinesosa("1.5l", "rypsiöljyä");
+          paistaminen.lisaaOhje("Kuumenna öljy kattilassa 175°C");
+          paistaminen.lisaaOhje("Paista lihapiirakoita, kunnes molemmat puolet ovat kauniin ruskeita");
+          paistaminen.lisaaOhje("Nosta kuivumaan talouspaperille tai ritilälle");
+          
+          try {
+              testiReseptit.setTiedostoPolku("testidata/");
+              testiReseptit.tallenna();
+          } catch (SailoException exception) {
+              Dialogs.showMessageDialog("Testidataa ei saada tallennettua: " + exception.getMessage());
+          }
+          
+      }
+      */
 }
