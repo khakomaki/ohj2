@@ -2,8 +2,8 @@ package fxReseptihaku;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
-import fi.jyu.mit.fxgui.ComboBoxChooser;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.ModalControllerInterface;
@@ -15,15 +15,18 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import kanta.SailoException;
+import kanta.VaihtoehtoAttribuutti;
 import reseptihaku.Ohje;
 import reseptihaku.Ohjeet;
 import reseptihaku.Osio;
@@ -43,10 +46,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     @FXML private VBox ainesosaJaOhjeetVBox;
     @FXML private TextField reseptinNimiTextField;
     @FXML private TextArea kuvausTextArea;
-    @FXML private ComboBoxChooser<String> hintaSuodatin;
-    @FXML private ComboBoxChooser<String> valmistusaikaSuodatin;
-    @FXML private ComboBoxChooser<String> tahdetSuodatin;
-    @FXML private ComboBoxChooser<String> vaativuusSuodatin;
+    @FXML private GridPane attribuutitGridPane;
 
     @FXML private void handleSulje() { sulje(); }
     @FXML private void handleTallenna() { tallenna(); }
@@ -93,35 +93,40 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     
     private void naytaReseptinOminaisuudet() {
-        // TODO vähennä samanlaisen koodin toistoa
         this.reseptinNimiTextField.setText(this.valittuResepti.getNimi());
         reseptinNimiTextField.setOnKeyTyped(e -> { valittuResepti.setUusiNimi(reseptinNimiTextField.getText()); });
         
         this.kuvausTextArea.setText(this.valittuResepti.getKuvaus());
         kuvausTextArea.setOnKeyTyped(e -> { valittuResepti.setKuvaus(kuvausTextArea.getText()); });
         
+        // tyhjennetään attribuutit gridpane
+        this.attribuutitGridPane.getChildren().clear();
         
-        /*
+        int rivi = 0;
         
-        this.hintaSuodatin.clear(); 
-        this.hintaSuodatin.setRivit("\n" + Resepti.getHintaVaihtoehdot());
-        this.hintaSuodatin.setSelectedIndex(this.valittuResepti.getHinta());
-        
-        this.valmistusaikaSuodatin.clear(); 
-        this.valmistusaikaSuodatin.setRivit("\n" + Resepti.getValmistusaikaVaihtoehdot());
-        this.valmistusaikaSuodatin.setSelectedIndex(this.valittuResepti.getValmistusaika());
-        
-        this.tahdetSuodatin.clear(); 
-        this.tahdetSuodatin.setRivit("\n" + Resepti.getTahdetVaihtoehdot());
-        this.tahdetSuodatin.setSelectedIndex(this.valittuResepti.getTahdet());
-        
-        this.vaativuusSuodatin.clear(); 
-        this.vaativuusSuodatin.setRivit("\n" + Resepti.getVaativuusVaihtoehdot());
-        this.vaativuusSuodatin.setSelectedIndex(this.valittuResepti.getVaativuus());
-        
-        
-        
-        */
+        for (VaihtoehtoAttribuutti attribuutti : this.valittuResepti.getAttribuutit()) {
+            Label attribuutinNimi = new Label(attribuutti.getNimi());
+            ComboBox<VaihtoehtoAttribuutti> attribuutinVaihtoehdot = new ComboBox<VaihtoehtoAttribuutti>();
+
+            // lisätään vaihtoehdot (tyhjä + valittavat) ComboBox-nodeen
+            attribuutinVaihtoehdot.getItems().add(new VaihtoehtoAttribuutti(attribuutti.getNimi(), attribuutti.getVaihtoehdot()));
+            for (Entry<Integer, String> entry : attribuutti.getVaihtoehdot().entrySet()) {
+                VaihtoehtoAttribuutti va = new VaihtoehtoAttribuutti(attribuutti.getNimi(), attribuutti.getVaihtoehdot());
+                va.setValinta(entry.getKey());
+                attribuutinVaihtoehdot.getItems().add(va);
+            }
+            
+            // lisätään kuuntelija muutoksille
+            attribuutinVaihtoehdot.setOnAction(e -> {
+                attribuutti.setValinta(attribuutinVaihtoehdot.getValue().getValinta());
+            });
+            
+            // lisätään nimi Label ja vaihtoehto ComboBox GridPaneen
+            this.attribuutitGridPane.add(attribuutinNimi, 0, rivi);
+            this.attribuutitGridPane.add(attribuutinVaihtoehdot, 1, rivi);
+            
+            rivi++;
+        }
     }
     
     

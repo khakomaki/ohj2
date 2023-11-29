@@ -72,16 +72,18 @@ public class DynaaminenGridPane<T> extends GridPane {
     public void paivita() {
         this.getChildren().clear(); // tyhjentää GridPanen
         
+        int rivi = 0;
+        
         // otsikot
         if (0 < this.otsikot.size()) {
             for (int i = 0; i < this.otsikot.size(); i++) {
                 this.add(this.otsikot.get(i), i, 0);
             }
             this.add(new Label(""), this.otsikot.size() + 1, 0); // tyhjä otsikko poistopainikkeille
+            rivi++;
         }
         
         // lisää rivit paneeliin
-        int rivi = 1;
         for (T olio : this.hallitsijaLuokka.anna()) {
             lisaaRiviGridPaneen(olio, rivi++);
         }

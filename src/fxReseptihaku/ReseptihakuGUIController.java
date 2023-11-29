@@ -13,6 +13,7 @@ import fxKanta.RajausSuodatin;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -93,7 +94,6 @@ public class ReseptihakuGUIController implements Initializable {
               Label valimerkkiLabel = new Label("-");
               ComboBox<VaihtoehtoAttribuutti> maksimiComboBox = new ComboBox<VaihtoehtoAttribuutti>(suodatin.getMaksimiVaihtoehdotList());
               
-              
               // TODO vaihtoehdot reagoimaan valintoihin
               minimiComboBox.setOnAction(e -> {
                   haeReseptit();
@@ -103,12 +103,15 @@ public class ReseptihakuGUIController implements Initializable {
                   haeReseptit();
               });
               
-              
               // suodattimet GridPaneen
               this.suodattimetGridPane.add(minimiComboBox, sarake++, rivi);
               this.suodattimetGridPane.add(valimerkkiLabel, sarake++, rivi);
               this.suodattimetGridPane.add(maksimiComboBox, sarake, rivi++);
               
+              // suodattimien ulkonäkö
+              GridPane.setHalignment(minimiComboBox, HPos.RIGHT);
+              
+              // lisätään luokan listaan
               this.suodatinValinnat.add(minimiComboBox);
               this.suodatinValinnat.add(maksimiComboBox);
           }
