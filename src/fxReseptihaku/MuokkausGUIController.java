@@ -88,9 +88,6 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         }
         
         naytaReseptinOminaisuudet();
-        
-        // tyhjentää VBox sisällön
-        this.ainesosaJaOhjeetVBox.getChildren().clear();
         naytaOsiot();
     }
     
@@ -102,6 +99,9 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         this.kuvausTextArea.setText(this.valittuResepti.getKuvaus());
         kuvausTextArea.setOnKeyTyped(e -> { valittuResepti.setKuvaus(kuvausTextArea.getText()); });
+        
+        
+        /*
         
         this.hintaSuodatin.clear(); 
         this.hintaSuodatin.setRivit("\n" + Resepti.getHintaVaihtoehdot());
@@ -118,10 +118,17 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         this.vaativuusSuodatin.clear(); 
         this.vaativuusSuodatin.setRivit("\n" + Resepti.getVaativuusVaihtoehdot());
         this.vaativuusSuodatin.setSelectedIndex(this.valittuResepti.getVaativuus());
+        
+        
+        
+        */
     }
     
     
     private void naytaOsiot() {
+        // tyhjentää VBox sisällön
+        this.ainesosaJaOhjeetVBox.getChildren().clear();
+        
         Osiot osiot = this.valittuResepti.getOsiot();
         for (int i = 0; i < osiot.getLkm(); i++) {
             // luo osion HBoxin ja lisää sen käyttöliittymään

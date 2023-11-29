@@ -162,7 +162,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
          <left>
-            <GridPane BorderPane.alignment="CENTER">
+            <GridPane BorderPane.alignment="CENTER" fx:id="suodattimetGridPane">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" />
                 <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="20.0" />
@@ -183,39 +183,39 @@
               </rowConstraints>
                <children>
                   <Label text="Hinta" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
-                  <ComboBoxChooser fx:id="alinHinta" rivit="" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                  <ComboBoxChooser rivit="" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
                      <tooltip>
                         <Tooltip text="Alin hintaluokka" />
                      </tooltip>
                   </ComboBoxChooser>
                   <Label text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <ComboBoxChooser fx:id="ylinHinta" rivit="€€" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                  <ComboBoxChooser rivit="€€" GridPane.columnIndex="2" GridPane.rowIndex="4">
                      <tooltip>
                         <Tooltip text="Ylin hintaluokka" />
                      </tooltip>
                   </ComboBoxChooser>
                   <Label text="Tähdet" GridPane.rowIndex="7" />
                   <Label text="-" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                  <ComboBoxChooser fx:id="alinTahdet" rivit="★★" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
+                  <ComboBoxChooser rivit="★★" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
                      <tooltip>
                         <Tooltip text="Vähimmät tähdet" />
                      </tooltip></ComboBoxChooser>
-                  <ComboBoxChooser fx:id="ylinTahdet" GridPane.columnIndex="2" GridPane.rowIndex="8">
+                  <ComboBoxChooser GridPane.columnIndex="2" GridPane.rowIndex="8">
                      <tooltip>
                         <Tooltip text="Enimmät tähdet" />
                      </tooltip></ComboBoxChooser>
                   <Label text="Vaativuus" GridPane.rowIndex="9" />
-                  <ComboBoxChooser fx:id="alinVaativuus" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
+                  <ComboBoxChooser GridPane.halignment="RIGHT" GridPane.rowIndex="10">
                      <tooltip>
                         <Tooltip text="Alin vaativuustaso" />
                      </tooltip></ComboBoxChooser>
                   <Label text="-" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                  <ComboBoxChooser fx:id="ylinVaativuus" GridPane.columnIndex="2" GridPane.rowIndex="10">
+                  <ComboBoxChooser GridPane.columnIndex="2" GridPane.rowIndex="10">
                      <tooltip>
                         <Tooltip text="Ylin vaativuustaso" />
                      </tooltip></ComboBoxChooser>
                   <Label text="Lajittele tulokset" />
-                  <ComboBoxChooser fx:id="lajitteluPeruste" rivit="valmistusaika" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+                  <ComboBoxChooser rivit="valmistusaika" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                      <tooltip>
                         <Tooltip text="Lajittele tulokset valinnan perusteella" />
                      </tooltip></ComboBoxChooser>
@@ -224,13 +224,13 @@
                         <Tooltip text="Käännä tulosten lajittelun käänteiseksi" />
                      </tooltip></CheckBox>
                   <Label text="Valmistusaika" GridPane.rowIndex="5" />
-                  <ComboBoxChooser fx:id="alinValmistusaika" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                  <ComboBoxChooser GridPane.halignment="RIGHT" GridPane.rowIndex="6">
                      <tooltip>
                         <Tooltip text="Nopein valmistusaika" />
                      </tooltip>
                   </ComboBoxChooser>
                   <Label text="-" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <ComboBoxChooser fx:id="ylinValmistusaika" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                  <ComboBoxChooser GridPane.columnIndex="2" GridPane.rowIndex="6">
                      <tooltip>
                         <Tooltip text="Hitain valmistusaika" />
                      </tooltip>

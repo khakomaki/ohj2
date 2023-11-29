@@ -5,17 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import fi.jyu.mit.fxgui.ComboBoxChooser;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.StringGrid;
+import fxKanta.RajausSuodatin;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import kanta.SailoException;
 import kanta.Satunnaisluku;
+import kanta.VaihtoehtoAttribuutti;
 import reseptihaku.Resepti;
 import reseptihaku.Reseptit;
 
@@ -29,15 +32,7 @@ public class ReseptihakuGUIController implements Initializable {
       @FXML private TextField hakukentta;
       @FXML private Label tuloksetTeksti;
       @FXML private StringGrid<String> hakutulokset;
-      @FXML private ComboBoxChooser<String> lajitteluPeruste;
-      @FXML private ComboBoxChooser<String> alinHinta;
-      @FXML private ComboBoxChooser<String> ylinHinta;
-      @FXML private ComboBoxChooser<String> alinValmistusaika;
-      @FXML private ComboBoxChooser<String> ylinValmistusaika;
-      @FXML private ComboBoxChooser<String> alinTahdet;
-      @FXML private ComboBoxChooser<String> ylinTahdet;
-      @FXML private ComboBoxChooser<String> alinVaativuus;
-      @FXML private ComboBoxChooser<String> ylinVaativuus;
+      @FXML private GridPane suodattimetGridPane;
     
       @FXML private void handleUusiResepti() { lisaaResepti(); }
       @FXML private void handleMuokkaaResepti() { muokkaaResepti(); }
@@ -59,7 +54,7 @@ public class ReseptihakuGUIController implements Initializable {
       
       private final String hakutuloksetOtsikko = "reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso\n";
       private Reseptit reseptit;
-      private List<ComboBoxChooser<String>> suodatinValinnat = new ArrayList<>();
+      private List<ComboBox<VaihtoehtoAttribuutti>> suodatinValinnat = new ArrayList<>();
       private List<Resepti> hakuReseptit = new ArrayList<Resepti>();
       
       private void sulje() {
@@ -72,71 +67,88 @@ public class ReseptihakuGUIController implements Initializable {
        */
       public void alusta() {
           alustaSuodattimet();
+          this.hakukentta.clear();
           alustaHakutulokset();
       }
       
       
       private void alustaHakutulokset() {
           this.hakutulokset.clear();
-          
-          // asetetaan sama kuin hakiessa reseptejä
-          this.hakutulokset.setColumnWidth(-1, 120);
-          
-          hakutulokset.setSortable(-1, false);
       }
       
       
       private void alustaSuodattimet() {
-          // TODO: varmistu ettei suodatin ole null
-          // TODO: hankkiudu eroon toistuvasta koodista
+          this.suodattimetGridPane.getChildren().clear();
+          int rivi = 0;
           
-          // lisätään yksittäiset suodattimet listaan ja tyhjennetään fxml tiedoston esimerkki tiedot
-          this.suodatinValinnat.add(this.alinHinta);
-          this.suodatinValinnat.add(this.ylinHinta);
-          this.suodatinValinnat.add(this.alinValmistusaika);
-          this.suodatinValinnat.add(this.ylinValmistusaika);
-          this.suodatinValinnat.add(this.alinTahdet);
-          this.suodatinValinnat.add(this.ylinTahdet);
-          this.suodatinValinnat.add(this.alinVaativuus);
-          this.suodatinValinnat.add(this.ylinVaativuus);
-          for (ComboBoxChooser<String> suodatin : this.suodatinValinnat) {
-              suodatin.clear();
-              suodatin.setPrefWidth(145);
+          for (VaihtoehtoAttribuutti suodatettava : Reseptit.getOletusAttribuutit()) {
+              int sarake = 0;
+              Label suodatinNimiLabel = new Label(suodatettava.getNimi());
+              this.suodattimetGridPane.add(suodatinNimiLabel, sarake, rivi++);
+              
+              // luodaan suodatin ja sen nodet
+              RajausSuodatin suodatin = new RajausSuodatin(suodatettava);
+              ComboBox<VaihtoehtoAttribuutti> minimiComboBox = new ComboBox<VaihtoehtoAttribuutti>(suodatin.getMinimiVaihtoehdotList());
+              Label valimerkkiLabel = new Label("-");
+              ComboBox<VaihtoehtoAttribuutti> maksimiComboBox = new ComboBox<VaihtoehtoAttribuutti>(suodatin.getMaksimiVaihtoehdotList());
+              
+              
+              // TODO vaihtoehdot reagoimaan valintoihin
+              minimiComboBox.setOnAction(e -> {
+                  haeReseptit();
+              });
+              
+              maksimiComboBox.setOnAction(e -> {
+                  haeReseptit();
+              });
+              
+              
+              // suodattimet GridPaneen
+              this.suodattimetGridPane.add(minimiComboBox, sarake++, rivi);
+              this.suodattimetGridPane.add(valimerkkiLabel, sarake++, rivi);
+              this.suodattimetGridPane.add(maksimiComboBox, sarake, rivi++);
+              
+              this.suodatinValinnat.add(minimiComboBox);
+              this.suodatinValinnat.add(maksimiComboBox);
           }
           
-          // lisää suodattimien vaihtoehdot ja jättää nykyisen valinnan tyhjäksi
-          this.lajitteluPeruste.setRivit("Hinta\nValmistusaika\nTähdet\nVaativuus");
-          this.alinHinta.setRivit("\n" + Resepti.getHintaVaihtoehdot());
-          this.ylinHinta.setRivit("\n" + Resepti.getHintaVaihtoehdot());
-          this.alinValmistusaika.setRivit("\n" + Resepti.getValmistusaikaVaihtoehdot());
-          this.ylinValmistusaika.setRivit("\n" + Resepti.getValmistusaikaVaihtoehdot());
-          this.alinTahdet.setRivit("\n" + Resepti.getTahdetVaihtoehdot());
-          this.ylinTahdet.setRivit("\n" + Resepti.getTahdetVaihtoehdot());
-          this.alinVaativuus.setRivit("\n" + Resepti.getVaativuusVaihtoehdot());
-          this.ylinVaativuus.setRivit("\n" + Resepti.getVaativuusVaihtoehdot());
-          
-          // TODO: kuuntelijat suodattimien muuttumiselle
+          tyhjennaSuodattimet();
       }
       
       
-      private void haeReseptit() {
+      /**
+       * Suorittaa haun resepteille
+       */
+      public void haeReseptit() {
           String hakusana = hakukentta.getText();
           this.hakutulokset.clear();
           
           StringBuilder sb = new StringBuilder(hakutuloksetOtsikko);
           
-          // haetaan hakusanaa vastanneet reseptit
-          this.hakuReseptit = this.reseptit.etsiNimella(hakusana);
-          
-          for (int i = 0; i < this.hakuReseptit.size(); i++) {
-              // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
-              sb.append(this.hakuReseptit.get(i).getTaulukkoMuodossa());
-              sb.append("\n");
+          if (this.reseptit != null) {
+              // suodattimet
+              List<VaihtoehtoAttribuutti> suodattimet = getSuodatinValinnat();
+              List<VaihtoehtoAttribuutti> minimiSuodattimet = new ArrayList<VaihtoehtoAttribuutti>();
+              List<VaihtoehtoAttribuutti> maksimiSuodattimet = new ArrayList<VaihtoehtoAttribuutti>();
+              for (int i = 0; i < suodattimet.size(); i++) {
+                  if (i % 2 == 0) {
+                      minimiSuodattimet.add(suodattimet.get(i));
+                  } else {
+                      maksimiSuodattimet.add(suodattimet.get(i));
+                  }
+              }
+              // haetaan hakusanaa vastanneet reseptit
+              this.hakuReseptit = this.reseptit.etsiNimella(hakusana, minimiSuodattimet, maksimiSuodattimet);
+              
+              for (int i = 0; i < this.hakuReseptit.size(); i++) {
+                  // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
+                  sb.append(this.hakuReseptit.get(i).getTaulukkoMuodossa());
+                  sb.append("\n");
+              }
           }
           
           this.hakutulokset.setRivit(sb.toString());
           
-          // asettaa muuten väärän kokoiseksi
           this.hakutulokset.setColumnWidth(-1, 120);
           hakutulokset.setSortable(-1, false);
           
@@ -154,7 +166,7 @@ public class ReseptihakuGUIController implements Initializable {
       
       
       private void lisaaResepti() {
-          Resepti luotuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Lisää resepti", null, null);
+          Resepti luotuResepti = ModalController.showModal(ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Lisää resepti", null, null);
           
           // poistutaan jos luotu resepti on null
           if (luotuResepti == null) return;
@@ -171,7 +183,7 @@ public class ReseptihakuGUIController implements Initializable {
           Resepti muokattavaResepti = hakuReseptit.get(valittuResepti);
           
           // avataan muokkausnäkymä, josta palatessa saadaan mahdollisesti muokattu resepti
-          Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, muokattavaResepti);
+          Resepti muokattuResepti = ModalController.showModal(ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, muokattavaResepti);
           
           // poistaa reseptin resepteistä jos palautetaan null viite (resepti on poistettu muokkausnäkymässä)
           if (muokattuResepti == null) {
@@ -238,9 +250,21 @@ public class ReseptihakuGUIController implements Initializable {
       
       
       private void tyhjennaSuodattimet() {
-          for (ComboBoxChooser<String> suodatin : this.suodatinValinnat) { 
-              suodatin.setSelectedIndex(-1); 
+          for (ComboBox<VaihtoehtoAttribuutti> suodatin : this.suodatinValinnat) {
+              suodatin.setValue(suodatin.getItems().get(0));
           }
+      }
+      
+      
+      private List<VaihtoehtoAttribuutti> getSuodatinValinnat() {
+          List<VaihtoehtoAttribuutti> suodattimet = new ArrayList<VaihtoehtoAttribuutti>();
+          for (int i = 0; i < this.suodatinValinnat.size(); i++) {
+              VaihtoehtoAttribuutti suodatin = this.suodatinValinnat.get(i).getValue();
+              if (suodatin == null) break;
+              suodattimet.add(suodatin);
+          }
+          
+          return suodattimet;
       }
       
       
@@ -260,7 +284,6 @@ public class ReseptihakuGUIController implements Initializable {
        */
       public void setReseptit(Reseptit reseptit) {
           this.reseptit = reseptit;
-          // luoTestiReseptit();
       }
       
       
@@ -279,73 +302,4 @@ public class ReseptihakuGUIController implements Initializable {
               Dialogs.showMessageDialog("Tiedoston luvussa ongelmia: " + exception.getMessage());
           }
       }
-      
-      
-      /*
-      
-      public void luoTestiReseptit() {
-          Reseptit testiReseptit = new Reseptit();
-          
-          
-          // 10 mustikkapiirakka reseptiä satunnaisilla attribuuteilla
-          for (int i = 0; i < 5; i++) {
-              Resepti testiMustikkapiirakka = testiReseptit.lisaaMustikkapiirakka();
-              testiMustikkapiirakka.satunnaisetAttribuutit();
-          }
-          
-          // lihapiirakka resepti
-          Resepti lihapiirakka = new Resepti("Lihapiirakka");
-          testiReseptit.lisaa(lihapiirakka);
-          lihapiirakka.satunnaisetAttribuutit();
-          
-          Osio taikina = new Osio("Taikina");
-          lihapiirakka.lisaaOsio(taikina);
-          taikina.lisaaAinesosa("50g", "hiivaa");
-          taikina.lisaaAinesosa("6dl", "maitoa");
-          taikina.lisaaAinesosa("1tl", "suolaa");
-          taikina.lisaaAinesosa("2rkl", "sokeria");
-          taikina.lisaaAinesosa("2kpl", "kananmunia");
-          taikina.lisaaAinesosa("10dl", "vehnäjauhoja");
-          taikina.lisaaAinesosa("100g", "voita");
-          taikina.lisaaOhje("Sekoita hiiva maitoon");
-          taikina.lisaaOhje("Lisää kananmunat, suola ja sokeri");
-          taikina.lisaaOhje("Lisää jauhot ja voi");
-          taikina.lisaaOhje("Anna kohota");
-          
-          Osio tayte = new Osio("Täyte");
-          lihapiirakka.lisaaOsio(tayte);
-          tayte.lisaaAinesosa("400g", "jauhelihaa");
-          tayte.lisaaAinesosa("1kpl", "sipuli");
-          tayte.lisaaAinesosa("1,5dl", "riisiä");
-          tayte.lisaaAinesosa("1tl", "suolaa");
-          tayte.lisaaAinesosa("1tl", "mustapippuria");
-          tayte.lisaaAinesosa("2dl", "vettä");
-          tayte.lisaaOhje("Lisää riisi, jauheliha, sipuli ja vesi kattilaan");
-          tayte.lisaaOhje("Paista kunnes riisit kypsyvät");
-          
-          Osio piirakat = new Osio("Piirakat");
-          lihapiirakka.lisaaOsio(piirakat);
-          piirakat.lisaaOhje("Jaa taikina n.10 osaan ja muotoile");
-          piirakat.lisaaOhje("Lisää täyte taikinapalojen keskelle");
-          piirakat.lisaaOhje("Taita taikina taskuksi");
-          piirakat.lisaaOhje("Painele taskujen reunat kiinni haarukalla");
-          
-          Osio paistaminen = new Osio("Paistaminen");
-          lihapiirakka.lisaaOsio(paistaminen);
-          paistaminen.lisaaAinesosa("1.5l", "rypsiöljyä");
-          paistaminen.lisaaOhje("Kuumenna öljy kattilassa 175°C");
-          paistaminen.lisaaOhje("Paista lihapiirakoita, kunnes molemmat puolet ovat kauniin ruskeita");
-          paistaminen.lisaaOhje("Nosta kuivumaan talouspaperille tai ritilälle");
-          
-          try {
-              testiReseptit.setTiedostoPolku("testidata/");
-              testiReseptit.tallenna();
-          } catch (SailoException exception) {
-              Dialogs.showMessageDialog("Testidataa ei saada tallennettua: " + exception.getMessage());
-          }
-          
-          
-      }
-      
-      */
 }

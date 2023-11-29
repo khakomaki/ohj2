@@ -6,8 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -157,10 +159,30 @@ public class Resepti {
     
     
     private void luoVaihtoehtoAttribuutit() {
-        this.hinta = new VaihtoehtoAttribuutti(hintaVaihtoehdot, -1, "");
-        this.valmistusaika = new VaihtoehtoAttribuutti(valmistusaikaVaihtoehdot, -1, "");
-        this.tahdet = new VaihtoehtoAttribuutti(tahdetVaihtoehdot, -1, "");
-        this.vaativuus = new VaihtoehtoAttribuutti(vaativuusVaihtoehdot, -1, "");
+        this.hinta = new VaihtoehtoAttribuutti("Hinta", hintaVaihtoehdot);
+        this.valmistusaika = new VaihtoehtoAttribuutti("Valmistusaika", valmistusaikaVaihtoehdot);
+        this.tahdet = new VaihtoehtoAttribuutti("Tähdet", tahdetVaihtoehdot);
+        this.vaativuus = new VaihtoehtoAttribuutti("Vaativuus", vaativuusVaihtoehdot);
+    }
+    
+    
+    /**
+     * Reseptin attribuutit suodattamista varten listassa.
+     * Järjestys:
+     * - hinta
+     * - valmistusaika
+     * - tähdet
+     * - vaativuus
+     * 
+     * @return reseptin attribuutit
+     */
+    public List<VaihtoehtoAttribuutti> getAttribuutit() {
+        List<VaihtoehtoAttribuutti> attribuutit = new ArrayList<VaihtoehtoAttribuutti>();
+        attribuutit.add(hinta);
+        attribuutit.add(valmistusaika);
+        attribuutit.add(tahdet);
+        attribuutit.add(vaativuus);
+        return attribuutit;
     }
     
     
@@ -936,60 +958,15 @@ public class Resepti {
         StringBuilder sb = new StringBuilder();
         sb.append(this.reseptiId);
         sb.append('|');
-        sb.append(this.nimi);
+        sb.append(getNimi());
         sb.append('|');
-        sb.append(this.hinta);
+        sb.append(getHinta());
         sb.append('|');
-        sb.append(this.valmistusaika);
+        sb.append(getValmistusaika());
         sb.append('|');
-        sb.append(this.tahdet);
+        sb.append(getTahdet());
         sb.append('|');
-        sb.append(this.vaativuus);
-        return sb.toString();
-    }
-
-
-    /**
-     * @return kaikki mahdolliset hintavaihtoehdot
-     */
-    public static String getHintaVaihtoehdot() {
-        return getVaihtoehdot(hintaVaihtoehdot);
-    }
-    
-    
-    /**
-     * @return kaikki mahdolliset valmistusaikavaihtoehdot
-     */
-    public static String getValmistusaikaVaihtoehdot() {
-        return getVaihtoehdot(valmistusaikaVaihtoehdot);
-    }
-    
-    
-    /**
-     * @return kaikki mahdolliset tahdetvaihtoehdot
-     */
-    public static String getTahdetVaihtoehdot() {
-        return getVaihtoehdot(tahdetVaihtoehdot);
-    }
-    
-    
-    /**
-     * @return kaikki mahdolliset vaativuusvaihtoehdot
-     */
-    public static String getVaativuusVaihtoehdot() {
-        return getVaihtoehdot(vaativuusVaihtoehdot);
-    }
-    
-    
-    private static String getVaihtoehdot(Map<Integer, String> vaihtoehdotMap) {
-        StringBuilder sb = new StringBuilder();
-        
-        // lisää vaihtoehdot riviväleillä erotettuna StringBuilderiin
-        for (String vaihtoehto : vaihtoehdotMap.values()) {
-            sb.append(vaihtoehto);
-            sb.append("\n");
-        }
-        
+        sb.append(getVaativuus());
         return sb.toString();
     }
     

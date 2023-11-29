@@ -12,6 +12,7 @@ import java.util.Scanner;
 import kanta.Hajautus;
 import kanta.Hallitsija;
 import kanta.SailoException;
+import kanta.VaihtoehtoAttribuutti;
 
 /**
  * @author hakom
@@ -25,6 +26,8 @@ public class Reseptit implements Hallitsija<Resepti> {
     private String polku                = "reseptidata/";
     private boolean muutettu            = true;
     private int lkm                     = 0;
+    
+    private final static Resepti esimerkkiresepti = new Resepti();
     
     /**
      * Reseptit.
@@ -334,18 +337,70 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @return kaikki reseptit jotka sisältävät hakusanan
      */
     public List<Resepti> etsiNimella(String hakusana) {
-        ArrayList<Resepti> loydetytReseptit = new ArrayList<Resepti>();
+        // TODO listan palauttamisen sijaan esim. Stream
+        List<Resepti> loydetytReseptit = new ArrayList<Resepti>();
         String kaytettavaHakusana = hakusana.strip();
         
         // tyhjällä hakusanalla palautetaan kaikki reseptit
         if (kaytettavaHakusana.isBlank()) return anna();
         
-        for (int i = 0; i < this.lkm; i++) {
-            Resepti resepti = anna(i);
+        for (Resepti resepti : this.reseptit) {
             if (resepti.onkoNimessa(kaytettavaHakusana)) loydetytReseptit.add(resepti);
         }
         
         return loydetytReseptit;
+    }
+    
+    
+    /**
+     * Hakee reseptejä annetulla hakusanalla ja suodattimilla
+     * 
+     * @param hakusana millä hakusanalla reseptiä haetaan
+     * @param minimit suodattimet attribuuttien minimiarvoille
+     * @param maksimit suodattimet attribuuttien maksimiarvoille
+     * @return lista löydetyistä resepteistä
+     */
+    public List<Resepti> etsiNimella(String hakusana, List<VaihtoehtoAttribuutti> minimit, List<VaihtoehtoAttribuutti> maksimit) {
+        // TODO listan palauttamisen sijaan esim. Stream
+        List<Resepti> loydetytReseptit = new ArrayList<Resepti>();
+        
+        for (Resepti resepti : this.reseptit) {
+            if (!resepti.onkoNimessa(hakusana)) continue;
+            List<VaihtoehtoAttribuutti> reseptinAttribuutit = resepti.getAttribuutit();
+            boolean suodataPois = false;
+            
+            for (int i = 0; i < minimit.size(); i++) {
+                VaihtoehtoAttribuutti attribuutti = reseptinAttribuutit.get(i);
+                int minimi = minimit.get(i).getValinta();
+                
+                if (attribuutti.onkoOletusValinta(minimi)) continue; // ei huomioi oletusvalintoja
+                if (attribuutti.getValinta() < minimi) suodataPois = true;
+            }
+            
+            for (int i = 0; i < maksimit.size(); i++) {
+                VaihtoehtoAttribuutti attribuutti = reseptinAttribuutit.get(i);
+                int maksimi = maksimit.get(i).getValinta();
+                
+                if (attribuutti.onkoOletusValinta(maksimi)) continue; // ei huomioi oletusvalintoja
+                if (maksimi < attribuutti.getValinta()) suodataPois = true;
+            }
+            
+            // pääsee lisäämään vain jos kaikki ehdot täyttyvät
+            if (suodataPois) continue; 
+            loydetytReseptit.add(resepti);
+        }
+        
+        return loydetytReseptit;
+    }
+    
+    
+    /**
+     * Antaa reseptin oletusattribuutit
+     * 
+     * @return reseptin oletusattribuutit
+     */
+    public static List<VaihtoehtoAttribuutti> getOletusAttribuutit() {
+        return esimerkkiresepti.getAttribuutit();
     }
     
     

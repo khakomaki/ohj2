@@ -1,6 +1,5 @@
 package kanta;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +13,7 @@ import java.util.Map;
  */
 public class VaihtoehtoAttribuutti {
     
+    private String nimi;
     private Integer valinta;
     private Integer oletusValinta;
     private String oletusString;
@@ -21,12 +21,44 @@ public class VaihtoehtoAttribuutti {
     
     
     /**
+     * @param nimi attribuutin nimi
      * @param vaihtoehdot Map vaihtoehdoista ja niitä vastaavista String-muodoista
      * @param oletusarvo oletusarvo
      * @param oletusString oletusarvon String-arvo
+     * 
+     * @example
+     * <pre name="test">
+     * #import java.util.Map;
+     * #import java.util.HashMap;
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map, -2, "ei määritelty");
+     * attribuutti.toString() === "ei määritelty";
+     * 
+     * attribuutti.setValinta(0);
+     * attribuutti.toString() === "ei määritelty";
+     * 
+     * attribuutti.setValinta(1);
+     * attribuutti.toString() === "vähän";
+     * 
+     * attribuutti.setValinta(2);
+     * attribuutti.toString() === "keskimääräisesti";
+     * 
+     * attribuutti.setValinta(3);
+     * attribuutti.toString() === "paljon";
+     * 
+     * attribuutti.setValinta(3);
+     * attribuutti.toString() === "paljon";
+     * 
+     * attribuutti.setValinta(-2);
+     * attribuutti.toString() === "ei määritelty";
+     * </pre>
      */
-    public VaihtoehtoAttribuutti(Map<Integer, String> vaihtoehdot, Integer oletusarvo, String oletusString) {
-        this.vaihtoehdot = Collections.unmodifiableMap(new HashMap<Integer, String>(vaihtoehdot));
+    public VaihtoehtoAttribuutti(String nimi, Map<Integer, String> vaihtoehdot, Integer oletusarvo, String oletusString) {
+        this.nimi = nimi;
+        this.vaihtoehdot = vaihtoehdot;
         this.oletusValinta = oletusarvo;
         this.oletusString = oletusString;
         this.valinta = oletusarvo;
@@ -34,13 +66,77 @@ public class VaihtoehtoAttribuutti {
     
     
     /**
+     * @param nimi attribuutin nimi
+     * @param vaihtoehdot Map vaihtoehdoista ja niitä vastaavista String-muodoista
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map);
+     * attribuutti.toString() === "";
+     * 
+     * attribuutti.setValinta(1);
+     * attribuutti.toString() === "vähän";
+     * 
+     * attribuutti.setValinta(2);
+     * attribuutti.toString() === "keskimääräisesti";
+     * 
+     * attribuutti.setValinta(3);
+     * attribuutti.toString() === "paljon";
+     * 
+     * attribuutti.setValinta(3);
+     * attribuutti.toString() === "paljon";
+     * 
+     * attribuutti.setValinta(-1);
+     * attribuutti.toString() === "";
+     * </pre>
+     */
+    public VaihtoehtoAttribuutti(String nimi, Map<Integer, String> vaihtoehdot) {
+        this.nimi = nimi;
+        this.vaihtoehdot = vaihtoehdot;
+        
+        this.oletusString = "";
+        this.oletusValinta = -1;
+        this.valinta = -1;
+    }
+    
+    
+    /**
      * Asettaa nykyisen valinnan
      * 
      * @param valinta miksikä valinnaksi koitetaan vaihtaa
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map, -2, "ei määritelty");
+     * attribuutti.getValinta() === -2;
+     * 
+     * attribuutti.setValinta(0);
+     * attribuutti.getValinta() === -2;
+     * 
+     * attribuutti.setValinta(1);
+     * attribuutti.getValinta() === 1;
+     * 
+     * attribuutti.setValinta(3);
+     * attribuutti.getValinta() === 3;
+
+     * attribuutti.setValinta(5);
+     * attribuutti.getValinta() === 3;
+     * 
+     * attribuutti.setValinta(-2);
+     * attribuutti.getValinta() === -2;
+     * </pre>
      */
-    public void setValinta(Integer valinta) {
+    public void setValinta(int valinta) {
         // jos annetaan sama kuin oletusvalinta
-        if (valinta.equals(this.oletusValinta)) {
+        if (onkoOletusValinta(valinta)) {
             this.valinta = valinta;
             return;
         }
@@ -54,9 +150,60 @@ public class VaihtoehtoAttribuutti {
      * Antaa nykyisen valinnan
      * 
      * @return nykyinen valinta
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map, -2, "ei määritelty");
+     * attribuutti.getValinta() === -2;
+     * 
+     * attribuutti.setValinta(0);
+     * attribuutti.getValinta() === -2;
+     * 
+     * attribuutti.setValinta(1);
+     * attribuutti.getValinta() === 1;
+     * 
+     * attribuutti.setValinta(3);
+     * attribuutti.getValinta() === 3;
+
+     * attribuutti.setValinta(5);
+     * attribuutti.getValinta() === 3;
+     * 
+     * attribuutti.setValinta(-2);
+     * attribuutti.getValinta() === -2;
+     * </pre>
      */
-    public Integer getValinta() {
+    public int getValinta() {
         return this.valinta;
+    }
+    
+    
+    /**
+     * Kertoo onko annettu arvo sama kuin oletusvalinta
+     * 
+     * @param verrattava mitä verrataan oletusvalintaan
+     * @return onko annettu arvo yhtä kuin oletusvalinta
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map, -2, "ei määritelty");
+     * attribuutti.onkoOletusValinta(-3) === false;
+     * attribuutti.onkoOletusValinta(-2) === true;
+     * attribuutti.onkoOletusValinta(-1) === false;
+     * attribuutti.onkoOletusValinta(0) === false;
+     * attribuutti.onkoOletusValinta(1) === false;
+     * attribuutti.onkoOletusValinta(2) === false;
+     * </pre>
+     */
+    public boolean onkoOletusValinta(int verrattava) {
+        return verrattava == this.oletusValinta;
     }
     
     
@@ -64,6 +211,22 @@ public class VaihtoehtoAttribuutti {
      * Antaa nykyistä valintaa vastaavan String-arvon
      * 
      * @return valintaa vastaava String-arvo
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map, -2, "ei määritelty");
+     * attribuutti.getValintaString() === "ei määritelty";
+     * 
+     * attribuutti.setValinta(2);
+     * attribuutti.getValintaString() === "keskimääräisesti";
+     * 
+     * attribuutti.setValinta(3);
+     * attribuutti.getValintaString() === "paljon";
+     * </pre>
      */
     public String getValintaString() {
         if (valinta == this.oletusValinta) return this.oletusString;
@@ -71,9 +234,128 @@ public class VaihtoehtoAttribuutti {
     }
     
     
+    /**
+     * Antaa oletusvalinnan
+     * 
+     * @return oletusvalinta
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map, -2, "ei määritelty");
+     * attribuutti.getOletus() === -2;
+     * 
+     * attribuutti.setValinta(3);
+     * attribuutti.getOletus() === -2;
+     * </pre>
+     */
+    public int getOletus() {
+        return this.oletusValinta;
+    }
+    
+    
+    /**
+     * Antaa oletusvalinnan String-muodon
+     * 
+     * @return oletusvalinnan String
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map, -2, "ei määritelty");
+     * attribuutti.getOletusString() === "ei määritelty";
+     * 
+     * attribuutti.setValinta(2);
+     * attribuutti.getOletusString() === "ei määritelty";
+     * </pre>
+     */
+    public String getOletusString() {
+        return this.oletusString;
+    }
+    
+    
+    /**
+     * Palauttaa Mapin mahdollisista vaihtoehdoista
+     * 
+     * @return vaihtoehdot
+     */
+    public Map<Integer, String> getVaihtoehdot() {
+        return new HashMap<Integer, String>(this.vaihtoehdot);
+    }
+    
+    
+    /**
+     * Antaa attribuutille määritellyn nimen
+     * 
+     * @return attribuutin nimi
+     */
+    public String getNimi() {
+        return this.nimi;
+    }
+    
+    
     @Override
+    /**
+     * VaihtoehtoAttribuutin nykyinen valinta String-muodossa.
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("määrä", map, -2, "ei määritelty");
+     * attribuutti.toString() === "ei määritelty";
+     * 
+     * attribuutti.setValinta(2);
+     * attribuutti.toString() === "keskimääräisesti";
+     * </pre>
+     */
     public String toString() {
-        return "" +  this.valinta.intValue();
+        return getValintaString();
+    }
+    
+    
+    @Override
+    public boolean equals(Object verrattava) {
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
+        VaihtoehtoAttribuutti verrattavaVA = (VaihtoehtoAttribuutti)verrattava;
+        
+        if (verrattavaVA.getNimi() != this.getNimi()) return false;
+        if (verrattavaVA.getOletus() != this.getOletus()) return false;
+        if (!verrattavaVA.getOletusString().equals(this.getOletusString())) return false;
+        if (!verrattavaVA.getVaihtoehdot().equals(this.getVaihtoehdot())) return false;
+        
+        return true;
+    }
+    
+    
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusString(hash, this.getNimi());
+        hash = Hajautus.hajautusInt(hash, this.getOletus());
+        hash = Hajautus.hajautusString(hash, this.getOletusString());
+        hash = Hajautus.hajautusInt(hash, this.vaihtoehdot.hashCode());
+        
+        return hash;
+    }
+    
+    
+    @Override
+    /**
+     * kopioi VaihtoehtoAttribuutin.
+     * ei säilytä valintaa, tekee uuden samanlaisen HashMapin.
+     */
+    public VaihtoehtoAttribuutti clone() {
+        return new VaihtoehtoAttribuutti(this.nimi, new HashMap<Integer, String>(this.vaihtoehdot), this.oletusValinta, this.oletusString);
     }
     
 }
