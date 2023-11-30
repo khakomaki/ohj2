@@ -9,9 +9,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
@@ -41,8 +43,10 @@ public class Resepti {
     private VaihtoehtoAttribuutti vaativuus     = null;
     private String tiedostonimi                 = "reseptit.dat";
     private String tiedostopolku                = "reseptidata/";
+    private String rekisteroitynimi             = "";
     
     private static int annettavaId  = 1;
+    private static Set<String> rekisteroidytNimet = new HashSet<String>();
     
     private static final Map<Integer, String> hintaVaihtoehdot;
     private static final Map<Integer, String> valmistusaikaVaihtoehdot;
@@ -129,16 +133,14 @@ public class Resepti {
      * @return reseptin tunnus
      * 
      * @example
-     * <pre name="test">
      * Resepti lihapullat = new Resepti("Lihapullat");
      * lihapullat.toString() === "-1|Lihapullat|-1|-1|-1|-1";
-     * int n = lihapullat.rekisteroi();
+     * int n = lihapullat.rekisteroiTunnus();
      * 
      * Resepti perunamuusi = new Resepti("Perunamuusi");
-     * perunamuusi.rekisteroi() === n + 1;
-     * </pre>
+     * perunamuusi.rekisteroiTunnus() === n + 1;
      */
-    public int rekisteroi() {
+    private int rekisteroiTunnus() {
         if (0 < this.reseptiId) return this.reseptiId; // jos on jo rekisteröity
         
         this.reseptiId = Resepti.annettavaId;
@@ -155,11 +157,54 @@ public class Resepti {
      * @param id mikä tunnus yritetään laittaa
      * @return asetettu reseptin tunnus
      */
-    public int rekisteroi(int id) {
+    private int rekisteroiTunnus(int id) {
         if (0 < this.reseptiId) return this.reseptiId; // jos on jo rekisteröity
         
         if (Resepti.annettavaId < id) Resepti.annettavaId = id;
-        return rekisteroi();
+        return rekisteroiTunnus();
+    }
+    
+    
+    /**
+     * Koittaa rekisteröidä annetun nimen.
+     * Jos onnistuu niin vaihtaa nykyisen nimen samaksi.
+     * 
+     * @param rekisteroitavaNimi mitä nimeä koitetaan rekisteröidä
+     * @return rekisteröity nimi
+     */
+    private String rekisteroiNimi(String rekisteroitavaNimi) {
+        // ei vaihda jos ei ole tallennettava tai sellainen on jo rekisteröity
+        if (!Validoi.onkoNimiTallennettavissa(rekisteroitavaNimi)) return this.rekisteroitynimi;
+        if (Resepti.rekisteroidytNimet.contains(rekisteroitavaNimi)) return this.rekisteroitynimi;
+        
+        this.rekisteroitynimi = rekisteroitavaNimi;
+        Resepti.rekisteroidytNimet.add(this.rekisteroitynimi);
+        setUusiNimi(this.rekisteroitynimi); // nimi vastaamaan rekisteröityä nimeä
+        
+        return this.rekisteroitynimi;
+    }
+    
+    
+    /**
+     * Koittaa rekisteröidä nykyisen reseptinimen
+     * 
+     * @return rekisteröity nimi
+     */
+    private String rekisteroiNimi() {
+        // ei tee mitään jos nimi on jo sama kuin rekisteröity
+        if (getNimi().equals(this.rekisteroitynimi)) return this.rekisteroitynimi;
+        
+        // poistaa nykyisen rekisteröidyn nimen ja rekisteröi uuden
+        poistaRekisteroidyistaNimista();
+        return rekisteroiNimi(this.getNimi());
+    }
+    
+    
+    /**
+     * Poistaa rekisteröidyn nimen luokan nimistä
+     */
+    private void poistaRekisteroidyistaNimista() {
+        Resepti.rekisteroidytNimet.remove(this.rekisteroitynimi);
     }
     
     
@@ -666,7 +711,7 @@ public class Resepti {
         if (osioVirhe != null) return osioVirhe;
         
         // onko nimi ok
-        if (!Validoi.onkoNimiTallennettavissa(getNimi())) return "Reseptin nimi ei ole tallennettavissa!";
+        if (!rekisteroiNimi().equals(getNimi())) return "Reseptin nimeä ei voida tallentaa tai saman niminen resepti on jo olemassa!";
         
         return null;
     }
@@ -691,12 +736,12 @@ public class Resepti {
     public void tallenna() throws SailoException {
         if (!this.muutettu) return;
         
-        // tarkitestaan voidaanko tallentaa
+        // tarkistestaan voidaanko tallentaa
         String virhe = voidaankoTallentaa();
         if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
         
         // antaa reseptille uniikin tunnuksen jos ollaan tallentamassa
-        if (this.reseptiId < 0) rekisteroi();
+        if (this.reseptiId < 0) rekisteroiTunnus();
         
         File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
         File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
@@ -795,7 +840,6 @@ public class Resepti {
      * @param rivi mistä reseptin tiedot yritetään parsia
      * 
      * @example
-     * <pre name="test">
      * Resepti resepti = new Resepti();
      * resepti.parse("1|Mustikkapiirakka|halpa ja maukas.|2|2|3|1");
      * resepti.toString().endsWith("|Mustikkapiirakka|2|2|3|1") === true;
@@ -810,15 +854,14 @@ public class Resepti {
      * 
      * resepti.parse("5|Kasvispiirakka 1 3 2 2");
      * resepti.toString().endsWith("5|Kasvispiirakka|2|2|3|1");
-     * </pre>
      */
     public void parse(String rivi) {
         if (rivi == null || rivi.length() < 1) return;
         
         StringBuilder sb = new StringBuilder(rivi);
         
-        rekisteroi(Mjonot.erota(sb, '|', this.reseptiId));
-        setUusiNimi(Mjonot.erota(sb, '|', getNimi()));
+        rekisteroiTunnus(Mjonot.erota(sb, '|', this.reseptiId));
+        rekisteroiNimi(Mjonot.erota(sb, '|', this.rekisteroitynimi));
         setKuvaus(Mjonot.erota(sb, '|', getKuvaus()));
         setHinta(Mjonot.erota(sb, '|', getHinta()));
         setValmistusaika(Mjonot.erota(sb, '|', getValmistusaika()));
@@ -862,6 +905,7 @@ public class Resepti {
     public Resepti clone() {
         Resepti kopio = new Resepti();
         kopio.reseptiId = this.reseptiId;
+        kopio.rekisteroitynimi = this.rekisteroitynimi;
         kopio.setUusiNimi(this.getNimi());
         kopio.setHinta(this.getHinta());
         kopio.setValmistusaika(this.getValmistusaika());
@@ -1014,7 +1058,7 @@ public class Resepti {
      * TODO: poista kun ei enää tarvita
      */
     public void satunnaisetAttribuutit() {
-        rekisteroi();
+        rekisteroiTunnus();
         
         setHinta(Satunnaisluku.rand(1, 3));
         setValmistusaika(Satunnaisluku.rand(1, 5));
@@ -1067,10 +1111,10 @@ public class Resepti {
         System.out.println(mustikkapiirakka);
         System.out.println(mustikkapiirakka.getKuvaus());
         
-        System.out.println(mustikkapiirakka.rekisteroi());
+        System.out.println(mustikkapiirakka.rekisteroiTunnus());
         System.out.println(mustikkapiirakka);
         
-        lihapiirakka.rekisteroi();
+        lihapiirakka.rekisteroiTunnus();
         System.out.println(lihapiirakka);
         
         try {
