@@ -14,6 +14,7 @@ import kanta.Hajautus;
 import kanta.Hallitsija;
 import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
+import kanta.Validoi;
 
 /**
  * @author hakom
@@ -222,6 +223,29 @@ public class Osiot implements Hallitsija<Osio> {
     
     
     /**
+     * Kertoo voidaanko osiot tallentaa
+     * 
+     * @return virheteksti tai null jos voidaan tallentaa
+     */
+    public String voidaankoTallentaa() {
+        // samoja osioiden nimiä varten
+        List<String> osioNimet = new ArrayList<String>();
+        
+        // kysytään jokaseilta osiolta
+        for (Osio osio : this.osiot) {
+            String virhe = osio.voidaankoTallentaa();
+            if (virhe != null) return virhe;    
+            osioNimet.add(osio.getNimi());
+        }
+
+        if (osioNimet.size() <= 0) return "Ei ole yhtään osiota!";
+        if (Validoi.onkoDuplikaatteja(osioNimet)) return "Sama osion nimi useaan kertaan!";
+        
+        return null;
+    }
+    
+    
+    /**
      * Lukee Osion tiedot tiedostosta
      * 
      * @throws SailoException jos lukeminen epäonnistuu
@@ -261,6 +285,10 @@ public class Osiot implements Hallitsija<Osio> {
      */
     public void tallenna() throws SailoException {
         if (!this.muutettu) return;
+        
+        // tarkitestaan voidaanko tallentaa
+        String virhe = voidaankoTallentaa();
+        if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
         
         // käskee osioiden tallentamaan omat tietonsa (varmistetaan myös että osiot ovat saaneet uniikit tunnuksensa)
         for (Osio osio : this.osiot) {

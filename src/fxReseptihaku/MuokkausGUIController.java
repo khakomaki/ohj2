@@ -280,7 +280,9 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         if (tulikoMuutoksia()) { 
             tallennetaanko = Dialogs.showQuestionDialog("Reseptin tallennus", "Sinulla on tallentamattomia muutoksia. Haluatko tallentaa?", "Tallenna", "Sulje");
         }
-        if (tallennetaanko) tallenna();
+        if (tallennetaanko) {
+            if (!tallenna()) return; // koittaa tallentaa, jos ei onnistu niin ei sulje
+        };
         suljeTallentamatta();
     }
     
@@ -290,15 +292,17 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
-    private void tallenna() {
+    private boolean tallenna() {
         // ei tallenneta turhaan jos ei ole tullut muutoksia
-        if (!tulikoMuutoksia()) return;
+        if (!tulikoMuutoksia()) return true;
         
-        this.alkuperainenResepti = this.valittuResepti;
         try {
-            this.alkuperainenResepti.tallenna();
+            this.valittuResepti.tallenna();
+            this.alkuperainenResepti = this.valittuResepti;
+            return true;
         } catch (SailoException exception) {
             Dialogs.showMessageDialog("Tallentamisessa ongelmia: " + exception.getMessage());
+            return false;
         }
     }
     

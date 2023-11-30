@@ -19,6 +19,7 @@ import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 import kanta.Satunnaisluku;
 import kanta.VaihtoehtoAttribuutti;
+import kanta.Validoi;
 
 /**
  * @author hakom
@@ -655,6 +656,23 @@ public class Resepti {
     
     
     /**
+     * Validoi voidaanko resepti tallentaa
+     * 
+     * @return virheteksti tai null jos voidaan tallentaa
+     */
+    public String voidaankoTallentaa() {
+        // kysytään osioilta
+        String osioVirhe = this.osiot.voidaankoTallentaa();
+        if (osioVirhe != null) return osioVirhe;
+        
+        // onko nimi ok
+        if (!Validoi.onkoNimiTallennettavissa(getNimi())) return "Reseptin nimi ei ole tallennettavissa!";
+        
+        return null;
+    }
+    
+    
+    /**
      * Lukee reseptin tiedot tiedostosta
      * 
      * @throws SailoException jos tietoja ei saada luettua
@@ -672,6 +690,10 @@ public class Resepti {
      */
     public void tallenna() throws SailoException {
         if (!this.muutettu) return;
+        
+        // tarkitestaan voidaanko tallentaa
+        String virhe = voidaankoTallentaa();
+        if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
         
         // antaa reseptille uniikin tunnuksen jos ollaan tallentamassa
         if (this.reseptiId < 0) rekisteroi();

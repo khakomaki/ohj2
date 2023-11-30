@@ -5,6 +5,7 @@ import java.io.File;
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 import kanta.SailoException;
+import kanta.Validoi;
 
 /**
  * @author hakom
@@ -300,6 +301,22 @@ public class Osio {
     
     
     /**
+     * Kertoo voidaanko osio tallentaa
+     * 
+     * @return virheteksti tai null jos voidaan tallentaa
+     */
+    public String voidaankoTallentaa() {
+        // onko nimi ok
+        if (!Validoi.onkoNimiTallennettavissa(getNimi())) return "Osion nimi ei ole tallennettavissa!";
+        
+        // onko sekä ohjeet että ainesosat tyhjiä
+        if (this.ohjeet.getLkm() <= 0 && this.osionAinesosat.getLkm() <= 0) return "Osio ei sisällä yhtään ohjetta tai ainesosaa!";
+        
+        return null;
+    }
+    
+    
+    /**
      * Lukee osion tiedot tiedostosta
      * 
      * @throws SailoException jos tiedoston lukeminen ei onnistu
@@ -319,6 +336,10 @@ public class Osio {
      * @throws SailoException jos tallentaminen epäonnistuu
      */
     public void tallenna() throws SailoException {
+        // tarkitestaan voidaanko tallentaa
+        String virhe = voidaankoTallentaa();
+        if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
+        
         // rekisteröi osion jos sille ei ole annettu vielä omaa tunnusta
         if (this.osioId < 0) rekisteroi();
         

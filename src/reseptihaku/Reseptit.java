@@ -15,6 +15,7 @@ import kanta.Hallitsija;
 import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 import kanta.VaihtoehtoAttribuutti;
+import kanta.Validoi;
 
 /**
  * @author hakom
@@ -410,6 +411,27 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
+     * Validoi voidaanko resepti tallentaa
+     * 
+     * @return virheteksti tai null jos voidaan tallentaa
+     */
+    public String voidaankoTallentaa() {
+        // samoja reseptin nimiä varten
+        List<String> reseptiNimet = new ArrayList<String>();
+        
+        // kysytään resepteiltä
+        for (Resepti resepti : this.reseptit) {
+            String virhe = resepti.voidaankoTallentaa();
+            if (virhe != null) return virhe;
+            reseptiNimet.add(resepti.getNimi());
+        }
+        if (Validoi.onkoDuplikaatteja(reseptiNimet)) return "Sama reseptin nimi useaan kertaan!";
+        
+        return null;
+    }
+    
+    
+    /**
      * Lukee Reseptien tiedot tiedostosta
      * 
      * @throws SailoException jos tallennus epäonnistuu
@@ -447,6 +469,10 @@ public class Reseptit implements Hallitsija<Resepti> {
      */
     public void tallenna() throws SailoException {
         if (!this.muutettu) return;
+        
+        // tarkitestaan voidaanko tallentaa
+        String virhe = voidaankoTallentaa();
+        if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
         
         // vaihdetaan nykyinen tiedosto varmuuskopioksi
         File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
