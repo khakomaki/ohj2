@@ -27,7 +27,6 @@ public class Osiot implements Hallitsija<Osio> {
     private String tiedostopolku    = "reseptidata/Reseptin nimi/";
     private int reseptiId           = -1;
     private List<Osio> osiot        = new ArrayList<Osio>();
-    private boolean muutettu        = true;
     
     /**
      * Luo osiot
@@ -64,7 +63,6 @@ public class Osiot implements Hallitsija<Osio> {
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
         this.tiedostonimi = tiedostonimi;
-        this.muutettu = true;
     }
     
     
@@ -82,8 +80,6 @@ public class Osiot implements Hallitsija<Osio> {
         for (Osio osio : this.osiot) {
             osio.setTiedostopolku(this.tiedostopolku);
         }
-        
-        this.muutettu = true;
     }
     
     
@@ -94,7 +90,6 @@ public class Osiot implements Hallitsija<Osio> {
      */
     public void setReseptiTunnus(int tunnus) {
         this.reseptiId = tunnus;
-        this.muutettu = true;
     }
     
     
@@ -136,7 +131,6 @@ public class Osiot implements Hallitsija<Osio> {
     public Osio lisaa(String nimi) {
         Osio osio = new Osio(nimi);
         osiot.add(osio);
-        this.muutettu = true;
         return osio;
     }
     
@@ -162,7 +156,6 @@ public class Osiot implements Hallitsija<Osio> {
         if (osio == null) return;
         Osio lisattavaOsio = osio;
         this.osiot.add(lisattavaOsio);
-        this.muutettu = true;
     }
     
     
@@ -200,7 +193,6 @@ public class Osiot implements Hallitsija<Osio> {
     @Override
     public void poista(Osio osio) {
         this.osiot.remove(osio);
-        this.muutettu = true;
     }
     
     
@@ -268,8 +260,6 @@ public class Osiot implements Hallitsija<Osio> {
                 osio.lueTiedostosta();
             }
             
-            this.muutettu = false;
-            
         } catch (FileNotFoundException exception) {
             throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         }
@@ -283,9 +273,7 @@ public class Osiot implements Hallitsija<Osio> {
      * 
      * @throws SailoException jos tallennus epäonnistuu
      */
-    public void tallenna() throws SailoException {
-        if (!this.muutettu) return;
-        
+    public void tallenna() throws SailoException {        
         // tarkitestaan voidaanko tallentaa
         String virhe = voidaankoTallentaa();
         if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
@@ -331,8 +319,6 @@ public class Osiot implements Hallitsija<Osio> {
         } catch (IOException exception) {
             throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
         }
-        
-        this.muutettu = false;
     }
     
     

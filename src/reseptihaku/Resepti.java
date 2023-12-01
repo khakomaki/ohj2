@@ -35,7 +35,6 @@ public class Resepti {
     private int reseptiId                       = -1;
     private String nimi                         = "";
     private Osiot osiot                         = null;
-    private boolean muutettu                    = true;
     private String kuvaus                       = "";
     private VaihtoehtoAttribuutti hinta         = null;
     private VaihtoehtoAttribuutti valmistusaika = null;
@@ -146,7 +145,6 @@ public class Resepti {
         this.reseptiId = Resepti.annettavaId;
         this.osiot.setReseptiTunnus(this.reseptiId);
         Resepti.annettavaId++;
-        this.muutettu = true;
         return this.reseptiId;
     }
     
@@ -293,7 +291,6 @@ public class Resepti {
         // ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
         if (nimi == null || nimi.length() < 1) return;
         this.nimi = nimi;
-        this.muutettu = true;
     }
     
     
@@ -338,7 +335,6 @@ public class Resepti {
         }
         
         this.kuvaus = kuvaus;
-        this.muutettu = true;
     }
     
     
@@ -396,7 +392,6 @@ public class Resepti {
         File dir = new File(this.tiedostopolku);
         dir.mkdirs();
         
-        this.muutettu = true;
         this.osiot.setTiedostoPolku(getAlihakemistoPolku()); // esim. reseptidata/Mustikkapiirakka/
     }
     
@@ -471,7 +466,6 @@ public class Resepti {
     public void lisaaOsio(Osio osio) {
         if (osio == null) return;
         this.osiot.lisaa(osio);
-        this.muutettu = true;
     }
     
     
@@ -482,7 +476,6 @@ public class Resepti {
      */
     public void poistaOsio(Osio osio) {
         this.osiot.poista(osio);
-        this.muutettu = true;
     }
 
 
@@ -734,8 +727,6 @@ public class Resepti {
      * @throws SailoException jos tallentaminen epäonnistuu
      */
     public void tallenna() throws SailoException {
-        if (!this.muutettu) return;
-        
         // tarkistestaan voidaanko tallentaa
         String virhe = voidaankoTallentaa();
         if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
@@ -803,7 +794,6 @@ public class Resepti {
         } catch (IOException exception) {
             throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
         }
-        this.muutettu = false;
         
         // käskee osioita tallentamaan
         this.osiot.setTiedostoPolku(getAlihakemistoPolku());

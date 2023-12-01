@@ -152,6 +152,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // luo osion nimen tekstikentän
         TextField osioNimiAinesosat = new TextField(osio.getNimi());
+        osioNimiAinesosat.setOnKeyTyped(e -> { osio.setUusiNimi(osioNimiAinesosat.getText()); });
         osioNimiAinesosat.setFont(kirjasinB16);
         
         // luo osion poisto-painikkeen

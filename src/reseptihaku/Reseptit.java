@@ -27,7 +27,6 @@ public class Reseptit implements Hallitsija<Resepti> {
     private List<Resepti> reseptit      = new ArrayList<Resepti>();
     private String tiedostonimi         = "reseptit.dat";
     private String tiedostopolku        = "reseptidata/";
-    private boolean muutettu            = true;
     private int lkm                     = 0;
     
     private final static Resepti esimerkkiresepti = new Resepti();
@@ -97,8 +96,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         for (Resepti resepti : this.reseptit) {
             resepti.setTiedostopolku(this.tiedostopolku);
         }
-        
-        this.muutettu = true;
     }
     
     
@@ -126,7 +123,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         Resepti resepti = new Resepti(nimi);
         reseptit.add(resepti);
         this.lkm++;
-        this.muutettu = true;
         return resepti;
     }
     
@@ -155,7 +151,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         Resepti lisattavaResepti = resepti;
         reseptit.add(lisattavaResepti);
         this.lkm++;
-        this.muutettu = true;
     }
     
     
@@ -253,7 +248,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         if (vanhaReseptiIndeksi < 0) return;
         
         this.reseptit.set(vanhaReseptiIndeksi, vaihdettavaResepti);
-        this.muutettu = true;
     }
     
     
@@ -331,7 +325,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         
         this.reseptit.remove(poistettavanIndeksi);
         this.lkm--;
-        this.muutettu = true;
     }
     
     
@@ -454,8 +447,6 @@ public class Reseptit implements Hallitsija<Resepti> {
                 resepti.lueTiedostosta();
             }
             
-            this.muutettu = false;
-            
         } catch (FileNotFoundException exception) {
             throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
         }
@@ -468,7 +459,6 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @throws SailoException jos tallentaminen epäonnistuu
      */
     public void tallenna() throws SailoException {
-        if (!this.muutettu) return;
         
         // tarkitestaan voidaanko tallentaa
         String virhe = voidaankoTallentaa();
@@ -498,8 +488,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         for (Resepti resepti : this.reseptit) {
             resepti.tallenna();
         }
-        
-        this.muutettu = false;
     }
     
     
