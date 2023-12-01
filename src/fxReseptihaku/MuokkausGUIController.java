@@ -39,6 +39,9 @@ import reseptihaku.Resepti;
  * @author hakom
  * @version 1 Oct 2023
  *
+ * Muokkausnäkymä annetulle reseptille.
+ * Muuttaa annetun reseptin tietoja, jos tallennetaan.
+ * Sulkeminen ilman tallennusta ei tee muutoksia annettuun reseptiin.
  */
 public class MuokkausGUIController implements ModalControllerInterface<Resepti> {
     
@@ -55,55 +58,81 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     
     // ====================================================================================================
     
+    // käyttöliittymän ulkonäkö
     private final Insets PEHMUSTE_ISO = new Insets(10, 10, 10, 10);
     private final Insets PEHMUSTE_PIENI = new Insets(5, 5, 5, 5);
     private final int VALI = 10;
+    private final Font kirjasinB16 = new Font("System Bold", 16);
+    private final Font kirjasin14 = new Font(14);
     
-    // luodaan käytettävät fontit
-    private Font kirjasinB16 = new Font("System Bold", 16);
-    private Font kirjasin14 = new Font(14);
-    
+    // alkuperäinen ja muokattava resepti
     private Resepti valittuResepti;
     private Resepti alkuperainenResepti;
     
     
+    /**
+     * Palautettava resepti muokkauksen jälkeen
+     */
     @Override
     public Resepti getResult() { 
         return this.alkuperainenResepti;
     }
 
+    
+    /**
+     * Ei tehdä mitään kun resepti on laitettu näkyville
+     */
     @Override
     public void handleShown() {
         //
     }
-
+    
+    
+    /**
+     * Asettaa reseptin näkymälle
+     */
     @Override
     public void setDefault(Resepti oletus) {
         this.alkuperainenResepti = oletus;
-        // luodaan Reseptipohja jos annettu Resepti on null, muuten luodaan kopio annetusta
+        
+        // luodaan kopio annetusta reseptistä muokattavaksi tai uusi jos annettu on null
         if (oletus == null) { 
             this.valittuResepti = new Resepti(); 
         } else { 
             this.valittuResepti = oletus.clone(); 
         }
         
+        // näytetään resepti
+        naytaResepti();
+    }
+    
+    
+    /**
+     * Näyttää reseptin käyttöliittymään
+     */
+    private void naytaResepti() {
         naytaReseptinOminaisuudet();
         naytaOsiot();
     }
     
     
+    /**
+     * Näyttää reseptin ominaisuudet kuten nimi, kuvaus sekä sille määritellyt attribuutit
+     */
     private void naytaReseptinOminaisuudet() {
+        // reseptin nimi
         this.reseptinNimiTextField.setText(this.valittuResepti.getNimi());
         reseptinNimiTextField.setOnKeyTyped(e -> { valittuResepti.setUusiNimi(reseptinNimiTextField.getText()); });
         
+        // reseptin kuvaus
         this.kuvausTextArea.setText(this.valittuResepti.getKuvaus());
         kuvausTextArea.setOnKeyTyped(e -> { valittuResepti.setKuvaus(kuvausTextArea.getText()); });
         
         // tyhjennetään attribuutit gridpane
         this.attribuutitGridPane.getChildren().clear();
         
+        // attribuutit omille riveilleen
         int rivi = 0;
-        
         for (VaihtoehtoAttribuutti attribuutti : this.valittuResepti.getAttribuutit()) {
             Label attribuutinNimi = new Label(attribuutti.getNimi());
             ComboBox<VaihtoehtoAttribuutti> attribuutinVaihtoehdot = new ComboBox<VaihtoehtoAttribuutti>();
@@ -130,6 +159,9 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
+    /**
+     * Näyttää reseptin osiot
+     */
     private void naytaOsiot() {
         // tyhjentää VBox sisällön
         this.ainesosaJaOhjeetVBox.getChildren().clear();
@@ -143,9 +175,16 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
+    /**
+     * Luo annetulle osiolle VBox-noden joka sisältää osion tiedot
+     * 
+     * @param osio mikä osio näytetään
+     * @return luotu VBox osion tiedoilla
+     */
     private VBox naytaOsio(Osio osio) {
         VBox osioVBox = new VBox(); // koko osio
         
+        // otsikko joka koostuu osion nimestä ja osion poistopainikkeesta
         HBox osioOstikkoHBox = new HBox();
         osioOstikkoHBox.setSpacing(VALI);
         osioOstikkoHBox.setPadding(PEHMUSTE_ISO);
@@ -164,8 +203,10 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         osioOstikkoHBox.getChildren().add(osioNimiAinesosat);
         osioOstikkoHBox.getChildren().add(osioPoisto);
         
+        // osion sisältö kuten ohjeet ja ainesosat
         HBox osionSisaltoHBox = new HBox();
         
+        // sarakkeinden muotoilut
         ColumnConstraints ainesosaConstraints = NodeKasittely.luoSarakeRajoitteet(140, Priority.SOMETIMES, HPos.CENTER);
         ColumnConstraints painikeConstraints = NodeKasittely.luoSarakeRajoitteet(30, Priority.NEVER, HPos.CENTER);
         ColumnConstraints vaiheConstraints = NodeKasittely.luoSarakeRajoitteet(50, Priority.NEVER, HPos.CENTER);
@@ -173,6 +214,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // ==================== näytetään ainesosat ====================
         
+        // ainesosat
         VBox ainesosatVBox = new VBox();
         ainesosatVBox.setPadding(PEHMUSTE_ISO);
         OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
@@ -201,6 +243,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // ==================== näytetään ohjeet ====================
         
+        // ohjeet
         VBox ohjeetVBox = new VBox();
         ohjeetVBox.setPadding(PEHMUSTE_ISO);
         Ohjeet osionOhjeet = osio.annaOsionOhjeet();
@@ -236,6 +279,12 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
+    /**
+     * Luo annetulle ohjeelle javafx nodet tarvittua muokkausta varten
+     * 
+     * @param ohje mille ohjeelle luodaan nodet
+     * @return lista luoduista nodeista
+     */
     private List<Node> luoOhjeNodet(Ohje ohje) {
         List<Node> nodet = new ArrayList<Node>();
         
@@ -249,13 +298,19 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ohjeistus.setPrefColumnCount(0);
         ohjeistus.setPrefRowCount(2);
         ohjeistus.setWrapText(true);
-        ohjeistus.setOnKeyTyped( e -> {ohje.setOhjeistus(ohjeistus.getText()); } );
+        ohjeistus.setOnKeyTyped( e -> { ohje.setOhjeistus(ohjeistus.getText()); } );
         nodet.add(ohjeistus);
         
         return nodet;
     }
     
     
+    /**
+     * Luo annetulle ainesosalle javafx nodet muokkausta varten
+     * 
+     * @param osionAinesosa mille ainesosalle luodaan
+     * @return lista luoduista nodeista
+     */
     private List<Node> luoAinesosaNodet(OsionAinesosa osionAinesosa) {
         List<Node> nodet = new ArrayList<Node>();
         
@@ -275,6 +330,10 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
+    /**
+     * yrittää sulkea muokkausnäkymän.
+     * jos muokkausnäkymässä on tallentamattomia muutoksia, näyttää dialogin tallentamisesta.
+     */
     private void sulje() {
         boolean tallennetaanko = false;
         // näytetään dialogi tallentamisesta jos on tallentamattomia muutoksia
@@ -288,15 +347,25 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
+    /**
+     * sulkee näkymän ilman dialogeja tai tallentamista
+     */
     private void suljeTallentamatta() {
         ModalController.closeStage(reseptinNimiTextField);
     }
     
     
+    /**
+     * koittaa tallentaa reseptin, jos on tullut muutoksia.
+     * ilmoittaa ongelmista tallentamisesta dialogilla.
+     * 
+     * @return saatiinko tallennettua
+     */
     private boolean tallenna() {
         // ei tallenneta turhaan jos ei ole tullut muutoksia
         if (!tulikoMuutoksia()) return true;
         
+        // yrittää tallentaa, näyttää dialogin jos ei onnistunut
         try {
             this.valittuResepti.tallenna();
             this.alkuperainenResepti = this.valittuResepti;
@@ -308,16 +377,25 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
+    /**
+     * poistaa reseptin ja sulkee näkymän.
+     * näyttää dialogin poistamisen varmistamiseksi.
+     */
     private void poistaResepti() {
-        boolean vastaus = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
-        if (vastaus) { 
+        boolean poistetaanko = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
+        if (poistetaanko) {
             this.alkuperainenResepti = null;
             suljeTallentamatta();
         }
     }
     
     
+    /**
+     * lisää reseptiin uuden osion sille tehdyn TextField-nodet tekstillä.
+     * jos TextField on tyhjä niin luo osion oletusnimellä.
+     */
     private void lisaaOsio() {
+        // teksti osion lisäys-kentästä
         String osioTeksti = osioTekstiKentta.getText();
         if (osioTeksti.isEmpty()) osioTeksti = "";
         
@@ -334,19 +412,33 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     }
     
     
+    /**
+     * poistaa osion käyttöliittymästä ja reseptistä
+     * 
+     * @param osioVBox poistettavan osion käyttöliittymä-komponentti
+     * @param osio poistettava osio
+     */
     private void poistaOsio(VBox osioVBox, Osio osio) {
-        if (osioVBox == null) { return; }
+        if (osioVBox == null) return;
+        
+        // kutsuu osion parent-nodea ja käskee sen poistamaan
         if (osioVBox.getParent() instanceof VBox) {
             VBox ylempiVBox = (VBox)osioVBox.getParent();
             ylempiVBox.getChildren().remove(osioVBox);
         }
         
+        // poistaa osion reseptistä
         this.valittuResepti.poistaOsio(osio);
     }
     
     
+    /**
+     * Kertoo onko muokkauksen aikana tullut muutoksia alkuperäiseen reseptiin
+     * 
+     * @return totuusarvo tuliko muutoksia
+     */
     private boolean tulikoMuutoksia() {
-        // valittu resepti ei voi olla null, joten voidaan tehdä vertailu
+        if (valittuResepti == null) return true;
         return !this.valittuResepti.equals(this.alkuperainenResepti);
     }
 
