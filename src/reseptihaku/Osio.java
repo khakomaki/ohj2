@@ -19,6 +19,7 @@ public class Osio {
     private OsionAinesosat osionAinesosat;
     private Ohjeet ohjeet;
     private String tiedostopolku            = "reseptidata/Reseptin nimi/";
+    private boolean muutettu                = true;
     
     private static int annettavaId          = 1;
     
@@ -141,6 +142,7 @@ public class Osio {
         if (nimi == null) return;
         if (nimi.length() < 1) return;
         this.nimi = nimi;
+        this.muutettu = true;
     }
     
     
@@ -174,6 +176,7 @@ public class Osio {
         
         this.ohjeet.setTiedostoPolku(getAlihakemistoPolku());
         this.osionAinesosat.setTiedostoPolku(getAlihakemistoPolku());
+        this.muutettu = true;
     }
     
     
@@ -267,6 +270,18 @@ public class Osio {
     
     
     /**
+     * Kertoo onko osioon tullut muutoksia
+     * 
+     * @return onko osioon tullut muutoksia
+     */
+    public boolean onkoTallentamattomiaMuutoksia() {
+        if (this.ohjeet.onkoTallentamattomiaMuutoksia()) return true;
+        if (this.osionAinesosat.onkoTallentamattomiaMuutoksia()) return true;
+        return this.muutettu;
+    }
+    
+    
+    /**
      * Koittaa parsia osion tiedot annetusta rivistä
      * 
      * @param rivi mistä koitetaan lukea osion tiedot
@@ -336,6 +351,8 @@ public class Osio {
      * @throws SailoException jos tallentaminen epäonnistuu
      */
     public void tallenna() throws SailoException {
+        if (!onkoTallentamattomiaMuutoksia()) return;
+        
         // tarkitestaan voidaanko tallentaa
         String virhe = voidaankoTallentaa();
         if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);

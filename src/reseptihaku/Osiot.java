@@ -215,6 +215,19 @@ public class Osiot implements Hallitsija<Osio> {
     
     
     /**
+     * Kertoo onko osioissa tallentamattomia muutoksia
+     * 
+     * @return onko tallentamattomia muutoksia
+     */
+    public boolean onkoTallentamattomiaMuutoksia() {
+        for (Osio osio : this.osiot) {
+            if (osio.onkoTallentamattomiaMuutoksia()) return true;
+        }
+        return false;
+    }
+    
+    
+    /**
      * Kertoo voidaanko osiot tallentaa
      * 
      * @return virheteksti tai null jos voidaan tallentaa

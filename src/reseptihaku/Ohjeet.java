@@ -302,6 +302,16 @@ public class Ohjeet implements Hallitsija<Ohje> {
     
     
     /**
+     * Kertoo onko ohjeisiin tullut tallentamattomia muutoksia
+     * 
+     * @return onko tallentamattomia muutoksia
+     */
+    public boolean onkoTallentamattomiaMuutoksia() {
+        return this.muutettu;
+    }
+    
+    
+    /**
      * Lukee ohjeet tiedostosta
      * 
      * @throws SailoException jos tiedoston lukeminen epäonnistuu
@@ -337,7 +347,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @throws SailoException jos tallennus epäonnistuu
      */
     public void tallenna() throws SailoException {
-        if (!muutettu) return;
+        if (!onkoTallentamattomiaMuutoksia()) return;
         
         File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
         File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));

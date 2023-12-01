@@ -27,7 +27,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     private String tiedostonimi     = "osion_ainesosat.dat";
     private String tiedostopolku    = "reseptidata/Reseptin nimi/Osion nimi/";
     private int osioId              = -1;
-    private boolean muutettu        = false;
+    private boolean muutettu        = true;
     
     
     /**
@@ -196,6 +196,16 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     
     
     /**
+     * Kertoo onko osion ainesosiin tullut tallentamattomia muutoksia
+     * 
+     * @return onko tallentamattomia muutoksia
+     */
+    public boolean onkoTallentamattomiaMuutoksia() {
+        return this.muutettu;
+    }
+    
+    
+    /**
      * Lukee Osion Ainesosien tiedot tiedostosta
      * 
      * @throws SailoException jos tallennus epäonnistuu
@@ -230,7 +240,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @throws SailoException jos tallennus epäonnistuu
      */
     public void tallenna() throws SailoException {
-        if (!this.muutettu) return;
+        if (!onkoTallentamattomiaMuutoksia()) return;
         
         File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
         File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));

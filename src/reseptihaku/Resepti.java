@@ -43,6 +43,7 @@ public class Resepti {
     private String tiedostonimi                 = "reseptit.dat";
     private String tiedostopolku                = "reseptidata/";
     private String rekisteroitynimi             = "";
+    private boolean muutettu                    = true;
     
     private static int annettavaId  = 1;
     private static Set<String> rekisteroidytNimet = new HashSet<String>();
@@ -291,6 +292,7 @@ public class Resepti {
         // ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
         if (nimi == null || nimi.length() < 1) return;
         this.nimi = nimi;
+        this.muutettu = true;
     }
     
     
@@ -335,6 +337,7 @@ public class Resepti {
         }
         
         this.kuvaus = kuvaus;
+        this.muutettu = true;
     }
     
     
@@ -393,6 +396,7 @@ public class Resepti {
         dir.mkdirs();
         
         this.osiot.setTiedostoPolku(getAlihakemistoPolku()); // esim. reseptidata/Mustikkapiirakka/
+        this.muutettu = true;
     }
     
     
@@ -494,6 +498,7 @@ public class Resepti {
      */
     public void setHinta(int hinta) {
         this.hinta.setValinta(hinta);
+        this.muutettu = true;
     }
     
     
@@ -504,6 +509,7 @@ public class Resepti {
      */
     public void setValmistusaika(int valmistusaika) {
         this.valmistusaika.setValinta(valmistusaika);
+        this.muutettu = true;
     }
     
     
@@ -514,6 +520,7 @@ public class Resepti {
      */
     public void setTahdet(int tahdet) {
         this.tahdet.setValinta(tahdet);
+        this.muutettu = true;
     }
     
     
@@ -524,6 +531,7 @@ public class Resepti {
      */
     public void setVaativuus(int vaativuus) {
         this.vaativuus.setValinta(vaativuus);
+        this.muutettu = true;
     }
     
     
@@ -694,6 +702,17 @@ public class Resepti {
     
     
     /**
+     * Kertoo onko reseptillä tallentamattomia muutoksia
+     * 
+     * @return onko tallentamattomia muutoksia
+     */
+    public boolean onkoTallentamattomiaMuutoksia() {
+        if (this.osiot.onkoTallentamattomiaMuutoksia()) return true;
+        return this.muutettu;
+    }
+    
+    
+    /**
      * Validoi voidaanko resepti tallentaa
      * 
      * @return virheteksti tai null jos voidaan tallentaa
@@ -718,6 +737,7 @@ public class Resepti {
     public void lueTiedostosta() throws SailoException {
         this.osiot.setTiedostoPolku(getAlihakemistoPolku());
         this.osiot.lueTiedostosta();
+        this.muutettu = true;
     }
     
     
@@ -727,6 +747,8 @@ public class Resepti {
      * @throws SailoException jos tallentaminen epäonnistuu
      */
     public void tallenna() throws SailoException {
+        if (!onkoTallentamattomiaMuutoksia()) return;
+        
         // tarkistestaan voidaanko tallentaa
         String virhe = voidaankoTallentaa();
         if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
@@ -798,6 +820,7 @@ public class Resepti {
         // käskee osioita tallentamaan
         this.osiot.setTiedostoPolku(getAlihakemistoPolku());
         this.osiot.tallenna();
+        this.muutettu = false;
     }
     
     
