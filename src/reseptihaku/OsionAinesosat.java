@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -42,7 +43,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * </pre>
      */
     public OsionAinesosat() {
-        //
+        super(2.0, 0);
     }
     
     
@@ -58,6 +59,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * </pre>
      */
     public OsionAinesosat(int osioId) {
+        super(2.0, 0);
         this.osioId = osioId;
     }
     
@@ -122,7 +124,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     public void lisaa(OsionAinesosa osionAinesosa) {
         if (osionAinesosa == null) return;
         
-        lisaaOlio(osionAinesosa);
+        add(osionAinesosa);
         this.muutettu = true;
     }
     
@@ -144,7 +146,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      */
     @Override
     public void poista(OsionAinesosa osionAinesosa) {
-        poistaOlio(osionAinesosa);
+        remove(osionAinesosa);
         this.muutettu = true;
     }
     
@@ -164,7 +166,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * </pre>
      */
     public OsionAinesosa anna(int indeksi) {
-        return getOlio(indeksi);
+        return get(indeksi);
     }
     
     
@@ -173,7 +175,14 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      */
     @Override
     public List<OsionAinesosa> anna() {
-        return getOliotListana();
+        List<OsionAinesosa> lista = new ArrayList<OsionAinesosa>();
+        
+        // lisätään ainesosat listaan
+        for (OsionAinesosa oa : this) {
+            lista.add(oa);
+        }
+        
+        return lista;
     }
     
     
@@ -182,7 +191,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      */
     public void tulostaOsionAinesosat(OutputStream os) {
         PrintStream out = new PrintStream(os);
-        for (int i = 0; i < getLkm(); i++) {
+        for (int i = 0; i < size(); i++) {
             OsionAinesosa osionAinesosa = this.anna(i);
             
             // tulostaa ainesosista tunnusta vastaavan ainesosan nimen
@@ -268,7 +277,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
             // ainesosien tiedot kirjoittajaan
-            for (int i = 0; i < this.getLkm(); i++) {
+            for (int i = 0; i < this.size(); i++) {
                 fo.print(this.osioId);
                 fo.print('|');
                 fo.println(anna(i));
@@ -308,16 +317,14 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         kopio.tiedostonimi = this.tiedostonimi;
         
         // kopioidaan kaikki alkiot kopioon
-        // TODO: käske TietueHallitsijan kopioimaan
-        for (int i = 0; i < this.getLkm(); i++) {
-            kopio.lisaa(this.anna(i));
+        for (OsionAinesosa oa : this) {
+            kopio.lisaa(oa);
         }
         
         return kopio;
     }
     
     
-    @Override
     /**
      * @example
      * <pre name="test">
@@ -338,6 +345,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * oa1.equals(oa2) === true;
      * </pre>
      */
+    @Override
     public boolean equals(Object verrattava) {
         if (verrattava == null) return false;
         if (verrattava.getClass() != this.getClass()) return false;
@@ -345,10 +353,10 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         OsionAinesosat verrattavaOA = (OsionAinesosat)verrattava;
         if (verrattavaOA.osioId != this.osioId) return false;
         if (!verrattavaOA.tiedostonimi.equals(this.tiedostonimi)) return false;
-        if (verrattavaOA.getLkm() != this.getLkm()) return false;
+        if (verrattavaOA.size() != this.size()) return false;
         
         // verrataan alkioita keskenään
-        for (int i = 0; i < this.getLkm(); i++) {
+        for (int i = 0; i < this.size(); i++) {
             if (!verrattavaOA.anna(i).equals(this.anna(i))) return false;
         }
         
@@ -356,7 +364,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     }
     
     
-    @Override
     /**
      * @return hajautusluku
      * 
@@ -379,13 +386,14 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * oa1.hashCode() == oa2.hashCode() === true;
      * </pre>
      */
+    @Override
     public int hashCode() {
         int hash = 1;
         hash = Hajautus.hajautusInt(hash, this.osioId);
         hash = Hajautus.hajautusString(hash, this.tiedostonimi);
         
-        for (int i = 0; i < this.getLkm(); i++) {
-            hash = Hajautus.hajautusInt(hash, this.anna(i).hashCode());
+        for (OsionAinesosa oa : this) {
+            hash = Hajautus.hajautusInt(hash, oa.hashCode());
         }
         
         return hash;
@@ -409,7 +417,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         sb.append('|');
         sb.append(this.tiedostonimi);
         sb.append('|');
-        sb.append(getLkm());
+        sb.append(size());
         return sb.toString();
     }
     

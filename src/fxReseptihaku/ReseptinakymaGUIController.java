@@ -135,7 +135,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
      */
     private void naytaReseptinAinesosat(Osio osio) {
         OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
-        if (osionAinesosat.getLkm() < 1) return; // ei näytetä jos ei yhtään ainesosaa
+        if (osionAinesosat.size() < 1) return; // ei näytetä jos ei yhtään ainesosaa
         
         // lisätään osion nimi -Label
         Label osionNimi = luoOtsikko(osio.getNimi());

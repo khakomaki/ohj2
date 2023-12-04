@@ -33,7 +33,7 @@ public class TietueHallitsijaIteraattori<T> implements Iterator<T> {
      */
     @Override
     public boolean hasNext() {
-        return this.nykyinenKohta < tietueHallitsija.getLkm() - 1;
+        return this.nykyinenKohta < tietueHallitsija.size() - 1;
     }
     
     
@@ -43,6 +43,6 @@ public class TietueHallitsijaIteraattori<T> implements Iterator<T> {
     @Override
     public T next() {
         if (!hasNext()) throw new NoSuchElementException("Ei ole seuraavaa elementtiä!");
-        return tietueHallitsija.getOlio(++this.nykyinenKohta); // kasvatetaan ensin ja annetaan sen kohdan olio
+        return tietueHallitsija.get(++this.nykyinenKohta); // kasvatetaan ensin ja annetaan sen kohdan olio
     }
 }

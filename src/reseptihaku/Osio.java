@@ -326,7 +326,7 @@ public class Osio {
         if (!Validoi.onkoNimiTallennettavissa(getNimi())) return "Osion nimi ei ole tallennettavissa!";
         
         // onko sekä ohjeet että ainesosat tyhjiä
-        if (this.ohjeet.getLkm() <= 0 && this.osionAinesosat.getLkm() <= 0) return "Osio ei sisällä yhtään ohjetta tai ainesosaa!";
+        if (this.ohjeet.getLkm() <= 0 && this.osionAinesosat.size() <= 0) return "Osio ei sisällä yhtään ohjetta tai ainesosaa!";
         
         return null;
     }
