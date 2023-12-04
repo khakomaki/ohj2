@@ -9,6 +9,7 @@ import java.util.Set;
  * @author hakom
  * @version 30 Nov 2023
  *
+ * Luokka yleisiä validointi funktioita varten.
  */
 public class Validoi {
 

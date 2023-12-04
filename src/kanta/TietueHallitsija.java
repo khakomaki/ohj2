@@ -8,6 +8,8 @@ import java.util.List;
  * @version 18 Oct 2023
  * @param <T> Tietueen hallitsijan tyyppi
  *
+ * Oma olioiden hallinta luokka. 
+ * Mahdollisuus määritellä kuinka olioille allokoidaan lisää tilaa.
  */
 public class TietueHallitsija<T> {
     
@@ -283,6 +285,8 @@ public class TietueHallitsija<T> {
     
     
     /**
+     * Testipääohjelma
+     * 
      * @param args ei käytössä
      */
     public static void main(String[] args) {

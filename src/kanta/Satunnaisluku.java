@@ -4,6 +4,7 @@ package kanta;
  * @author hakom
  * @version 23 Oct 2023
  *
+ * Luokka satunnaislukuihin liittyvistä yleisistä funktioista.
  */
 public class Satunnaisluku {
     /**

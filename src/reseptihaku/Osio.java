@@ -11,6 +11,7 @@ import kanta.Validoi;
  * @author hakom
  * @version 19 Oct 2023
  *
+ * Reseptin osio koostuu ainesosista ja ohjeista.
  */
 public class Osio {
     
@@ -528,6 +529,8 @@ public class Osio {
     
     
     /**
+     * Testipääohjelma
+     * 
      * @param args ei käytössä
      */
     public static void main(String[] args) {

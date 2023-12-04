@@ -221,6 +221,9 @@ public class RajausSuodatin {
     }
     
     
+    /**
+     * Päivittää maksimin vaihtoehdot
+     */
     private void paivitaMaksimi() {
         this.maksimiVaihtoehdot.clear();
         
@@ -255,6 +258,9 @@ public class RajausSuodatin {
     }
     
     
+    /**
+     * Päivittää minimin vaihtoehdot
+     */
     private void paivitaMinimi() {
         this.minimiVaihtoehdot.clear();
         

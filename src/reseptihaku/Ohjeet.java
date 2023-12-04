@@ -21,6 +21,7 @@ import kanta.SailoException;
  * @author hakom
  * @version 30 Oct 2023
  *
+ * Ohjeet hallitsee ohje-olioita.
  */
 public class Ohjeet implements Hallitsija<Ohje> {
 

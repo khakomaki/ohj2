@@ -322,6 +322,9 @@ public class VaihtoehtoAttribuutti {
     }
     
     
+    /**
+     * Vertailee onko annettu olio sama kuin nykyinen
+     */
     @Override
     public boolean equals(Object verrattava) {
         if (verrattava == null) return false;
@@ -337,6 +340,9 @@ public class VaihtoehtoAttribuutti {
     }
     
     
+    /**
+     * Luo omista tiedoistaan hash-luvun
+     */
     @Override
     public int hashCode() {
         int hash = 1;

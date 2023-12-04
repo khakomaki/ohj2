@@ -7,6 +7,7 @@ import kanta.Hajautus;
  * @author hakom
  * @version 15 Oct 2023
  *
+ * Osion ainesosat koostuvat ainesosista ja niiden määristä.
  */
 public class OsionAinesosa {
     

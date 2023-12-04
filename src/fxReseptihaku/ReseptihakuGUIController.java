@@ -27,6 +27,8 @@ import reseptihaku.Reseptit;
 /**
  * @author hakom
  * @version 13.9.2023
+ * 
+ * Reseptihakunäkymän controller
  */
 public class ReseptihakuGUIController implements Initializable {
     @FXML private TextField hakukentta;
@@ -44,12 +46,6 @@ public class ReseptihakuGUIController implements Initializable {
     @FXML private void handleSulje() { sulje(); }
     @FXML private void handleTulosta() { tulosta(); }
     
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        alusta();
-        hakutulokset.setColumnWidth(-1, 120);
-    }
-    
     // ====================================================================================================
     
     private final String hakutuloksetOtsikko = "reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso\n";
@@ -57,6 +53,20 @@ public class ReseptihakuGUIController implements Initializable {
     private List<ComboBox<VaihtoehtoAttribuutti>> suodatinValinnat = new ArrayList<>();
     private List<Resepti> hakuReseptit = new ArrayList<Resepti>();
     
+    
+    /**
+     * Tekee näkymän alustukset
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        alusta();
+        hakutulokset.setColumnWidth(-1, 120);
+    }
+    
+    
+    /**
+     * Sulkee ohjelman
+     */
     private void sulje() {
         Platform.exit();
     }
@@ -72,15 +82,22 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Alustaa hakutulokset tyhjentämällä FXMLLoaderin asettamat
+     */
     private void alustaHakutulokset() {
         this.hakutulokset.clear();
     }
     
     
+    /**
+     * Luo suodattimet paneelin ja alustaa ne tyhjillä valinnoilla
+     */
     private void alustaSuodattimet() {
         this.suodattimetGridPane.getChildren().clear();
         int rivi = 0;
         
+        // lisätään reseptejen sisältämät oletus attribuutit
         for (VaihtoehtoAttribuutti suodatettava : Reseptit.getOletusAttribuutit()) {
             int sarake = 0;
             Label suodatinNimiLabel = new Label(suodatettava.getNimi());
@@ -140,8 +157,8 @@ public class ReseptihakuGUIController implements Initializable {
             // haetaan hakusanaa vastanneet reseptit
             this.hakuReseptit = this.reseptit.etsiNimella(hakusana, minimiSuodattimet, maksimiSuodattimet);
             
+            // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
             for (int i = 0; i < this.hakuReseptit.size(); i++) {
-                // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
                 sb.append(this.hakuReseptit.get(i).getTaulukkoMuodossa());
                 sb.append("\n");
             }
@@ -154,6 +171,11 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Asettaa "hakutulokset sanalle ()"-tekstin
+     * 
+     * @param hakusana mikä hakusana
+     */
     private void asetaTuloksetTeksti(String hakusana) {
         StringBuilder sb = new StringBuilder();
         sb.append("Tulokset hakusanalle \"");
@@ -163,6 +185,9 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Lisää uuden reseptin, avaa muokkausnäkymän null-reseptillä
+     */
     private void lisaaResepti() {
         Resepti luotuResepti = ModalController.showModal(ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Lisää resepti", null, null);
         
@@ -174,6 +199,9 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Muokkaa valittua reseptiä, avaa muokkausnäkymän valitulla reseptillä
+     */
     private void muokkaaResepti() {
         // haetaan mikä resepti on valittuna
         int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
@@ -203,6 +231,9 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Avaa valitun reseptin, avaa reseptinäkymän valitulla reseptillä
+     */
     private void avaaResepti() {
         int valittuResepti = hakutulokset.getSelectionModel().getSelectedIndex();
           
@@ -233,6 +264,9 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Avaa satunnaisen reseptin hakutuloksen resepteistä
+     */
     private void avaaSatunnainenResepti() {
         // poistutaan jos ei ole reseptejä
         if (this.hakuReseptit.size() < 1) return;
@@ -243,6 +277,9 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Poistaa valitun reseptin, näyttää tapahtuman varmistavan dialogin ennen poistoa
+     */
     private void poistaResepti() {
         // haetaan mikä resepti on valittuna
         int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
@@ -262,6 +299,9 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Tyhjentää suodattimien valinnat
+     */
     private void tyhjennaSuodattimet() {
         for (ComboBox<VaihtoehtoAttribuutti> suodatin : this.suodatinValinnat) {
             suodatin.setValue(suodatin.getItems().get(0));
@@ -269,6 +309,11 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Antaa suodatinvalinnat listana
+     * 
+     * @return suodatin valinnat
+     */
     private List<VaihtoehtoAttribuutti> getSuodatinValinnat() {
         List<VaihtoehtoAttribuutti> suodattimet = new ArrayList<VaihtoehtoAttribuutti>();
         for (int i = 0; i < this.suodatinValinnat.size(); i++) {
@@ -280,6 +325,10 @@ public class ReseptihakuGUIController implements Initializable {
     }
     
     
+    /**
+     * Avaa tulostusnäkymän valitulle reseptille
+     * TODO tulostus toimimaan
+     */
     private void tulosta() {
         // haetaan mikä resepti on valittuna
         int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
@@ -316,7 +365,6 @@ public class ReseptihakuGUIController implements Initializable {
                 this.reseptit.setTiedostoPolku("reseptidata/");
                 this.reseptit.lueTiedostosta();
             }
-            
         } catch (SailoException exception) {
             Dialogs.showMessageDialog("Tiedoston lukemisessa ongelmia: " + exception.getMessage());
         }

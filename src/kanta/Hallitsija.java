@@ -7,6 +7,7 @@ import java.util.List;
  * @version 24 Nov 2023
  * @param <T> Luokan hallitsema olio
  *
+ * Rajapinta luokille jotka hallitsevat toista oliota.
  */
 public interface Hallitsija<T> {
     

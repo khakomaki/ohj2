@@ -27,6 +27,7 @@ import kanta.Validoi;
  * @author hakom
  * @version 19 Oct 2023
  *
+ * Resepti koostuu osioista ja reseptin attribuuteista.
  */
 public class Resepti {
     

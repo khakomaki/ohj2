@@ -9,6 +9,7 @@ import javafx.scene.Node;
  * @version 25 Nov 2023
  * @param <T> mille oliolle nodet luodaan
  *
+ * Rajapinta noden luonnille. Varmistaa että pystyy luoda listan oliota vastaavista nodeista.
  */
 public interface NodeLuonti<T> {
     

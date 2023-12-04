@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
  * @author hakom
  * @version 13.9.2023
  *
+ * Reseptihaku-ohjelman pääohjelma
  */
 public class ReseptihakuMain extends Application {
     @Override
@@ -21,12 +22,14 @@ public class ReseptihakuMain extends Application {
             final Pane root = ldr.load();
             final ReseptihakuGUIController reseptihakuCtrl = (ReseptihakuGUIController)ldr.getController();
             
+            // luo ja näyttää reseptihaun stagen
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("reseptihaku.css").toExternalForm());
             primaryStage.setScene(scene);
             primaryStage.setTitle("Reseptihaku");
             primaryStage.show();
             
+            // luo uuden reseptit-olion, antaa reseptihakucontrollerille ja käskee lukemaan tiedostosta
             Reseptit reseptit = new Reseptit();
             reseptihakuCtrl.setReseptit(reseptit);
             reseptihakuCtrl.lueTiedostosta();

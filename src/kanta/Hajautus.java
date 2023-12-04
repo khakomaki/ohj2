@@ -4,6 +4,7 @@ package kanta;
  * @author hakom
  * @version 4 Nov 2023
  *
+ * Luokka luvun hajauttamiseen liittyvistä funktioista (hash)
  */
 public class Hajautus {
     

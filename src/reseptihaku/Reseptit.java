@@ -21,6 +21,7 @@ import kanta.Validoi;
  * @author hakom
  * @version 19 Oct 2023
  *
+ * Reseptit hallitsee resepti-olioita.
  */
 public class Reseptit implements Hallitsija<Resepti> {
 
@@ -638,6 +639,8 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
+     * Testipääohjelma
+     * 
      * @param args ei käytössä
      */
     public static void main(String[] args) {

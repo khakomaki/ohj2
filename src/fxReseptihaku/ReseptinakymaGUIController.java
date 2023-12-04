@@ -30,6 +30,7 @@ import reseptihaku.Resepti;
  * @author hakom
  * @version 30 Sept 2023
  *
+ * Reseptinäkymän controller, reseptin katselu
  */
 public class ReseptinakymaGUIController implements ModalControllerInterface<Resepti> {
 
@@ -52,19 +53,32 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     
     private Resepti valittuResepti;
     private final Insets PEHMUSTE_ISO = new Insets(10, 10, 10, 10);
-    private RowConstraints rivirajoitteet = new RowConstraints();
     private final Font kirjasin14 = new Font("Arial Bold", 14);
+    private RowConstraints rivirajoitteet = new RowConstraints();
     
+    
+    /**
+     * Palautettava resepti näkymää suljettaessa.
+     * Palautetaan null jos resepti on poistettu.
+     */
     @Override
     public Resepti getResult() { 
         return this.valittuResepti; 
     }
 
+    
+    /**
+     * Ei tehdä mitään kun resepti on laitettu näkyviin
+     */
     @Override
     public void handleShown() {
         // 
     }
 
+    
+    /**
+     * Asettaa näytetävän reseptin
+     */
     @Override
     public void setDefault(Resepti oletus) {
         this.valittuResepti = oletus;
@@ -76,12 +90,18 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Tyhjentää FXMLLoaderin asettamat tiedot
+     */
     private void tyhjennaTiedot() {
         this.ainesosatVBox.getChildren().clear();
         this.ohjeetVBox.getChildren().clear();
     }
     
     
+    /**
+     * Näyttää reseptin ominaisuudet
+     */
     private void naytaReseptinOminaisuudet() {
         // asetetaan reseptin tiedot näkymään
         this.reseptinNimi.setText(this.valittuResepti.getNimi());
@@ -93,6 +113,9 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Näyttää reseptin osioiden tiedot
+     */
     private void naytaReseptinOsiot() {
         Osiot osiot = this.valittuResepti.getOsiot();
         
@@ -104,6 +127,12 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Näyttää reseptin ainesosat.
+     * Ei näytä mitään jos annetussa osiossa ei ole ainesosia.
+     * 
+     * @param osio minkä osion ainesosat näytetään
+     */
     private void naytaReseptinAinesosat(Osio osio) {
         OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
         if (osionAinesosat.getLkm() < 1) return; // ei näytetä jos ei yhtään ainesosaa
@@ -126,6 +155,12 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Luo ainesosalle vastaavat javafx-nodet
+     * 
+     * @param osionAinesosa mille ainesosalle luodaan
+     * @return ainesosaa vastaavat nodet
+     */
     private List<Node> luoAinesosaNodet(OsionAinesosa osionAinesosa) {
         List<Node> nodet = new ArrayList<Node>();
         
@@ -141,6 +176,12 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Luo otsikko Labelin
+     * 
+     * @param otsikko otsikon teksti
+     * @return otsikko Label
+     */
     private Label luoOtsikko(String otsikko) {
         Label otsikkoLabel = new Label(otsikko);
         otsikkoLabel.setFont(kirjasin14);
@@ -149,6 +190,12 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Näyttää osion ohjeet.
+     * Jos osiossa ei ole yhtään ohjetta, ei näytä mitään.
+     * 
+     * @param osio minkä osion ohjeet näytetään
+     */
     private void naytaOsionOhjeet(Osio osio) {
         Ohjeet osionOhjeet = osio.annaOsionOhjeet();
         if (osionOhjeet.getLkm() < 1) return; // ei näytetä jos ei yhtään ohjetta
@@ -172,6 +219,12 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Luo ohjetta vastaavat javafx-nodet
+     * 
+     * @param ohje mille ohjeelle luodaan
+     * @return ohjeen nodet
+     */
     private List<Node> luoOhjeNodet(Ohje ohje) {
         List<Node> nodet = new ArrayList<Node>();
         
@@ -193,22 +246,40 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Vaihtaa tekstin näkyvyyttä (päällä -> pois | pois -> päällä)
+     * 
+     * @param teksti minkä näkyvyyttä vaihdetaan
+     */
     private void vaihdaNakyvyys(Label teksti) {
         if (teksti.isVisible()) teksti.setVisible(false);
         else teksti.setVisible(true);
     }
     
     
+    /**
+     * Sulkee reseptinäkymän
+     */
     private void sulje() {
         ModalController.closeStage(reseptinNimi);
     }
     
     
+    /**
+     * Avaa reseptin tulostusnäkymän
+     * TODO tulostaminen toimimaan
+     */
     private void tulosta() {
         Dialogs.showMessageDialog("Ei osata tulostaa vielä");
     }
     
     
+    /**
+     * Avaa katseltavan reseptin muokkausnäkymän.
+     * Muokkausnäkymästä tultaessa varmistaa onko resepti poistettu tai onko sitä muokattu.
+     * Poiston tapauksessa sulkee näkymän.
+     * Muokkauksen tapauksessa päivittää näkymän.
+     */
     private void muokkaaResepti() {
         Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, this.valittuResepti);
         
@@ -227,6 +298,10 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     }
     
     
+    /**
+     * Poistaa katseltavan reseptin, näyttää varmistus dialogin ennen poistamista.
+     * Sulkee näkymän poiston jälkeen.
+     */
     private void poistaResepti() {
         boolean vastaus = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
         if (vastaus) {

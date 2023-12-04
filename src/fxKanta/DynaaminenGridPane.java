@@ -15,6 +15,10 @@ import kanta.Hallitsija;
  * @version 24 Nov 2023
  * @param <T> minkä tyyppinen olio yhdistetään riviin
  *
+ * Dynaamisempi GridPane-node, johon voidaan lisätä rivejä antamalla olio ja sitä vastaavat javafx-nodet.
+ * Luo javafx-nodeja automaattisesti oliota lisättäessä.
+ * Voidaan määrittää onko GridPane muokattavissa poisto- ja lisäyspainikkeilla käyttöliittymästä.
+ * Voidaan luoda otsikko-Labelit, joille ei tule poisto painikkeita.
  */
 public class DynaaminenGridPane<T> extends GridPane {
     private Hallitsija<T> hallitsijaLuokka;

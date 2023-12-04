@@ -4,6 +4,7 @@ package kanta;
  * @author hakom
  * @version 15 Nov 2023
  *
+ * Omien poikkeusten heittämisen mahdollistava luokka.
  */
 public class SailoException extends Exception {
     

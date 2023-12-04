@@ -20,6 +20,7 @@ import kanta.Validoi;
  * @author hakom
  * @version 19 Oct 2023
  *
+ * Osiot hallitsee osio-olioita.
  */
 public class Osiot implements Hallitsija<Osio> {
 
@@ -478,6 +479,8 @@ public class Osiot implements Hallitsija<Osio> {
     
     
     /**
+     * Testipääohjelma
+     * 
      * @param args ei käytössä
      */
     public static void main(String[] args) {

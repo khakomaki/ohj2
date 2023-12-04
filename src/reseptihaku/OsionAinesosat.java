@@ -21,6 +21,7 @@ import kanta.TietueHallitsija;
  * @author hakom
  * @version 15 Oct 2023
  *
+ * Osion ainesosat hallitsee osion ainesosa -olioita.
  */
 public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements Hallitsija<OsionAinesosa> {
     
@@ -414,6 +415,8 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     
     
     /**
+     * Testipääohjelma
+     * 
      * @param args ei käytössä
      */
     public static void main(String[] args) {

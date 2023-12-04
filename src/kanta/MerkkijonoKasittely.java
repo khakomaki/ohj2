@@ -4,6 +4,7 @@ package kanta;
  * @author hakom
  * @version 18 Nov 2023
  *
+ * Luokka yleisistä merkkijonon käsittelyyn liittyvistä funktioista.
  */
 public class MerkkijonoKasittely {
     

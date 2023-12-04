@@ -8,6 +8,7 @@ import javafx.scene.layout.Priority;
  * @author hakom
  * @version 24 Nov 2023
  *
+ * Luokka yleisiä javafx-node funktioita varten.
  */
 public class NodeKasittely {
 

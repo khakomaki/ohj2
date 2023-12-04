@@ -7,6 +7,7 @@ import kanta.Hajautus;
  * @author hakom
  * @version 30 Oct 2023
  *
+ * Ohje jolla on vaihe ja ohjeistus.
  */
 public class Ohje {
     
