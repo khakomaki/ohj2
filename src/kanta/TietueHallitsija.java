@@ -1,6 +1,7 @@
 package kanta;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -11,13 +12,14 @@ import java.util.List;
  * Oma olioiden hallinta luokka. 
  * Mahdollisuus määritellä kuinka olioille allokoidaan lisää tilaa.
  */
-public class TietueHallitsija<T> {
+public class TietueHallitsija<T> implements Iterable<T> {
     
     private T[] oliot;
-    private int maxLkm =        1;
-    private int lkm =           0;
-    private final int VAKIO =         0;
-    private final double KERROIN =    2;
+    private int maxLkm =            1;
+    private int lkm =               0;
+    
+    private final int vakio =       0;
+    private final double kerroin =  2;
     
     
     /**
@@ -97,8 +99,8 @@ public class TietueHallitsija<T> {
     public List<T> getOliotListana() {
         List<T> olioLista = new ArrayList<T>();
         
-        for (int i = 0; i < this.lkm; i++) {
-            olioLista.add(this.oliot[i]);
+        for (T olio : this) {
+            olioLista.add(olio);
         }
         
         return olioLista;
@@ -143,7 +145,7 @@ public class TietueHallitsija<T> {
      */
     public int lisaaTilaa() {
         // kasvatetaan listaa kertoimen ja vakion avulla, palautetaan kokonaisluku
-        int uusiMaxLkm = this.maxLkm + (int)(this.maxLkm * (this.KERROIN - 1) + this.VAKIO);
+        int uusiMaxLkm = this.maxLkm + (int)(this.maxLkm * (this.kerroin - 1) + this.vakio);
         
         // vaihdetaan uuteen mnaksimi lukumäärään, jos se on vähintään yhden enemmän kuin alkuperäinen
         if (this.maxLkm + 1 <= uusiMaxLkm) { 
@@ -249,6 +251,17 @@ public class TietueHallitsija<T> {
     }
     
     
+    /**
+     * Luo iteraattorin itselleen
+     * 
+     * @return iteraattori
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return new TietueHallitsijaIteraattori<T>(this);
+    }
+    
+    
     @Override
     /**
      * Palauttaa TietueHallitsijan tiedot muodossa:
@@ -277,10 +290,55 @@ public class TietueHallitsija<T> {
         sb.append('|');
         sb.append(this.maxLkm);
         sb.append('|');
-        sb.append(this.KERROIN);
+        sb.append(this.kerroin);
         sb.append('|');
-        sb.append(this.VAKIO);
+        sb.append(this.vakio);
         return sb.toString();
+    }
+    
+    
+    /**
+     * Vertaa onko annettu olio sama kuin nykyinen
+     * 
+     * @param verrattava mihin verrataan
+     */
+    @Override
+    public boolean equals(Object verrattava) {
+        if (verrattava == null) return false;
+        if (verrattava.getClass() != this.getClass()) return false;
+        if ( !((TietueHallitsija<?>)verrattava).oliot.equals(this.oliot) ) return false;
+        @SuppressWarnings("unchecked") // voidaan tehdä typecast, koska on jo poistuttu jos ei ole oikeaa tyyppiä
+        TietueHallitsija<T> verrattavaTietueHallitsija = (TietueHallitsija<T>)verrattava;
+        if (verrattavaTietueHallitsija.getLkm() != this.getLkm()) return false;
+        if (verrattavaTietueHallitsija.maxLkm != this.maxLkm) return false;
+        if (verrattavaTietueHallitsija.kerroin != this.kerroin) return false;
+        if (verrattavaTietueHallitsija.vakio != this.vakio) return false;
+        
+        for (int i = 0; i < this.getLkm(); i++) {
+            if (!verrattavaTietueHallitsija.oliot[i].equals(this.oliot[i])) return false;
+        }
+        
+        // on sama jos ei ole vielä palautettu false
+        return true;
+    }
+    
+    
+    /**
+     * Muodostaa hash-luvun tietuehallitsijalle
+     */
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        hash = Hajautus.hajautusInt(hash, this.lkm);
+        hash = Hajautus.hajautusInt(hash, this.maxLkm);
+        // hash = Hajautus.hajautusInt(hash, this.KERROIN); TODO
+        hash = Hajautus.hajautusInt(hash, this.vakio);
+        
+        for (T olio : this) {
+            hash = Hajautus.hajautusInt(hash, olio.hashCode());
+        }
+        
+        return hash;
     }
     
     
