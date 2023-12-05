@@ -97,7 +97,13 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // luodaan kopio annetusta reseptistä muokattavaksi tai uusi jos annettu on null
         if (oletus == null) { 
-            this.valittuResepti = new Resepti(); 
+            this.valittuResepti = new Resepti();
+            
+            // lisätään uuteen reseptiin osio tyhjällä ainesosalla ja ohjeella
+            Osio osio = new Osio();
+            osio.lisaaAinesosa(new OsionAinesosa());
+            osio.lisaaOhje(new Ohje());
+            this.valittuResepti.lisaaOsio(osio);
         } else { 
             this.valittuResepti = oletus.clone(); 
         }
@@ -420,6 +426,14 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
      */
     private void poistaOsio(VBox osioVBox, Osio osio) {
         if (osioVBox == null) return;
+        
+        // varmistetaan poistoaikomus dialogilla
+        StringBuilder osioPoistoKysymys = new StringBuilder();
+        osioPoistoKysymys.append("Haluatko varmasti poistaa osion \"");
+        osioPoistoKysymys.append(osio.getNimi());
+        osioPoistoKysymys.append("\"?");
+        boolean poistetaanko = Dialogs.showQuestionDialog("Osion poisto", osioPoistoKysymys.toString(), "Poista", "Peruuta");
+        if (!poistetaanko) return;
         
         // kutsuu osion parent-nodea ja käskee sen poistamaan
         if (osioVBox.getParent() instanceof VBox) {

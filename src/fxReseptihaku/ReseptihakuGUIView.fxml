@@ -129,15 +129,11 @@
          <center>
             <BorderPane BorderPane.alignment="CENTER">
                <center>
-                  <ScrollPane fitToWidth="true" prefHeight="250.0" BorderPane.alignment="CENTER">
-                     <content>
-                        <StringGrid fx:id="hakutulokset" prefWidth="600.0" rivit="reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso&#10;Mustikkapiirakka |€€ |nopea |★★★☆☆ |helppo&#10;Lihapiirakka |€ |keskiverto |★★★★★ | keskiverto">
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
-                        </StringGrid>
-                     </content>
-                  </ScrollPane>
+                  <StringGrid fx:id="hakutulokset" prefWidth="600.0" rivit="reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso&#10;Mustikkapiirakka |€€ |nopea |★★★☆☆ |helppo&#10;Lihapiirakka |€ |keskiverto |★★★★★ | keskiverto">
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </StringGrid>
                </center>
                <top>
                   <Label fx:id="tuloksetTeksti" text="Tulokset hakusanalle &quot;&quot;" BorderPane.alignment="TOP_LEFT" />

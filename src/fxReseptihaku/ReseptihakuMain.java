@@ -15,6 +15,7 @@ import javafx.fxml.FXMLLoader;
  * Reseptihaku-ohjelman pääohjelma
  */
 public class ReseptihakuMain extends Application {
+    
     @Override
     public void start(Stage primaryStage) {
         try {

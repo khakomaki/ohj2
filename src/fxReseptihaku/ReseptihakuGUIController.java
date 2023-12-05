@@ -31,6 +31,7 @@ import reseptihaku.Reseptit;
  * Reseptihakunäkymän controller
  */
 public class ReseptihakuGUIController implements Initializable {
+    
     @FXML private TextField hakukentta;
     @FXML private Label tuloksetTeksti;
     @FXML private StringGrid<String> hakutulokset;
@@ -165,8 +166,11 @@ public class ReseptihakuGUIController implements Initializable {
         }
         // asettaa tulokset StringGridiin ja sen oikein 
         this.hakutulokset.setRivit(sb.toString());
+        
+        // TODO StringGridin sijaan taulukko itse, jolloin ei tarvitse asettaa näitä uudestaan joka päivityksen jälkeen
         this.hakutulokset.setColumnWidth(-1, 120);
         hakutulokset.setSortable(-1, false);
+        
         asetaTuloksetTeksti(hakusana);
     }
     
