@@ -588,8 +588,19 @@ public class Reseptit implements Hallitsija<Resepti> {
             throw new SailoException("Ei voida nimetä uudelleen tallennus-tiedostoa");
         }
         
+        boolean tallennustiedostoLuotu = false;
         for (Resepti resepti : this.reseptit) {
             resepti.tallenna();
+            tallennustiedostoLuotu = true;
+        }
+        
+        // luodaan tyhjä tallennustiedosto jos ei ollut yhtään reseptiä joka loisi tiedoston
+        if (!tallennustiedostoLuotu) {
+            try {
+                tiedosto.createNewFile();
+            } catch (IOException exception) {
+                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
+            }
         }
     }
     
