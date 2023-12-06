@@ -2,6 +2,10 @@ package kanta;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * @author hakom
@@ -182,6 +186,22 @@ public class VaihtoehtoAttribuutti {
     
     
     /**
+     * Antaa valinnan arvon perusteella
+     * 
+     * @param arvo millä arvolla etsitään
+     * @return löydetty avain tai null
+     */
+    public Integer getValinta(String arvo) {
+        for (Entry<Integer, String> entry : this.vaihtoehdot.entrySet()) {
+            if (entry.getValue().equals(arvo)) return entry.getKey();
+        }
+        
+        // palautetaan oletusvalinta jos ei löytynyt
+        return this.oletusValinta;
+    }
+    
+    
+    /**
      * Kertoo onko annettu arvo sama kuin oletusvalinta
      * 
      * @param verrattava mitä verrataan oletusvalintaan
@@ -286,7 +306,54 @@ public class VaihtoehtoAttribuutti {
      * @return vaihtoehdot
      */
     public Map<Integer, String> getVaihtoehdot() {
-        return new HashMap<Integer, String>(this.vaihtoehdot);
+        Map<Integer, String> map = new HashMap<Integer, String>(this.vaihtoehdot);
+        map.put(this.oletusValinta, this.oletusString);
+        return map;
+    }
+    
+    
+    /**
+     * Antaa vaihtoehdot merkkijonona.
+     * Erottaa vaihtoehdot rivinvaihdolla ja sisältää myös oletusvalinnan.
+     * 
+     * @return vaihtoehdot merkkijonona
+     */
+    public String getVaihtoehdotString() {
+        // oletusvalinta
+        StringBuilder sb = new StringBuilder(getOletusString());
+        sb.append("\n");
+        
+        // vaihtoehdot
+        for (Entry<Integer, String> entry : this.vaihtoehdot.entrySet()) {
+            sb.append(entry.getValue());
+            sb.append("\n");
+        }
+        
+        return sb.toString();
+    }
+    
+    
+    /**
+     * Muodostaa ObservableList-listan vaihtoehdoista.
+     * Sisällyttää listaan myös tyhjän vaihtoehdon.
+     * 
+     * @return ObservableList vaihtoehdoista sisältäen oletusvalinnan
+     */
+    public ObservableList<VaihtoehtoAttribuutti> getVaihtoehdotList() {
+        ObservableList<VaihtoehtoAttribuutti> lista = FXCollections.observableArrayList();
+        
+        // tyhjä vaihtoehto
+        VaihtoehtoAttribuutti tyhjaVaihtoehto = new VaihtoehtoAttribuutti(getNimi(), this.vaihtoehdot, getOletus(), getOletusString());
+        lista.add(tyhjaVaihtoehto);
+        
+        // vaihtoehdot
+        for (Entry<Integer, String> entry : this.vaihtoehdot.entrySet()) {
+            VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti(getNimi(), this.vaihtoehdot, getOletus(), getOletusString());
+            attribuutti.setValinta(entry.getKey());
+            lista.add(attribuutti);
+        }
+        
+        return lista;
     }
     
     

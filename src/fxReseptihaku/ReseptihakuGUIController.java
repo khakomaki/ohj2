@@ -5,11 +5,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Map.Entry;
 
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.StringGrid;
-import fxKanta.RajausSuodatin;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -51,7 +51,9 @@ public class ReseptihakuGUIController implements Initializable {
     
     private final String hakutuloksetOtsikko = "reseptin nimi |hintaluokka |valmistusaika |tähdet |vaativuustaso\n";
     private Reseptit reseptit;
-    private List<ComboBox<VaihtoehtoAttribuutti>> suodatinValinnat = new ArrayList<>();
+    private List<VaihtoehtoAttribuutti> minimiValinnat = new ArrayList<VaihtoehtoAttribuutti>();
+    private List<VaihtoehtoAttribuutti> maksimiValinnat = new ArrayList<VaihtoehtoAttribuutti>();
+    private List<ComboBox<String>> suodattimet = new ArrayList<ComboBox<String>>();
     private List<Resepti> hakuReseptit = new ArrayList<Resepti>();
     
     
@@ -103,18 +105,27 @@ public class ReseptihakuGUIController implements Initializable {
             int sarake = 0;
             Label suodatinNimiLabel = new Label(suodatettava.getNimi());
             this.suodattimetGridPane.add(suodatinNimiLabel, sarake, rivi++);
+                        
+            // minimi
+            VaihtoehtoAttribuutti minimiVA = new VaihtoehtoAttribuutti(suodatettava.getNimi(), suodatettava.getVaihtoehdot(), suodatettava.getOletus(), suodatettava.getOletusString());
+            ComboBox<String> minimiComboBox = new ComboBox<String>();
+            asetaVaihtoehdot(minimiComboBox, suodatettava);
             
-            // luodaan suodatin ja sen nodet
-            RajausSuodatin suodatin = new RajausSuodatin(suodatettava);
-            ComboBox<VaihtoehtoAttribuutti> minimiComboBox = new ComboBox<VaihtoehtoAttribuutti>(suodatin.getMinimiVaihtoehdotList());
+            // välimerkki
             Label valimerkkiLabel = new Label("-");
-            ComboBox<VaihtoehtoAttribuutti> maksimiComboBox = new ComboBox<VaihtoehtoAttribuutti>(suodatin.getMaksimiVaihtoehdotList());
+            
+            // maksimi
+            VaihtoehtoAttribuutti maksimiVA = new VaihtoehtoAttribuutti(suodatettava.getNimi(), suodatettava.getVaihtoehdot(), suodatettava.getOletus(), suodatettava.getOletusString());
+            ComboBox<String> maksimiComboBox = new ComboBox<String>();
+            asetaVaihtoehdot(maksimiComboBox, suodatettava);
             
             // TODO vaihtoehdot reagoimaan valintoihin
             minimiComboBox.setOnAction(e -> {
+                minimiVA.setValinta(minimiVA.getValinta(minimiComboBox.getValue()));
                 haeReseptit();
             });
             maksimiComboBox.setOnAction(e -> {
+                maksimiVA.setValinta(maksimiVA.getValinta(maksimiComboBox.getValue()));
                 haeReseptit();
             });
             
@@ -126,11 +137,30 @@ public class ReseptihakuGUIController implements Initializable {
             // suodattimien ulkonäkö
             GridPane.setHalignment(minimiComboBox, HPos.RIGHT);
             
-            // lisätään luokan listaan
-            this.suodatinValinnat.add(minimiComboBox);
-            this.suodatinValinnat.add(maksimiComboBox);
+            // lisätään tiedot listaan
+            this.minimiValinnat.add(minimiVA);
+            this.maksimiValinnat.add(maksimiVA);
+
+            this.suodattimet.add(minimiComboBox);
+            this.suodattimet.add(maksimiComboBox);
         }
+        
+        // asetetaan tyhjään valintaan
         tyhjennaSuodattimet();
+    }
+    
+    
+    /**
+     * Asettaa annetulle combobox-nodelle attribuutin mukaiset vaihtoehdot
+     * 
+     * @param combobox mihin vaihtoehdot laitetaan
+     * @param va vaihtoehtoattribuutti jonka vaihtoehdot laitetaan
+     */
+    private void asetaVaihtoehdot(ComboBox<String> combobox, VaihtoehtoAttribuutti va) {
+        for (Entry<Integer, String> entry : va.getVaihtoehdot().entrySet()) {
+            String arvo = entry.getValue();
+            combobox.getItems().add(arvo);
+        }
     }
     
     
@@ -144,19 +174,8 @@ public class ReseptihakuGUIController implements Initializable {
         StringBuilder sb = new StringBuilder(hakutuloksetOtsikko);
         
         if (this.reseptit != null) {
-            // suodattimet
-            List<VaihtoehtoAttribuutti> suodattimet = getSuodatinValinnat();
-            List<VaihtoehtoAttribuutti> minimiSuodattimet = new ArrayList<VaihtoehtoAttribuutti>();
-            List<VaihtoehtoAttribuutti> maksimiSuodattimet = new ArrayList<VaihtoehtoAttribuutti>();
-            for (int i = 0; i < suodattimet.size(); i++) {
-                if (i % 2 == 0) {
-                    minimiSuodattimet.add(suodattimet.get(i));
-                } else {
-                    maksimiSuodattimet.add(suodattimet.get(i));
-                }
-            }
             // haetaan hakusanaa vastanneet reseptit
-            this.hakuReseptit = this.reseptit.etsiNimella(hakusana, minimiSuodattimet, maksimiSuodattimet);
+            this.hakuReseptit = this.reseptit.etsiNimella(hakusana, this.minimiValinnat, this.maksimiValinnat);
             
             // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
             for (int i = 0; i < this.hakuReseptit.size(); i++) {
@@ -307,25 +326,9 @@ public class ReseptihakuGUIController implements Initializable {
      * Tyhjentää suodattimien valinnat
      */
     private void tyhjennaSuodattimet() {
-        for (ComboBox<VaihtoehtoAttribuutti> suodatin : this.suodatinValinnat) {
+        for (ComboBox<String> suodatin : this.suodattimet) {
             suodatin.setValue(suodatin.getItems().get(0));
         }
-    }
-    
-    
-    /**
-     * Antaa suodatinvalinnat listana
-     * 
-     * @return suodatin valinnat
-     */
-    private List<VaihtoehtoAttribuutti> getSuodatinValinnat() {
-        List<VaihtoehtoAttribuutti> suodattimet = new ArrayList<VaihtoehtoAttribuutti>();
-        for (int i = 0; i < this.suodatinValinnat.size(); i++) {
-            VaihtoehtoAttribuutti suodatin = this.suodatinValinnat.get(i).getValue();
-            if (suodatin == null) break;
-            suodattimet.add(suodatin);
-        }
-        return suodattimet;
     }
     
     

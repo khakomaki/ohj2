@@ -137,30 +137,77 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // tyhjennetään attribuutit gridpane
         this.attribuutitGridPane.getChildren().clear();
         
+        // TODO attribuutit silmukkaan
         // attribuutit omille riveilleen
         int rivi = 0;
-        for (VaihtoehtoAttribuutti attribuutti : this.valittuResepti.getAttribuutit()) {
-            Label attribuutinNimi = new Label(attribuutti.getNimi());
-            ComboBox<VaihtoehtoAttribuutti> attribuutinVaihtoehdot = new ComboBox<VaihtoehtoAttribuutti>();
+        int attribuuttiNro = 0;
+        
+        // hinta
+        VaihtoehtoAttribuutti hintaAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
+        Label hintaLabel = new Label(hintaAttr.getNimi());
+        ComboBox<String> hintaComboBox = new ComboBox<String>();
+        asetaVaihtoehdot(hintaComboBox, hintaAttr);
+        hintaComboBox.setOnAction(e -> {
+            this.valittuResepti.setHinta(hintaAttr.getValinta(hintaComboBox.getValue()));
+        });
+        // lisätään nimi-Label ja vaihtoehto-ComboBox GridPaneen
+        this.attribuutitGridPane.add(hintaLabel, 0, rivi);
+        this.attribuutitGridPane.add(hintaComboBox, 1, rivi++);
+            
 
-            // lisätään vaihtoehdot (tyhjä + valittavat) ComboBox-nodeen
-            attribuutinVaihtoehdot.getItems().add(new VaihtoehtoAttribuutti(attribuutti.getNimi(), attribuutti.getVaihtoehdot()));
-            for (Entry<Integer, String> entry : attribuutti.getVaihtoehdot().entrySet()) {
-                VaihtoehtoAttribuutti va = new VaihtoehtoAttribuutti(attribuutti.getNimi(), attribuutti.getVaihtoehdot());
-                va.setValinta(entry.getKey());
-                attribuutinVaihtoehdot.getItems().add(va);
-            }
+        // valmistusaika
+        VaihtoehtoAttribuutti valmAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
+        Label valmistusaikaLabel = new Label(valmAttr.getNimi());
+        ComboBox<String> valmistusaikaComboBox = new ComboBox<String>();
+        asetaVaihtoehdot(valmistusaikaComboBox, valmAttr);
+        valmistusaikaComboBox.setOnAction(e -> {
+            this.valittuResepti.setValmistusaika(valmAttr.getValinta(valmistusaikaComboBox.getValue()));
+        });
+        // lisätään nimi-Label ja vaihtoehto ComboBox-GridPaneen
+        this.attribuutitGridPane.add(valmistusaikaLabel, 0, rivi);
+        this.attribuutitGridPane.add(valmistusaikaComboBox, 1, rivi++);
+        
+        
+        // tähdet
+        VaihtoehtoAttribuutti tahdetAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
+        Label tahdetLabel = new Label(tahdetAttr.getNimi());
+        ComboBox<String> tahdetComboBox = new ComboBox<String>();
+        asetaVaihtoehdot(tahdetComboBox, tahdetAttr);
+        tahdetComboBox.setOnAction(e -> {
+            this.valittuResepti.setTahdet(tahdetAttr.getValinta(tahdetComboBox.getValue()));
+        });
+        // lisätään nimi-Label ja vaihtoehto ComboBox-GridPaneen
+        this.attribuutitGridPane.add(tahdetLabel, 0, rivi);
+        this.attribuutitGridPane.add(tahdetComboBox, 1, rivi++);
+        
+        
+        // vaativuus
+        VaihtoehtoAttribuutti vaativuusAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
+        Label vaativuusLabel = new Label(vaativuusAttr.getNimi());
+        ComboBox<String> vaativuusComboBox = new ComboBox<String>();
+        asetaVaihtoehdot(vaativuusComboBox, vaativuusAttr);
+        vaativuusComboBox.setOnAction(e -> {
+            this.valittuResepti.setVaativuus(vaativuusAttr.getValinta(vaativuusComboBox.getValue()));
+        });
+        // lisätään nimi-Label ja vaihtoehto ComboBox-GridPaneen
+        this.attribuutitGridPane.add(vaativuusLabel, 0, rivi);
+        this.attribuutitGridPane.add(vaativuusComboBox, 1, rivi++);
+    }
+    
+    
+    /**
+     * Asettaa annetulle combobox-nodelle attribuutin mukaiset vaihtoehdot ja sen nykyisen valinnan
+     * 
+     * @param combobox mihin vaihtoehdot laitetaan
+     * @param va vaihtoehtoattribuutti jonka vaihtoehdot ja valinta laitetaan
+     */
+    private void asetaVaihtoehdot(ComboBox<String> combobox, VaihtoehtoAttribuutti va) {
+        for (Entry<Integer, String> entry : va.getVaihtoehdot().entrySet()) {
+            String arvo = entry.getValue();
+            combobox.getItems().add(arvo);
             
-            // lisätään kuuntelija muutoksille
-            attribuutinVaihtoehdot.setOnAction(e -> {
-                attribuutti.setValinta(attribuutinVaihtoehdot.getValue().getValinta());
-            });
-            
-            // lisätään nimi Label ja vaihtoehto ComboBox GridPaneen
-            this.attribuutitGridPane.add(attribuutinNimi, 0, rivi);
-            this.attribuutitGridPane.add(attribuutinVaihtoehdot, 1, rivi);
-            
-            rivi++;
+            // laitetaan valinnaksi jos arvot täsmäävät
+            if (va.getValinta() == entry.getKey()) combobox.setValue(arvo);
         }
     }
     

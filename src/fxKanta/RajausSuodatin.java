@@ -2,9 +2,7 @@ package fxKanta;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kanta.VaihtoehtoAttribuutti;
 
@@ -77,17 +75,7 @@ public class RajausSuodatin {
      * </pre>
      */
     public String getMinimiVaihtoehdot() {
-        // oletusvalinta
-        StringBuilder sb = new StringBuilder(this.minimi.getOletusString());
-        sb.append("\n");
-        
-        // vaihtoehdot
-        for (Entry<Integer, String> entry : this.minimiVaihtoehdot.entrySet()) {
-            sb.append(entry.getValue());
-            sb.append("\n");
-        }
-        
-        return sb.toString();
+        return this.minimi.getVaihtoehdotString();
     }
     
     
@@ -134,17 +122,7 @@ public class RajausSuodatin {
      * </pre>
      */
     public ObservableList<VaihtoehtoAttribuutti> getMinimiVaihtoehdotList() {
-        ObservableList<VaihtoehtoAttribuutti> lista = FXCollections.observableArrayList();
-        VaihtoehtoAttribuutti tyhjaVaihtoehto = new VaihtoehtoAttribuutti(this.suodatin.getNimi() + " minimi", this.minimiVaihtoehdot, this.suodatin.getOletus(), this.suodatin.getOletusString());
-        lista.add(tyhjaVaihtoehto);
-        
-        for (Entry<Integer, String> entry : this.minimiVaihtoehdot.entrySet()) {
-            VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti(this.suodatin.getNimi() + " minimi", this.minimiVaihtoehdot, this.suodatin.getOletus(), this.suodatin.getOletusString());
-            attribuutti.setValinta(entry.getKey());
-            lista.add(attribuutti);
-        }
-        
-        return lista;
+        return this.minimi.getVaihtoehdotList();
     }
     
     
@@ -154,17 +132,7 @@ public class RajausSuodatin {
      * @return vaihtoehdot maksimiarvolle
      */
     public String getMaksimiVaihtoehdot() {
-        // oletusvalinta
-        StringBuilder sb = new StringBuilder(this.maksimi.getOletusString());
-        sb.append("\n");
-        
-        // vaihtoehdot
-        for (Entry<Integer, String> entry : this.maksimiVaihtoehdot.entrySet()) {
-            sb.append(entry.getValue());
-            sb.append("\n");
-        }
-        
-        return sb.toString();
+        return this.maksimi.getVaihtoehdotString();
     }
     
     
@@ -194,17 +162,7 @@ public class RajausSuodatin {
      * </pre>
      */
     public ObservableList<VaihtoehtoAttribuutti> getMaksimiVaihtoehdotList() {
-        ObservableList<VaihtoehtoAttribuutti> lista = FXCollections.observableArrayList();
-        VaihtoehtoAttribuutti tyhjaVaihtoehto = new VaihtoehtoAttribuutti(this.suodatin.getNimi() + " maksimi", this.maksimiVaihtoehdot, this.suodatin.getOletus(), this.suodatin.getOletusString());
-        lista.add(tyhjaVaihtoehto);
-        
-        for (Entry<Integer, String> entry : this.maksimiVaihtoehdot.entrySet()) {
-            VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti(this.suodatin.getNimi() + " maksimi", this.maksimiVaihtoehdot, this.suodatin.getOletus(), this.suodatin.getOletusString());
-            attribuutti.setValinta(entry.getKey());
-            lista.add(attribuutti);
-        }
-        
-        return lista;
+        return this.maksimi.getVaihtoehdotList();
     }
     
     
