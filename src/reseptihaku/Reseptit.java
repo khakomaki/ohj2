@@ -353,7 +353,8 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
-     * Hakee reseptejä annetulla hakusanalla ja suodattimilla
+     * Hakee reseptejä annetulla hakusanalla ja suodattimilla.
+     * Jos suodatin on asetettu, ei sisällytä oletusvalintaa vastaavia hakutuloksissa.
      * 
      * @param hakusana millä hakusanalla reseptiä haetaan
      * @param minimit suodattimet attribuuttien minimiarvoille
@@ -364,25 +365,34 @@ public class Reseptit implements Hallitsija<Resepti> {
         // TODO listan palauttamisen sijaan esim. Stream
         List<Resepti> loydetytReseptit = new ArrayList<Resepti>();
         
+        // käydään reseptit läpi
         for (Resepti resepti : this.reseptit) {
             if (!resepti.onkoNimessa(hakusana)) continue;
             List<VaihtoehtoAttribuutti> reseptinAttribuutit = resepti.getAttribuutit();
             boolean suodataPois = false;
             
+            // minimit
             for (int i = 0; i < minimit.size(); i++) {
                 VaihtoehtoAttribuutti attribuutti = reseptinAttribuutit.get(i);
                 int minimi = minimit.get(i).getValinta();
                 
-                if (attribuutti.onkoOletusValinta(minimi)) continue; // ei huomioi oletusvalintoja
-                if (attribuutti.getValinta() < minimi) suodataPois = true;
+                // skipataan käyttöliittymän oletusvalinnat
+                if (attribuutti.onkoOletusValinta(minimi)) continue;
+                
+                // laitetaan suodattumaan pois jos ei täsmää tai on oletusvalinta
+                if (attribuutti.getValinta() < minimi || attribuutti.onkoOletusValinta(attribuutti.getValinta())) suodataPois = true;
             }
             
+            // maksimit
             for (int i = 0; i < maksimit.size(); i++) {
                 VaihtoehtoAttribuutti attribuutti = reseptinAttribuutit.get(i);
                 int maksimi = maksimit.get(i).getValinta();
                 
-                if (attribuutti.onkoOletusValinta(maksimi)) continue; // ei huomioi oletusvalintoja
-                if (maksimi < attribuutti.getValinta()) suodataPois = true;
+                // skipataan käyttöliittymän oletusvalinnat
+                if (attribuutti.onkoOletusValinta(maksimi)) continue;
+                
+                // laitetaan suodattumaan pois jos ei täsmää tai on oletusvalinta
+                if (maksimi < attribuutti.getValinta() || attribuutti.onkoOletusValinta(attribuutti.getValinta())) suodataPois = true;
             }
             
             // pääsee lisäämään vain jos kaikki ehdot täyttyvät
