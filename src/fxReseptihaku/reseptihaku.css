@@ -1,1 +1,28 @@
-/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+.combo-box {
+	-fx-background-color: linear-gradient(to bottom, #D4B596, #E3CCB6);
+}
+
+
+.table-view {
+	-fx-background-color: #D4A373;
+}
+
+
+.table-view .column-header {
+	-fx-background-color: #D4A373;
+}
+
+
+.table-view .table-cell {
+	-fx-border-color: transparent;
+}
+
+
+.table-row-cell:selected {
+	-fx-background-color: #D4B596;
+}
+
+
+.root {
+	-fx-background-color: linear-gradient(to bottom, #F0E3D5, #FAFAFA);
+}

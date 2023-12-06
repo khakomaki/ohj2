@@ -145,6 +145,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // hinta
         VaihtoehtoAttribuutti hintaAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
         Label hintaLabel = new Label(hintaAttr.getNimi());
+        hintaLabel.setPadding(PEHMUSTE_PIENI);
+        
         ComboBox<String> hintaComboBox = new ComboBox<String>();
         asetaVaihtoehdot(hintaComboBox, hintaAttr);
         hintaComboBox.setOnAction(e -> {
@@ -158,6 +160,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // valmistusaika
         VaihtoehtoAttribuutti valmAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
         Label valmistusaikaLabel = new Label(valmAttr.getNimi());
+        valmistusaikaLabel.setPadding(PEHMUSTE_PIENI);
+        
         ComboBox<String> valmistusaikaComboBox = new ComboBox<String>();
         asetaVaihtoehdot(valmistusaikaComboBox, valmAttr);
         valmistusaikaComboBox.setOnAction(e -> {
@@ -171,6 +175,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // tähdet
         VaihtoehtoAttribuutti tahdetAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
         Label tahdetLabel = new Label(tahdetAttr.getNimi());
+        tahdetLabel.setPadding(PEHMUSTE_PIENI);
+        
         ComboBox<String> tahdetComboBox = new ComboBox<String>();
         asetaVaihtoehdot(tahdetComboBox, tahdetAttr);
         tahdetComboBox.setOnAction(e -> {
@@ -184,6 +190,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // vaativuus
         VaihtoehtoAttribuutti vaativuusAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
         Label vaativuusLabel = new Label(vaativuusAttr.getNimi());
+        vaativuusLabel.setPadding(PEHMUSTE_PIENI);
+        
         ComboBox<String> vaativuusComboBox = new ComboBox<String>();
         asetaVaihtoehdot(vaativuusComboBox, vaativuusAttr);
         vaativuusComboBox.setOnAction(e -> {
