@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -355,13 +357,23 @@ public class Reseptit implements Hallitsija<Resepti> {
     /**
      * Hakee reseptejä annetulla hakusanalla ja suodattimilla.
      * Jos suodatin on asetettu, ei sisällytä oletusvalintaa vastaavia hakutuloksissa.
+     * Jos annettua lajittelu perustetta vastaavaa attribuuttia ei löydetä, lajitellaan nimen perusteella.
      * 
      * @param hakusana millä hakusanalla reseptiä haetaan
      * @param minimit suodattimet attribuuttien minimiarvoille
      * @param maksimit suodattimet attribuuttien maksimiarvoille
+     * @param lajitteluPeruste minkä perusteella lajitellaan tulokset
+     * @param kaanteinenJarjestys annetaanko tulokset käänteisessä järjestyksessä
      * @return lista löydetyistä resepteistä
      */
-    public List<Resepti> etsiNimella(String hakusana, List<VaihtoehtoAttribuutti> minimit, List<VaihtoehtoAttribuutti> maksimit) {
+    public List<Resepti> etsiNimella(
+            String hakusana, 
+            List<VaihtoehtoAttribuutti> minimit, 
+            List<VaihtoehtoAttribuutti> maksimit, 
+            String lajitteluPeruste,
+            boolean kaanteinenJarjestys
+        ) {
+        
         // TODO listan palauttamisen sijaan esim. Stream
         List<Resepti> loydetytReseptit = new ArrayList<Resepti>();
         
@@ -400,7 +412,87 @@ public class Reseptit implements Hallitsija<Resepti> {
             loydetytReseptit.add(resepti);
         }
         
+        // tulosten lajittelu
+        boolean lajiteltu = false;
+        List<VaihtoehtoAttribuutti> attribuutit = Reseptit.getOletusAttribuutit();
+        
+        for (int i = 0; i < attribuutit.size(); i++) {
+            // suoritetaan vertailu jos vastaa nimeä
+            if (attribuutit.get(i).onkoNimi(lajitteluPeruste)) {
+                // vertailija
+                Comparator<Resepti> vertailija = new VertaileAttribuutteja(i);
+                if (kaanteinenJarjestys) vertailija = vertailija.reversed(); // käänteinen
+                Collections.sort(loydetytReseptit, vertailija);
+                
+                lajiteltu = true;
+                break;
+            }
+        }
+        
+        // jos attribuuteista ei löytynyt lajittelu perustetta, lajitellaan nimellä
+        if (!lajiteltu) {
+            Comparator<Resepti> vertailija = new VertaileNimia();
+            if (kaanteinenJarjestys) vertailija = vertailija.reversed(); // käänteinen
+            Collections.sort(loydetytReseptit, vertailija);
+        }
+        
         return loydetytReseptit;
+    }
+    
+    
+    /**
+     * Vertailee reseptien nimiä keskenään pienellä kirjoitettuna.
+     */
+    class VertaileNimia implements Comparator<Resepti> {
+        @Override
+        public int compare(Resepti resepti1, Resepti resepti2) {
+            String nimi1 = resepti1.getNimi().toLowerCase();
+            String nimi2 = resepti2.getNimi().toLowerCase();
+            return nimi1.compareTo(nimi2);
+        }
+    }
+    
+    
+    /**
+     * Vertailee reseptejä keskenään annetun attribuutin perusteella.
+     * Attribuutit haetaan annetuilta resepteiltä ennalta määritellyn indeksin perusteella.
+     */
+    class VertaileAttribuutteja implements Comparator<Resepti> {
+        private final int attribuutinIndeksi;
+        
+        /**
+         * Attribuutin vertailija.
+         * Ei anneta laittaa alle 0 indeksiä.
+         * 
+         * @param indeksi missä indeksissä olevaa attribuuttia vertaillaan
+         */
+        public VertaileAttribuutteja(int indeksi) {
+            if (indeksi < 0) {
+                this.attribuutinIndeksi = 0;
+            } else {
+                this.attribuutinIndeksi = indeksi;
+            }
+        }
+        
+        @Override
+        public int compare(Resepti resepti1, Resepti resepti2) {
+            // palautetaan että ovat samoja jos annettua indeksiä vastaavaa attribuuttia ei ole
+            if (resepti1.getAttribuutit().size() < this.attribuutinIndeksi || resepti2.getAttribuutit().size() < this.attribuutinIndeksi) return 0;
+            
+            // attribuutit
+            VaihtoehtoAttribuutti va1 = resepti1.getAttribuutit().get(this.attribuutinIndeksi);
+            VaihtoehtoAttribuutti va2 = resepti2.getAttribuutit().get(this.attribuutinIndeksi);
+            int integer1 = va1.getValinta();
+            int integer2 = va2.getValinta();
+            
+            // oletusvalinta muita valintoja myöhemmin
+            if (va1.onkoOletusValinta(integer1) && va2.onkoOletusValinta(integer2)) return 0;
+            if (va1.onkoOletusValinta(integer1)) return 1;
+            if (va2.onkoOletusValinta(integer2)) return -1;
+            
+            // Integer vertailu
+            return Integer.compare(integer1, integer2);
+        }
     }
     
     

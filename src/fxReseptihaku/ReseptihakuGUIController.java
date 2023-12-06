@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -55,6 +56,8 @@ public class ReseptihakuGUIController implements Initializable {
     private List<VaihtoehtoAttribuutti> maksimiValinnat = new ArrayList<VaihtoehtoAttribuutti>();
     private List<ComboBox<String>> suodattimet = new ArrayList<ComboBox<String>>();
     private List<Resepti> hakuReseptit = new ArrayList<Resepti>();
+    private String lajitteluPeruste = null;
+    private boolean kaanteinenJarjestys = false;
     
     
     /**
@@ -100,11 +103,39 @@ public class ReseptihakuGUIController implements Initializable {
         this.suodattimetGridPane.getChildren().clear();
         int rivi = 0;
         
+        // lajittelu teksti
+        Label lajitteluLabel = new Label("Lajittele tulokset");
+        
+        // lajittelu vaihtoehdot
+        ComboBox<String> lajitteluComboBox = new ComboBox<String>();
+        lajitteluComboBox.getItems().add("Nimi");
+        lajitteluComboBox.getSelectionModel().select(0); // valitaan nimi lajittelu perusteeksi
+        lajitteluComboBox.setOnAction(e -> {
+            this.lajitteluPeruste = lajitteluComboBox.getValue();
+            haeReseptit();
+        });
+        
+        // lajittelun käänteinen järjestys
+        CheckBox kaanteinenJarjestysCheckBox = new CheckBox("käänteinen järjestys");
+        kaanteinenJarjestysCheckBox.setOnAction(e -> {
+            this.kaanteinenJarjestys = kaanteinenJarjestysCheckBox.isSelected();
+            haeReseptit();
+        });
+        
+        // lajittelu GridPaneen
+        this.suodattimetGridPane.add(lajitteluLabel, 0, rivi++);
+        this.suodattimetGridPane.add(lajitteluComboBox, 0, rivi++);
+        this.suodattimetGridPane.add(kaanteinenJarjestysCheckBox, 0, rivi++);
+        
+        
         // lisätään reseptejen sisältämät oletus attribuutit
         for (VaihtoehtoAttribuutti suodatettava : Reseptit.getOletusAttribuutit()) {
             int sarake = 0;
             Label suodatinNimiLabel = new Label(suodatettava.getNimi());
             this.suodattimetGridPane.add(suodatinNimiLabel, sarake, rivi++);
+            
+            // lajitteluvaihtoehdoksi
+            lajitteluComboBox.getItems().add(suodatettava.getNimi());
                         
             // minimi
             VaihtoehtoAttribuutti minimiVA = new VaihtoehtoAttribuutti(suodatettava.getNimi(), suodatettava.getVaihtoehdot(), suodatettava.getOletus(), suodatettava.getOletusString());
@@ -175,7 +206,13 @@ public class ReseptihakuGUIController implements Initializable {
         
         if (this.reseptit != null) {
             // haetaan hakusanaa vastanneet reseptit
-            this.hakuReseptit = this.reseptit.etsiNimella(hakusana, this.minimiValinnat, this.maksimiValinnat);
+            this.hakuReseptit = this.reseptit.etsiNimella(
+                    hakusana, 
+                    this.minimiValinnat, 
+                    this.maksimiValinnat, 
+                    this.lajitteluPeruste,
+                    this.kaanteinenJarjestys
+            );
             
             // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
             for (int i = 0; i < this.hakuReseptit.size(); i++) {

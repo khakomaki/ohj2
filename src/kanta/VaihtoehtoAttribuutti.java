@@ -367,6 +367,35 @@ public class VaihtoehtoAttribuutti {
     }
     
     
+    /**
+     * Kertoo onko annettu nimi sama kuin attribuutin nimi
+     * 
+     * @param verrattavaNimi mihin nimeen verrataan
+     * @return onko verrattava nimi sama kuin attribuutin
+     * 
+     * @example
+     * <pre name="test">
+     * Map<Integer, String> map = new HashMap<Integer, String>();
+     * map.put(new Integer(1), new String("vähän"));
+     * map.put(new Integer(2), new String("keskimääräisesti"));
+     * map.put(new Integer(3), new String("paljon"));
+     * VaihtoehtoAttribuutti attribuutti = new VaihtoehtoAttribuutti("Määrä", map, -2, "ei määritelty");
+     * 
+     * attribuutti.getNimi() === "Määrä";
+     * attribuutti.onkoNimi("hinta") === false;
+     * attribuutti.onkoNimi("Määrä") === true;
+     * attribuutti.onkoNimi("MÄÄRÄ") === true;
+     * attribuutti.onkoNimi("määrä") === true;
+     * attribuutti.onkoNimi("") === false;
+     * attribuutti.onkoNimi(null) === false;
+     * </pre>
+     */
+    public boolean onkoNimi(String verrattavaNimi) {
+        if (verrattavaNimi == null) return false;
+        return this.nimi.toLowerCase().equals(verrattavaNimi.toLowerCase());
+    }
+    
+    
     @Override
     /**
      * VaihtoehtoAttribuutin nykyinen valinta String-muodossa.
