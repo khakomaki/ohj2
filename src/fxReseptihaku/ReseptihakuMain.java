@@ -25,7 +25,6 @@ public class ReseptihakuMain extends Application {
             
             // luo ja näyttää reseptihaun stagen
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("reseptihaku.css").toExternalForm());
             primaryStage.setScene(scene);
             primaryStage.setTitle("Reseptihaku");
             primaryStage.show();

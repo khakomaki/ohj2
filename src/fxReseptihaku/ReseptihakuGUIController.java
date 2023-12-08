@@ -66,7 +66,7 @@ public class ReseptihakuGUIController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         alusta();
-        hakutulokset.setColumnWidth(-1, 120);
+        this.hakutulokset.setColumnWidth(-1, 120);
     }
     
     
@@ -199,7 +199,7 @@ public class ReseptihakuGUIController implements Initializable {
      * Suorittaa haun resepteille
      */
     public void haeReseptit() {
-        String hakusana = hakukentta.getText();
+        String hakusana = this.hakukentta.getText();
         this.hakutulokset.clear();
         
         StringBuilder sb = new StringBuilder(hakutuloksetOtsikko);
@@ -225,7 +225,7 @@ public class ReseptihakuGUIController implements Initializable {
         
         // TODO StringGridin sijaan taulukko itse, jolloin ei tarvitse asettaa näitä uudestaan joka päivityksen jälkeen
         this.hakutulokset.setColumnWidth(-1, 120);
-        hakutulokset.setSortable(-1, false);
+        this.hakutulokset.setSortable(-1, false);
         
         asetaTuloksetTeksti(hakusana);
     }
@@ -254,7 +254,7 @@ public class ReseptihakuGUIController implements Initializable {
         // poistutaan jos luotu resepti on null
         if (luotuResepti == null) return;
         
-        reseptit.lisaa(luotuResepti);
+        this.reseptit.lisaa(luotuResepti);
         haeReseptit();
     }
     
@@ -266,16 +266,16 @@ public class ReseptihakuGUIController implements Initializable {
         // haetaan mikä resepti on valittuna
         int valittuResepti = this.hakutulokset.getSelectionModel().getSelectedIndex();
         if (valittuResepti < 0) return;
-        Resepti muokattavaResepti = hakuReseptit.get(valittuResepti);
+        Resepti muokattavaResepti = this.hakuReseptit.get(valittuResepti);
         
         // avataan muokkausnäkymä, josta palatessa saadaan mahdollisesti muokattu resepti
         Resepti muokattuResepti = ModalController.showModal(ReseptihakuGUIController.class.getResource("MuokkausGUIView.fxml"), "Muokkaa reseptiä", null, muokattavaResepti);
         
         // poistaa reseptin resepteistä jos palautetaan null viite (resepti on poistettu muokkausnäkymässä)
         if (muokattuResepti == null) {
-            reseptit.poista(muokattavaResepti);
+            this.reseptit.poista(muokattavaResepti);
             try {
-                reseptit.tallenna();
+                this.reseptit.tallenna();
             } catch (SailoException exception) {
                 Dialogs.showMessageDialog("Poistossa ongelmia: " + exception.getMessage());
             }
@@ -299,16 +299,16 @@ public class ReseptihakuGUIController implements Initializable {
           
         // poistutaan jos indeksi ei ole mieluisa
         if (valittuResepti < 0 || this.hakuReseptit.size() < valittuResepti) return;
-        Resepti avattavaResepti = hakuReseptit.get(valittuResepti);
+        Resepti avattavaResepti = this.hakuReseptit.get(valittuResepti);
         
         // avataan reseptinäkymä ja palatessa saadaan mahdollisesti muokattu resepti
-        Resepti muokattuResepti = ModalController.showModal( ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), "Reseptinäkymä", null, avattavaResepti);
+        Resepti muokattuResepti = ReseptinakymaGUIController.avaaResepti(avattavaResepti);
         
         // poistaa reseptin resepteistä jos palautetaan null viite (resepti on poistettu avausnäkymässä)
         if (muokattuResepti == null) {
-            reseptit.poista(avattavaResepti);
+            this.reseptit.poista(avattavaResepti);
             try {
-                reseptit.tallenna();
+                this.reseptit.tallenna();
             } catch (SailoException exception) {
                 Dialogs.showMessageDialog("Poistossa ongelmia: " + exception.getMessage());
             }
@@ -348,9 +348,9 @@ public class ReseptihakuGUIController implements Initializable {
         // näytetään dialogi reseptin poistamisesta
         boolean vastaus = Dialogs.showQuestionDialog("Reseptin poisto", "Haluatko varmasti poistaa reseptin pysyvästi?", "Poista", "Peruuta");
         if (vastaus) { 
-            reseptit.poista(hakuReseptit.get(valittuResepti));
+            this.reseptit.poista(this.hakuReseptit.get(valittuResepti));
             try {
-                reseptit.tallenna();
+                this.reseptit.tallenna();
             } catch (SailoException exception) {
                 Dialogs.showMessageDialog("Poistossa ongelmia: " + exception.getMessage());
             }

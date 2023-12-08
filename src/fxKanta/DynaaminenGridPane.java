@@ -93,10 +93,11 @@ public class DynaaminenGridPane<T> extends GridPane {
         }
         
         // olion lisäyspainike
-        if (muokattava) {
+        if (this.muokattava) {
             Button lisaysPainike = new Button("+");
             lisaysPainike.setOnAction(e -> lisaa(this.hallitsijaLuokka.luo()));
-            this.add(lisaysPainike, this.leveimmanRivinLeveys, rivi++);
+            this.getRowConstraints().add(this.riviRajoitteet);
+            this.add(lisaysPainike, this.leveimmanRivinLeveys, rivi);
         }
     }
     

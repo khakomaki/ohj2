@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxReseptihaku.ReseptinakymaGUIController">
+<BorderPane stylesheets="@reseptihaku.css" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxReseptihaku.ReseptinakymaGUIController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -53,7 +53,7 @@
    <center>
       <ScrollPane fitToWidth="true" maxHeight="800.0" BorderPane.alignment="CENTER">
          <content>
-            <BorderPane>
+            <BorderPane styleClass="root">
                <left>
                   <VBox fx:id="ainesosatVBox" fillWidth="false" spacing="10.0" BorderPane.alignment="CENTER">
                      <children>
@@ -132,7 +132,7 @@
                            </font>
                         </Label>
                         <Label fx:id="reseptinKuvaus" text="Halpa ja maukas." />
-                        <GridPane gridLinesVisible="true">
+                        <GridPane gridLinesVisible="true" fx:id="ominaisuudetGridPane">
                           <columnConstraints>
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

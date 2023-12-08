@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -23,6 +24,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import kanta.SailoException;
@@ -61,7 +63,8 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     // käyttöliittymän ulkonäkö
     private final Insets PEHMUSTE_ISO = new Insets(10, 10, 10, 10);
     private final Insets PEHMUSTE_PIENI = new Insets(5, 5, 5, 5);
-    private final int VALI = 10;
+    private final int VALI_ISO = 10;
+    private final int VALI_PIENI = 5;
     private final Font kirjasinB16 = new Font("System Bold", 16);
     private final Font kirjasin14 = new Font(14);
     
@@ -128,11 +131,11 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
     private void naytaReseptinOminaisuudet() {
         // reseptin nimi
         this.reseptinNimiTextField.setText(this.valittuResepti.getNimi());
-        reseptinNimiTextField.setOnKeyTyped(e -> { valittuResepti.setUusiNimi(reseptinNimiTextField.getText()); });
+        this.reseptinNimiTextField.setOnKeyTyped(e -> { this.valittuResepti.setUusiNimi(this.reseptinNimiTextField.getText()); });
         
         // reseptin kuvaus
         this.kuvausTextArea.setText(this.valittuResepti.getKuvaus());
-        kuvausTextArea.setOnKeyTyped(e -> { valittuResepti.setKuvaus(kuvausTextArea.getText()); });
+        this.kuvausTextArea.setOnKeyTyped(e -> { this.valittuResepti.setKuvaus(this.kuvausTextArea.getText()); });
         
         // tyhjennetään attribuutit gridpane
         this.attribuutitGridPane.getChildren().clear();
@@ -145,7 +148,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // hinta
         VaihtoehtoAttribuutti hintaAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
         Label hintaLabel = new Label(hintaAttr.getNimi());
-        hintaLabel.setPadding(PEHMUSTE_PIENI);
+        hintaLabel.setPadding(this.PEHMUSTE_PIENI);
         
         ComboBox<String> hintaComboBox = new ComboBox<String>();
         asetaVaihtoehdot(hintaComboBox, hintaAttr);
@@ -160,7 +163,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // valmistusaika
         VaihtoehtoAttribuutti valmAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
         Label valmistusaikaLabel = new Label(valmAttr.getNimi());
-        valmistusaikaLabel.setPadding(PEHMUSTE_PIENI);
+        valmistusaikaLabel.setPadding(this.PEHMUSTE_PIENI);
         
         ComboBox<String> valmistusaikaComboBox = new ComboBox<String>();
         asetaVaihtoehdot(valmistusaikaComboBox, valmAttr);
@@ -175,7 +178,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // tähdet
         VaihtoehtoAttribuutti tahdetAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
         Label tahdetLabel = new Label(tahdetAttr.getNimi());
-        tahdetLabel.setPadding(PEHMUSTE_PIENI);
+        tahdetLabel.setPadding(this.PEHMUSTE_PIENI);
         
         ComboBox<String> tahdetComboBox = new ComboBox<String>();
         asetaVaihtoehdot(tahdetComboBox, tahdetAttr);
@@ -190,7 +193,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // vaativuus
         VaihtoehtoAttribuutti vaativuusAttr = this.valittuResepti.getAttribuutit().get(attribuuttiNro++);
         Label vaativuusLabel = new Label(vaativuusAttr.getNimi());
-        vaativuusLabel.setPadding(PEHMUSTE_PIENI);
+        vaativuusLabel.setPadding(this.PEHMUSTE_PIENI);
         
         ComboBox<String> vaativuusComboBox = new ComboBox<String>();
         asetaVaihtoehdot(vaativuusComboBox, vaativuusAttr);
@@ -231,7 +234,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         for (int i = 0; i < osiot.getLkm(); i++) {
             // luo osion HBoxin ja lisää sen käyttöliittymään
             VBox osioVBox = naytaOsio(osiot.annaIndeksista(i));
-            ainesosaJaOhjeetVBox.getChildren().add(osioVBox);
+            this.ainesosaJaOhjeetVBox.getChildren().add(osioVBox);
         }
     }
     
@@ -247,18 +250,18 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // otsikko joka koostuu osion nimestä ja osion poistopainikkeesta
         HBox osioOstikkoHBox = new HBox();
-        osioOstikkoHBox.setSpacing(VALI);
-        osioOstikkoHBox.setPadding(PEHMUSTE_ISO);
+        osioOstikkoHBox.setSpacing(this.VALI_ISO);
+        osioOstikkoHBox.setPadding(this.PEHMUSTE_ISO);
         
         // luo osion nimen tekstikentän
         TextField osioNimiAinesosat = new TextField(osio.getNimi());
         osioNimiAinesosat.setOnKeyTyped(e -> { osio.setUusiNimi(osioNimiAinesosat.getText()); });
-        osioNimiAinesosat.setFont(kirjasinB16);
+        osioNimiAinesosat.setFont(this.kirjasinB16);
         
         // luo osion poisto-painikkeen
         Button osioPoisto = new Button("x");
         osioPoisto.setOnAction(e -> poistaOsio(osioVBox, osio)); // poistaa VBox-elementin
-        osioPoisto.setFont(kirjasinB16);
+        osioPoisto.setFont(this.kirjasinB16);
         
         // lisätään teksti ja painike HBox-elementtiin
         osioOstikkoHBox.getChildren().add(osioNimiAinesosat);
@@ -272,25 +275,29 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ColumnConstraints painikeConstraints = NodeKasittely.luoSarakeRajoitteet(30, Priority.NEVER, HPos.CENTER);
         ColumnConstraints vaiheConstraints = NodeKasittely.luoSarakeRajoitteet(50, Priority.NEVER, HPos.CENTER);
         ColumnConstraints ohjeConstraints = NodeKasittely.luoSarakeRajoitteet(250, Priority.ALWAYS, HPos.LEFT);
+        RowConstraints ainesosaRiviConstraints = NodeKasittely.luoRiviRajoitteet(30, Priority.SOMETIMES, VPos.CENTER);
+        RowConstraints ohjeRiviConstraints = NodeKasittely.luoRiviRajoitteet(50, Priority.SOMETIMES, VPos.CENTER);
         
         // ==================== näytetään ainesosat ====================
         
         // ainesosat
         VBox ainesosatVBox = new VBox();
-        ainesosatVBox.setPadding(PEHMUSTE_ISO);
+        ainesosatVBox.setPadding(this.PEHMUSTE_ISO);
         OsionAinesosat osionAinesosat = osio.annaOsionAinesosat();
         
         // luo ainesosien otsikon
         Label ainesosatLabel = new Label("Ainesosat");
-        ainesosatLabel.setFont(kirjasin14);
+        ainesosatLabel.setFont(this.kirjasin14);
         
         // luodaan GridPane ja otsikot
         DynaaminenGridPane<OsionAinesosa> ainesosatGridPane = new DynaaminenGridPane<OsionAinesosa>(osionAinesosat, ainesosa -> luoAinesosaNodet(ainesosa), true);
         ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
         ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
         ainesosatGridPane.getColumnConstraints().add(painikeConstraints);
-        Label maara = new Label("määrä"); maara.setPadding(PEHMUSTE_PIENI);
-        Label ainesosa = new Label("ainesosa"); ainesosa.setPadding(PEHMUSTE_PIENI);
+        ainesosatGridPane.asetaRiviRajoitteet(ainesosaRiviConstraints);
+        ainesosatGridPane.setHgap(this.VALI_PIENI);
+        Label maara = new Label("määrä"); maara.setPadding(this.PEHMUSTE_PIENI);
+        Label ainesosa = new Label("ainesosa"); ainesosa.setPadding(this.PEHMUSTE_PIENI);
         List<Label> ainesosaOtsikot = List.of(maara, ainesosa);
         ainesosatGridPane.lisaaOtsikot(ainesosaOtsikot);
         ainesosatGridPane.paivita();
@@ -306,21 +313,23 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         
         // ohjeet
         VBox ohjeetVBox = new VBox();
-        ohjeetVBox.setPadding(PEHMUSTE_ISO);
+        ohjeetVBox.setPadding(this.PEHMUSTE_ISO);
         Ohjeet osionOhjeet = osio.annaOsionOhjeet();
         
         // luo ohjeiden otsikon
         Label ohjeetLabel = new Label("Ohjeet");
-        ohjeetLabel.setFont(kirjasin14);
-        ohjeetLabel.setPadding(PEHMUSTE_ISO);
+        ohjeetLabel.setFont(this.kirjasin14);
+        ohjeetLabel.setPadding(this.PEHMUSTE_ISO);
         
         // luodaan GridPane ja otsikot
         DynaaminenGridPane<Ohje> ohjeetGridPane = new DynaaminenGridPane<Ohje>(osionOhjeet, ohje -> luoOhjeNodet(ohje), true);
         ohjeetGridPane.getColumnConstraints().add(vaiheConstraints);
         ohjeetGridPane.getColumnConstraints().add(ohjeConstraints);
         ohjeetGridPane.getColumnConstraints().add(painikeConstraints);
-        Label vaihe = new Label("vaihe"); vaihe.setPadding(PEHMUSTE_PIENI);
-        Label ohjeistus = new Label("ohjeistus"); ohjeistus.setPadding(PEHMUSTE_PIENI);
+        ohjeetGridPane.asetaRiviRajoitteet(ohjeRiviConstraints);
+        ohjeetGridPane.setVgap(this.VALI_PIENI);
+        Label vaihe = new Label("vaihe"); vaihe.setPadding(this.PEHMUSTE_PIENI);
+        Label ohjeistus = new Label("ohjeistus"); ohjeistus.setPadding(this.PEHMUSTE_PIENI);
         List<Label> ohjeOtsikot = List.of(vaihe, ohjeistus);
         ohjeetGridPane.lisaaOtsikot(ohjeOtsikot);
         ohjeetGridPane.paivita();
@@ -378,13 +387,13 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // määrä
         TextField maaraTextField = new TextField(osionAinesosa.getMaara());
         maaraTextField.setAlignment(Pos.CENTER);
-        maaraTextField.setOnKeyTyped( e -> {osionAinesosa.setMaara(maaraTextField.getText()); } );
+        maaraTextField.setOnKeyTyped( e -> { osionAinesosa.setMaara(maaraTextField.getText()); } );
         nodet.add(maaraTextField);
         
         // ainesosa
         TextField ainesosaTextField = new TextField(osionAinesosa.getAinesosa());
         ainesosaTextField.setAlignment(Pos.CENTER);
-        ainesosaTextField.setOnKeyTyped( e -> {osionAinesosa.setAinesosa(ainesosaTextField.getText()); } );
+        ainesosaTextField.setOnKeyTyped( e -> { osionAinesosa.setAinesosa(ainesosaTextField.getText()); } );
         nodet.add(ainesosaTextField);
         
         return nodet;
@@ -412,7 +421,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
      * sulkee näkymän ilman dialogeja tai tallentamista
      */
     private void suljeTallentamatta() {
-        ModalController.closeStage(reseptinNimiTextField);
+        ModalController.closeStage(this.reseptinNimiTextField);
     }
     
     
@@ -457,19 +466,19 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
      */
     private void lisaaOsio() {
         // teksti osion lisäys-kentästä
-        String osioTeksti = osioTekstiKentta.getText();
+        String osioTeksti = this.osioTekstiKentta.getText();
         if (osioTeksti.isEmpty()) osioTeksti = "";
         
         // Luodaan uusi osio ja näytetään se käyttöliittymään
         Osio osio = new Osio(osioTeksti);
         VBox osioHBox = naytaOsio(osio);
-        ainesosaJaOhjeetVBox.getChildren().add(osioHBox);
+        this.ainesosaJaOhjeetVBox.getChildren().add(osioHBox);
         
         // lisätään osio reseptiin
         this.valittuResepti.lisaaOsio(osio);
         
         // tyhjennetään tekstikenttä
-        osioTekstiKentta.clear();
+        this.osioTekstiKentta.clear();
     }
     
     
@@ -507,7 +516,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
      * @return totuusarvo tuliko muutoksia
      */
     private boolean tulikoMuutoksia() {
-        if (valittuResepti == null) return true;
+        if (this.valittuResepti == null) return true;
         return !this.valittuResepti.equals(this.alkuperainenResepti);
     }
 

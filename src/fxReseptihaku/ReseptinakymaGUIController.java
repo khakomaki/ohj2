@@ -11,9 +11,11 @@ import fxKanta.NodeKasittely;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
@@ -23,7 +25,6 @@ import reseptihaku.Ohjeet;
 import reseptihaku.Osio;
 import reseptihaku.OsionAinesosa;
 import reseptihaku.OsionAinesosat;
-import reseptihaku.Osiot;
 import reseptihaku.Resepti;
 
 /**
@@ -34,6 +35,7 @@ import reseptihaku.Resepti;
  */
 public class ReseptinakymaGUIController implements ModalControllerInterface<Resepti> {
 
+    @FXML private GridPane ominaisuudetGridPane;
     @FXML private CheckBox checkBox1;
     @FXML private Label reseptinNimi;
     @FXML private Label reseptinKuvaus;
@@ -54,7 +56,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
     private Resepti valittuResepti;
     private final Insets PEHMUSTE_ISO = new Insets(10, 10, 10, 10);
     private final Font kirjasin14 = new Font("Arial Bold", 14);
-    private RowConstraints rivirajoitteet = new RowConstraints();
+    private RowConstraints rivirajoitteet = NodeKasittely.luoRiviRajoitteet(25, Priority.SOMETIMES, VPos.CENTER);
     
     
     /**
@@ -68,34 +70,34 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
 
     
     /**
-     * Ei tehdä mitään kun resepti on laitettu näkyviin
+     * Ei tehdä mitään kun dialogi on näytetty
      */
     @Override
     public void handleShown() {
-        // 
+        //
     }
 
     
     /**
-     * Asettaa näytetävän reseptin
+     * Asettaa näytettävän reseptin
      */
     @Override
     public void setDefault(Resepti oletus) {
         this.valittuResepti = oletus;
-        this.rivirajoitteet.setMinHeight(25);
-        this.rivirajoitteet.setVgrow(Priority.SOMETIMES);
-        tyhjennaTiedot();
         naytaReseptinOminaisuudet();
         naytaReseptinOsiot();
     }
     
     
     /**
-     * Tyhjentää FXMLLoaderin asettamat tiedot
+     * Avaa dialogin, jossa reseptiä voidaan katsella.
+     * Palauttaa reseptin, joka voi olla muuttunut jos on avattu muokkausnäkymä tai se on poistettu.
+     * 
+     * @param resepti avattava resepti
+     * @return mahdollisesti muuttunut resepti
      */
-    private void tyhjennaTiedot() {
-        this.ainesosatVBox.getChildren().clear();
-        this.ohjeetVBox.getChildren().clear();
+    public static Resepti avaaResepti(Resepti resepti) {
+        return ModalController.showModal(ReseptihakuGUIController.class.getResource("ReseptinakymaGUIView.fxml"), resepti.getNimi(), null, resepti);
     }
     
     
@@ -117,10 +119,12 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
      * Näyttää reseptin osioiden tiedot
      */
     private void naytaReseptinOsiot() {
-        Osiot osiot = this.valittuResepti.getOsiot();
+        // tyhjennetään fxml alustukset
+        this.ainesosatVBox.getChildren().clear();
+        this.ohjeetVBox.getChildren().clear();
         
-        for (int i = 0; i < osiot.getLkm(); i++) {
-            Osio osio = osiot.annaIndeksista(i);
+        // käydään osiot läpi
+        for (Osio osio : this.valittuResepti.getOsiot().anna()) {
             naytaReseptinAinesosat(osio);
             naytaOsionOhjeet(osio);
         }
@@ -139,19 +143,19 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         
         // lisätään osion nimi -Label
         Label osionNimi = luoOtsikko(osio.getNimi());
-        ainesosatVBox.getChildren().add(osionNimi);
-        ainesosatVBox.setPadding(PEHMUSTE_ISO);
+        this.ainesosatVBox.getChildren().add(osionNimi);
+        this.ainesosatVBox.setPadding(this.PEHMUSTE_ISO);
         
         // luodaan GridPane ainesosille
         DynaaminenGridPane<OsionAinesosa> ainesosatGridPane = new DynaaminenGridPane<OsionAinesosa>(osionAinesosat, ainesosa -> luoAinesosaNodet(ainesosa), false);
-        ainesosatGridPane.asetaRiviRajoitteet(rivirajoitteet);
+        ainesosatGridPane.asetaRiviRajoitteet(this.rivirajoitteet);
         ainesosatGridPane.getColumnConstraints().add(NodeKasittely.luoSarakeRajoitteet(50, Priority.NEVER, HPos.RIGHT));
         ainesosatGridPane.getColumnConstraints().add(NodeKasittely.luoSarakeRajoitteet(125, Priority.SOMETIMES, HPos.LEFT));
         ainesosatGridPane.setHgap(5);
         ainesosatGridPane.setVgap(5);
         ainesosatGridPane.paivita();
         
-        ainesosatVBox.getChildren().add(ainesosatGridPane);
+        this.ainesosatVBox.getChildren().add(ainesosatGridPane);
     }
     
     
@@ -184,8 +188,8 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
      */
     private Label luoOtsikko(String otsikko) {
         Label otsikkoLabel = new Label(otsikko);
-        otsikkoLabel.setFont(kirjasin14);
-        otsikkoLabel.setPadding(PEHMUSTE_ISO);
+        otsikkoLabel.setFont(this.kirjasin14);
+        otsikkoLabel.setPadding(this.PEHMUSTE_ISO);
         return otsikkoLabel;
     }
     
@@ -202,8 +206,8 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         
         // lisätään osion nimi -Label
         Label OsionNimi = luoOtsikko(osio.getNimi());
-        ohjeetVBox.getChildren().add(OsionNimi);
-        ohjeetVBox.setPadding(PEHMUSTE_ISO);
+        this.ohjeetVBox.getChildren().add(OsionNimi);
+        this.ohjeetVBox.setPadding(this.PEHMUSTE_ISO);
         
         // luodaan GridPane ohjeille
         DynaaminenGridPane<Ohje> ohjeetGridPane = new DynaaminenGridPane<Ohje>(osionOhjeet, ohje -> luoOhjeNodet(ohje), false);
@@ -215,7 +219,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         ohjeetGridPane.setVgap(5);
         ohjeetGridPane.paivita();
         
-        ohjeetVBox.getChildren().add(ohjeetGridPane);
+        this.ohjeetVBox.getChildren().add(ohjeetGridPane);
     }
     
     
@@ -261,7 +265,7 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
      * Sulkee reseptinäkymän
      */
     private void sulje() {
-        ModalController.closeStage(reseptinNimi);
+        ModalController.closeStage(this.reseptinNimi);
     }
     
     
@@ -291,9 +295,9 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
         }
         
         // jos reseptiin on tehty muutoksia, päivitetään käyttöliittymän näkymä
-        if (!valittuResepti.equals(muokattuResepti)) {
+        if (!this.valittuResepti.equals(muokattuResepti)) {
             this.valittuResepti = muokattuResepti;
-            setDefault(valittuResepti); 
+            setDefault(this.valittuResepti); 
         }
     }
     
@@ -309,5 +313,4 @@ public class ReseptinakymaGUIController implements ModalControllerInterface<Rese
             sulje();
         }
     }
-    
 }
