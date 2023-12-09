@@ -222,8 +222,7 @@ public class OsionAinesosa {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusString(hash, this.ainesosaNimi);
-        hash = Hajautus.hajautusString(hash, this.maara);
+        hash = Hajautus.hajautusObject(hash, this.ainesosaNimi, this.maara);
         return hash;
     }
     
@@ -276,5 +275,18 @@ public class OsionAinesosa {
         sb.append('|');
         sb.append(this.maara);
         return sb.toString();
+    }
+    
+    
+    /**
+     * Testipääohjelma
+     * 
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+        OsionAinesosa oa1 = new OsionAinesosa("juusto", "2kg");
+        OsionAinesosa oa2 = new OsionAinesosa("sinihomejuusto", "2kg");
+        System.out.println(oa1.hashCode());
+        System.out.println(oa2.hashCode());
     }
 }

@@ -721,11 +721,11 @@ public class Reseptit implements Hallitsija<Resepti> {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusString(hash, this.tiedostonimi);
-        hash = Hajautus.hajautusInt(hash, this.lkm);
+        hash = Hajautus.hajautus(hash, this.tiedostonimi);
+        hash = Hajautus.hajautus(hash, this.lkm);
         
-        for (int i = 0; i < this.lkm; i++) {
-            hash = Hajautus.hajautusInt(hash, this.reseptit.get(i).hashCode());
+        for (Resepti resepti : this.reseptit) {
+            hash = Hajautus.hajautus(hash, resepti.hashCode());
         }
         
         return hash;

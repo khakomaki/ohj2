@@ -328,13 +328,11 @@ public class TietueHallitsija<T> implements Iterable<T> {
     @Override
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.lkm);
-        hash = Hajautus.hajautusInt(hash, this.maxLkm);
-        // hash = Hajautus.hajautusInt(hash, this.KERROIN); TODO
-        hash = Hajautus.hajautusInt(hash, this.vakio);
+        hash = Hajautus.hajautusInt(hash, this.lkm, this.maxLkm, this.vakio);
+        hash = Hajautus.hajautus(hash, this.kerroin);
         
         for (T olio : this) {
-            hash = Hajautus.hajautusInt(hash, olio.hashCode());
+            hash = Hajautus.hajautus(hash, olio.hashCode());
         }
         
         return hash;

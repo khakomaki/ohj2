@@ -505,11 +505,8 @@ public class Osio {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.osioId);
-        hash = Hajautus.hajautusString(hash, this.nimi);
-        hash = Hajautus.hajautusInt(hash, this.osionAinesosat.hashCode());
-        hash = Hajautus.hajautusInt(hash, this.ohjeet.hashCode());
-        
+        hash = Hajautus.hajautus(hash, this.nimi);
+        hash = Hajautus.hajautusInt(hash, this.osioId, this.osionAinesosat.hashCode(), this.ohjeet.hashCode());
         return hash;
     }
     

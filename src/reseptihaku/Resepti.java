@@ -1032,14 +1032,8 @@ public class Resepti {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusString(hash, this.nimi);
-        hash = Hajautus.hajautusString(hash, this.kuvaus);
-        hash = Hajautus.hajautusInt(hash, this.reseptiId);
-        hash = Hajautus.hajautusInt(hash, getHinta());
-        hash = Hajautus.hajautusInt(hash, getValmistusaika());
-        hash = Hajautus.hajautusInt(hash, getTahdet());
-        hash = Hajautus.hajautusInt(hash, getVaativuus());
-        hash = Hajautus.hajautusInt(hash, this.osiot.hashCode());
+        hash = Hajautus.hajautusObject(hash, this.nimi, this.kuvaus);
+        hash = Hajautus.hajautusInt(hash, this.reseptiId, this.getHinta(), this.getValmistusaika(), this.getTahdet(), this.getVaativuus(), this.osiot.hashCode());
         return hash;
     }
     

@@ -442,11 +442,8 @@ public class VaihtoehtoAttribuutti {
     @Override
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusString(hash, this.getNimi());
-        hash = Hajautus.hajautusInt(hash, this.getOletus());
-        hash = Hajautus.hajautusString(hash, this.getOletusString());
-        hash = Hajautus.hajautusInt(hash, this.vaihtoehdot.hashCode());
-        
+        hash = Hajautus.hajautusInt(hash, this.getOletus(), this.vaihtoehdot.hashCode());
+        hash = Hajautus.hajautusObject(hash, this.getNimi(), this.oletusString);
         return hash;
     }
     

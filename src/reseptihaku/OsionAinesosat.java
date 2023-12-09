@@ -389,11 +389,11 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     @Override
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.osioId);
-        hash = Hajautus.hajautusString(hash, this.tiedostonimi);
+        hash = Hajautus.hajautus(hash, this.osioId);
+        hash = Hajautus.hajautus(hash, this.tiedostonimi);
         
         for (OsionAinesosa oa : this) {
-            hash = Hajautus.hajautusInt(hash, oa.hashCode());
+            hash = Hajautus.hajautus(hash, oa.hashCode());
         }
         
         return hash;

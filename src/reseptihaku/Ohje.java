@@ -268,8 +268,8 @@ public class Ohje {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.vaihe);
-        hash = Hajautus.hajautusString(hash, this.ohjeistus);
+        hash = Hajautus.hajautus(hash, this.vaihe);
+        hash = Hajautus.hajautus(hash, this.ohjeistus);
         return hash;
     }
     

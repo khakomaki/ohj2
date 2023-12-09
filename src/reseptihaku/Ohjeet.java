@@ -560,11 +560,11 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusInt(hash, this.osioId);
-        hash = Hajautus.hajautusString(hash, this.tiedostonimi);
+        hash = Hajautus.hajautus(hash, this.osioId);
+        hash = Hajautus.hajautus(hash, this.tiedostonimi);
         
-        for (int i = 0; i < this.lkm; i++) {
-            hash = Hajautus.hajautusInt(hash, this.ohjeet.get(i).hashCode());
+        for (Ohje ohje : this.ohjeet) {
+            hash = Hajautus.hajautus(hash, ohje.hashCode());
         }
         
         return hash;

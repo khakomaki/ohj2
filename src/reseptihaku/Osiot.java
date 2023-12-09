@@ -449,10 +449,10 @@ public class Osiot implements Hallitsija<Osio> {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusString(hash, this.tiedostonimi);
+        hash = Hajautus.hajautus(hash, this.tiedostonimi);
         
-        for (int i = 0; i < this.osiot.size(); i++) {
-            hash = Hajautus.hajautusInt(hash, this.osiot.get(i).hashCode());
+        for (Osio osio : this.osiot) {
+            hash = Hajautus.hajautus(hash, osio.hashCode());
         }
         
         return hash;
