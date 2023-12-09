@@ -758,74 +758,79 @@ public class Reseptit implements Hallitsija<Resepti> {
      */
     public static void main(String[] args) {
         Reseptit reseptit = new Reseptit();
-        System.out.println(reseptit);
-        
-        Resepti mustikkapiirakka = reseptit.lisaa("Mustikkapiirakka");
-        reseptit.lisaa("Pizza");
-        reseptit.lisaa("Lihapiirakka");
-        mustikkapiirakka.setKuvaus("helppo ja hyvä");
-        System.out.println(reseptit + "\n");
-        
-        reseptit.tulostaReseptit(System.out);
-        
-        mustikkapiirakka.setHinta(2);
-        mustikkapiirakka.setValmistusaika(2);
-        mustikkapiirakka.setTahdet(3);
-        mustikkapiirakka.setVaativuus(1);
-        System.out.println(mustikkapiirakka);
-        
-        Reseptit kopioReseptit = reseptit.clone();
-        System.out.println(kopioReseptit.equals(reseptit));
-        
-        System.out.println(reseptit.hashCode());
-        System.out.println(kopioReseptit.hashCode());
-        
-        mustikkapiirakka.setKuvaus("vaikea ja huono");
-        
-        System.out.println(reseptit.anna(0).getKuvaus());
-        System.out.println(kopioReseptit.anna(0).getKuvaus());
-        
-        System.out.println(reseptit.hashCode());
-        System.out.println(kopioReseptit.hashCode());
-        
-        Reseptit mm = new Reseptit();
-        Resepti m1 = new Resepti();
-        m1.luoMustikkapiirakka();
-        mm.lisaa(m1);
-        
-        Resepti m2 = new Resepti();
-        m2.setHinta(2);
-        Osiot m2Osiot = m2.getOsiot();
-        Osio pizzapohja = m2Osiot.lisaa("Pizzapohja");
-        Osio tomaattikastike = m2Osiot.lisaa("Tomaattikastike");
-        pizzapohja.lisaaAinesosa("Vehnäjauhoja 00", "200g");
-        pizzapohja.lisaaAinesosa("kuivahiivaa", "1ps");
-        pizzapohja.lisaaAinesosa("Vettä", "1dl");
-        pizzapohja.lisaaOhje("Sekoita hiiva kädenlämpöiseen veteen");
-        pizzapohja.lisaaOhje("Sekoita vehnäjauhot veteen");
-        pizzapohja.lisaaOhje("Vaivaa käsin n. 10min");
-        tomaattikastike.lisaaAinesosa("Tomaattia", "4kpl");
-        tomaattikastike.lisaaAinesosa("Suolaa", "1tl");
-        tomaattikastike.lisaaAinesosa("Tomaattipyrettä", "1rkl");
-        tomaattikastike.lisaaOhje("Survo tomaatit");
-        tomaattikastike.lisaaOhje("Sekoita tomaattipyree tomaattisurvokseen");
-        tomaattikastike.lisaaOhje("Lisää suola");
-        mm.lisaa(m2);
-        
         try {
-            mm.tallenna();
+            reseptit.setTiedostoPolku("lisääReseptejä/");
         } catch (SailoException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         
-        Reseptit reseptitTiedostosta = new Reseptit();
+        Resepti kinkkukiusaus = new Resepti("Kinkkukiusaus");
+        Osio valmistus = new Osio("Valmistus");
+        valmistus.lisaaAinesosa("Pakaste peruna-sipuli sekoitusta", "1kg");
+        valmistus.lisaaAinesosa("Kinkkusuikaleita", "150g");
+        valmistus.lisaaAinesosa("Suolaa", "1tl");
+        valmistus.lisaaAinesosa("Mustapippuria", "1tl");
+        valmistus.lisaaAinesosa("Ruokakermaa", "2 prk");
+        valmistus.lisaaOhje("Kaada osa pakastesekoituksesta vuokaan");
+        valmistus.lisaaOhje("Levitä kinkkusuikaleet vuokaan");
+        valmistus.lisaaOhje("Kaada loput pakastesekoituksesta vuokaan");
+        valmistus.lisaaOhje("Lisää mausteet ja ruokakerma");
+        valmistus.lisaaOhje("Paista 200°C noin 1h");
+        kinkkukiusaus.lisaaOsio(valmistus);
+        kinkkukiusaus.setKuvaus("Halpaa arkiruokaa pienellä vaivalla");
+        kinkkukiusaus.setTahdet(1);
+        kinkkukiusaus.setValmistusaika(3);
+        reseptit.lisaa(kinkkukiusaus);
+        
+        Resepti lihapullat = new Resepti("Lihapullat");
+        Osio valmistusLihap = new Osio("Valmistus");
+        valmistusLihap.lisaaAinesosa("jauhelihaa", "400g");
+        valmistusLihap.lisaaAinesosa("sipulikeittoaineksia", "1ps");
+        valmistusLihap.lisaaAinesosa("kananmunia", "1kpl");
+        valmistusLihap.lisaaAinesosa("kermaviiliä", "1prk");
+        valmistusLihap.lisaaAinesosa("mustapippuria", "");
+        valmistusLihap.lisaaAinesosa("korppujauhoja", "1/2dl");
+        valmistusLihap.lisaaOhje("Sekoita sipulikeittoainekset, korppujauhot, kermaviili, kananamuna ja mustapippuri keskenään");
+        valmistusLihap.lisaaOhje("Lisää jauheliha ja sekoita tasaiseksi");
+        valmistusLihap.lisaaOhje("Kostuta kädet viileällä vedellä ja pyöritä halutun kokoisia lihapullia");
+        valmistusLihap.lisaaOhje("Paista 225°C noin 15min");
+        lihapullat.lisaaOsio(valmistusLihap);
+        lihapullat.setKuvaus("Sopivat hyvin usean eri lisukkeen, kuten perunamuusin tai ranskalaisten kanssa. Sopivat todella hyvin myös lihapullapastaan. Kermaviilin sijasta voi käyttää 1,5dl vettä.");
+        lihapullat.setHinta(1);
+        lihapullat.setTahdet(5);
+        lihapullat.setValmistusaika(3);
+        lihapullat.setVaativuus(2);
+        reseptit.lisaa(lihapullat);
+        
+        Resepti mustikkamuffinit = new Resepti("Mustikkamuffinit");
+        Osio valmistusMuff = new Osio("Valmistus");
+        valmistusMuff.lisaaAinesosa("vehnäjauhoja", "3.45dl");
+        valmistusMuff.lisaaAinesosa("sokeria", "2.1dl");
+        valmistusMuff.lisaaAinesosa("leivinjauhetta", "1.5tl");
+        valmistusMuff.lisaaAinesosa("voita", "110g");
+        valmistusMuff.lisaaAinesosa("kananmunia", "2kpl");
+        valmistusMuff.lisaaAinesosa("kardemummaa", "1tl");
+        valmistusMuff.lisaaAinesosa("vaniljasokeria", "1tl");
+        valmistusMuff.lisaaAinesosa("maustamatonta jogurttia", "1.5dl");
+        valmistusMuff.lisaaAinesosa("mustikoita", "2dl");
+        valmistusMuff.lisaaAinesosa("muffinivuokia", "10kpl");
+        valmistusMuff.lisaaOhje("Sekoita kuivat ainekset keskenään");
+        valmistusMuff.lisaaOhje("Erilliseen kulhoon, lisää sulatettu voi, jonka on annettu jäähtyä ennen lisäystä");
+        valmistusMuff.lisaaOhje("Lisää kananmunat ja jogurtti sulatettuun voihin");
+        valmistusMuff.lisaaOhje("Nopeasti sekoittaen lisää nestemäinen seos kuiviin aineksiin, vältä turhaa sekoitusta");
+        valmistusMuff.lisaaOhje("Kääntele mustikat taikinan joukkoon");
+        valmistusMuff.lisaaOhje("Jaa muffinivuokiin");
+        valmistusMuff.lisaaOhje("Paista 173°C 28min 30s");
+        mustikkamuffinit.lisaaOsio(valmistusMuff);
+        mustikkamuffinit.setHinta(2);
+        mustikkamuffinit.setValmistusaika(3);
+        mustikkamuffinit.setVaativuus(5);
+        reseptit.lisaa(mustikkamuffinit);
         
         try {
-            reseptitTiedostosta.lueTiedostosta();
+            reseptit.tallenna();
         } catch (SailoException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
-        
-        System.out.println(reseptitTiedostosta);
     }
 }
