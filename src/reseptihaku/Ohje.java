@@ -1,5 +1,10 @@
 package reseptihaku;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 
@@ -11,6 +16,7 @@ import kanta.Hajautus;
  */
 public class Ohje {
     
+    private int osioId          = -1;
     private int vaihe           = 1;
     private String ohjeistus    = "";
     
@@ -51,6 +57,16 @@ public class Ohje {
     public Ohje(String ohjeistus, int vaihe) {
         setOhjeistus(ohjeistus);
         setVaihe(vaihe);
+    }
+    
+    
+    /**
+     * Asettaa osion tunnuksen johon ohje kuuluu
+     * 
+     * @param id osion tunnus
+     */
+    public void setOsioId(int id) {
+        this.osioId = id;
     }
     
     
@@ -138,6 +154,60 @@ public class Ohje {
     
     
     /**
+     * Antaa tietokannan SQL-luontilausekkeen Ohjeet-taululle
+     * 
+     * @return Ohjeet-taulukon luontilauseke
+     */
+    public String getLuontilauseke() {
+        StringBuilder lauseke = new StringBuilder();
+        lauseke.append("CREATE TABLE Ohjeet (");
+        
+        lauseke.append("osio_id INTEGER, ");
+        lauseke.append("vaihe INTEGER, ");
+        lauseke.append("ohjeistus VARCHAR(255), ");
+        lauseke.append("PRIMARY KEY (osio_id, vaihe), ");
+        lauseke.append("FOREIGN KEY (osio_id) REFERENCES Osiot(osio_id)");
+        
+        lauseke.append(")");
+        return lauseke.toString();
+    }
+    
+    
+    /**
+     * Antaa ohjeen lisäyslausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return lisäyslauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getLisayslauseke(Connection yhteys) throws SQLException {
+        PreparedStatement sql = yhteys.prepareStatement("INSERT INTO Ohjeet (osio_id, vaihe, ohjeistus) VALUES (?, ?, ?)");
+        
+        // asetetaan osion tunnus jos se on asetettu
+        if ( 0 < this.osioId ) sql.setInt(1, this.osioId);
+        else sql.setString(1, null);
+        
+        sql.setInt(2, this.vaihe);
+        sql.setString(3, this.ohjeistus);
+        
+        return sql;
+    }
+    
+    
+    /**
+     * Parsii annetuista tiedoista omat tietonsa
+     * 
+     * @param tulokset mistä tiedot saadaan
+     * @throws SQLException jos tulee ongelmia
+     */
+    public void parse(ResultSet tulokset) throws SQLException {
+        setOsioId(tulokset.getInt("osio_id"));
+        setVaihe(tulokset.getInt("vaihe"));
+        setOhjeistus(tulokset.getString("ohjeistus"));
+    }
+    
+    
+    /**
      * Parsii annetusta rivistä omat tietonsa
      * 
      * @param rivi parsittava rivi
@@ -149,10 +219,6 @@ public class Ohje {
      * ohje.toString() === "1|Lisää mansikat";
      * 
      * ohje = new Ohje();
-     * ohje.parse(null);
-     * ohje.toString() === "1|";
-     * 
-     * ohje = new Ohje();
      * ohje.parse("Lisää mansikat|1");
      * ohje.toString() === "1|";
      * </pre>
@@ -162,11 +228,9 @@ public class Ohje {
         
         StringBuilder sb = new StringBuilder(rivi);
         
-        // jättää ensimmäisen kentän huomioitta (osioId)
-        Mjonot.erota(sb, '|');
-        
+        setOsioId(Mjonot.erota(sb, '|', this.osioId));
         setVaihe(Mjonot.erota(sb, '|', this.vaihe));
-        setOhjeistus(Mjonot.erota(sb, '|'));
+        setOhjeistus(Mjonot.erota(sb, '|', this.ohjeistus));
     }
     
     
@@ -291,5 +355,16 @@ public class Ohje {
         sb.append('|');
         sb.append(this.ohjeistus);
         return sb.toString();
+    }
+    
+    
+    /**
+     * Testipääohjelma
+     * 
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+        Ohje ohje = new Ohje();
+        System.out.println(ohje.getLuontilauseke());
     }
 }
