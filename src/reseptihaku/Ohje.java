@@ -26,13 +26,13 @@ public class Ohje {
      * @example
      * <pre name="test">
      * Ohje muropohja = new Ohje();
-     * muropohja.toString() === "1|";
+     * muropohja.toString() === "-1|1|";
      * 
      * muropohja.setOhjeistus("Lisää vehnäjauhot");
-     * muropohja.toString() === "1|Lisää vehnäjauhot";
+     * muropohja.toString() === "-1|1|Lisää vehnäjauhot";
      * 
      * muropohja.setOhjeistus(null);
-     * muropohja.toString() === "1|Lisää vehnäjauhot";
+     * muropohja.toString() === "-1|1|Lisää vehnäjauhot";
      * </pre>
      */
     public Ohje() {
@@ -76,16 +76,16 @@ public class Ohje {
      * @example
      * <pre name="test">
      * Ohje muropohja = new Ohje();
-     * muropohja.toString() === "1|";
+     * muropohja.toString() === "-1|1|";
      * 
      * muropohja.setOhjeistus("Lisää vehnäjauhot");
-     * muropohja.toString() === "1|Lisää vehnäjauhot";
+     * muropohja.toString() === "-1|1|Lisää vehnäjauhot";
      * 
      * muropohja.setOhjeistus(null);
-     * muropohja.toString() === "1|Lisää vehnäjauhot";
+     * muropohja.toString() === "-1|1|Lisää vehnäjauhot";
      * 
      * muropohja.setOhjeistus("");
-     * muropohja.toString() === "1|";
+     * muropohja.toString() === "-1|1|";
      * </pre>
      */
     public void setOhjeistus(String ohjeistus) {
@@ -183,10 +183,7 @@ public class Ohje {
     public PreparedStatement getLisayslauseke(Connection yhteys) throws SQLException {
         PreparedStatement sql = yhteys.prepareStatement("INSERT INTO Ohjeet (osio_id, vaihe, ohjeistus) VALUES (?, ?, ?)");
         
-        // asetetaan osion tunnus jos se on asetettu
-        if ( 0 < this.osioId ) sql.setInt(1, this.osioId);
-        else sql.setString(1, null);
-        
+        sql.setInt(1, this.osioId);
         sql.setInt(2, this.vaihe);
         sql.setString(3, this.ohjeistus);
         
@@ -215,12 +212,12 @@ public class Ohje {
      * @example
      * <pre name="test">
      * Ohje ohje = new Ohje();
-     * ohje.parse("1|1|Lisää mansikat");
-     * ohje.toString() === "1|Lisää mansikat";
+     * ohje.parse("2|1|Lisää mansikat");
+     * ohje.toString() === "2|1|Lisää mansikat";
      * 
      * ohje = new Ohje();
-     * ohje.parse("Lisää mansikat|1");
-     * ohje.toString() === "1|";
+     * ohje.parse("15|Lisää mansikat|3");
+     * ohje.toString() === "15|1|3";
      * </pre>
      */
     public void parse(String rivi) {
@@ -343,14 +340,16 @@ public class Ohje {
      * @example
      * <pre name="test">
      * Ohje ohje = new Ohje();
-     * ohje.toString() === "1|";
+     * ohje.toString() === "-1|1|";
      * 
      * ohje = new Ohje("Lisää sokeri", 7);
-     * ohje.toString() === "7|Lisää sokeri";
+     * ohje.toString() === "-1|7|Lisää sokeri";
      * </pre>
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(this.osioId);
+        sb.append('|');
         sb.append(this.vaihe);
         sb.append('|');
         sb.append(this.ohjeistus);
