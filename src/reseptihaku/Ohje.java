@@ -192,6 +192,24 @@ public class Ohje {
     
     
     /**
+     * Antaa ohjeen poistolausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return poistolauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getPoistolauseke(Connection yhteys) throws SQLException {
+        PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Ohjeet WHERE osio_id = ? AND vaihe = ?");
+        
+        // ohje yksilöity PK = osio_id, vaihe
+        sql.setInt(1, this.osioId);
+        sql.setInt(2, this.vaihe);
+        
+        return sql;
+    }
+    
+    
+    /**
      * Parsii annetuista tiedoista omat tietonsa
      * 
      * @param tulokset mistä tiedot saadaan
@@ -297,6 +315,7 @@ public class Ohje {
         Ohje verrattavaOhje = (Ohje)verrattava;
         if (!verrattavaOhje.ohjeistus.equals(this.ohjeistus)) return false;
         if (verrattavaOhje.vaihe != this.vaihe) return false;
+        if (verrattavaOhje.osioId != this.osioId) return false;
         return true;
     }
     
@@ -329,7 +348,7 @@ public class Ohje {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautus(hash, this.vaihe);
+        hash = Hajautus.hajautusInt(hash, this.osioId, this.vaihe);
         hash = Hajautus.hajautus(hash, this.ohjeistus);
         return hash;
     }

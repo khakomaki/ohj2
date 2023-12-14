@@ -3,7 +3,13 @@ package reseptihaku;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,13 +30,42 @@ import kanta.SailoException;
  * Ohjeet hallitsee ohje-olioita.
  */
 public class Ohjeet implements Hallitsija<Ohje> {
-
+    /**
+     * Alustukset testejä varten
+     * 
+     * @example
+     * <pre name="testJAVA">
+     * private Ohjeet kaikkiOhjeet;
+     * private String tiedNimi;
+     * private File tiedosto;
+     * 
+     * @Before
+     * public void alusta() throws SailoException {
+     *     tiedNimi = "testiOhjeet";
+     *     tiedosto = new File(tiedNimi + ".db");
+     *     tiedosto.delete();
+     *     kaikkiOhjeet = new Ohjeet(1, tiedNimi);
+     * }
+     * 
+     * @After
+     * public void siivoa() {
+     *     tiedosto.delete();
+     * }
+     * </pre>
+     */
+    
+    
     private String tiedostonimi     = "ohjeet.dat";
     private String tiedostopolku    = "reseptidata/Reseptin nimi/Osion nimi/";
     private int osioId              = -1;
     private int lkm                 = 0;
     private List<Ohje> ohjeet       = new ArrayList<Ohje>();
     private boolean muutettu        = false;
+    
+    private List<Ohje> ohjeidenOhjeet   = new ArrayList<Ohje>();
+    private static Ohje esimerkkiOhje   = new Ohje();
+    private Tietokanta tietokanta       = null;
+    private int vaihe                   = 1;
     
     
     /**
@@ -60,6 +95,36 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public Ohjeet(int osioId) {
         this.osioId = osioId;
+    }
+    
+    
+    /**
+     * Hallitsee tietokannassa sijaitsevia Ohje-olioita
+     * 
+     * @param osioId osion tunnus
+     * @param tietokantaNimi tietokannan nimi
+     * @throws SailoException jos tulee ongelmia
+     */
+    public Ohjeet(int osioId, String tietokantaNimi) throws SailoException {
+        this.osioId = osioId;
+        this.tietokanta = Tietokanta.alustaTietokanta(tietokantaNimi);
+        
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
+            // haetaan tietokannan metadatasta omaa tietokantaa, luodaan jos ei ole
+            DatabaseMetaData metadata = yhteys.getMetaData();
+            
+            try ( ResultSet taulu = metadata.getTables(null, null, "Ohjeet", null)) {
+                // luodaan uusi taulu jos ei voida siirtyä seuraavaan
+                if ( !taulu.next() ) {
+                    try ( PreparedStatement sql = yhteys.prepareStatement(esimerkkiOhje.getLuontilauseke()) ) {
+                        sql.execute();
+                    }
+                }
+            }
+            
+        } catch ( SQLException exception ) {
+            throw new SailoException("Ongelmia ohjeiden luonnissa tietokannan kanssa: " + exception.getMessage());
+        }
     }
     
     
@@ -113,6 +178,106 @@ public class Ohjeet implements Hallitsija<Ohje> {
         lisattavaOhje.setVaihe(this.lkm);
         
         this.muutettu = true;
+    }
+    
+    
+    /**
+     * Lisää ohjeen
+     * 
+     * @param ohje lisättävä ohje
+     * 
+     * @throws SailoException jos lisäämisen kanssa tulee ongelmia
+     * 
+     * @example
+     * <pre name="test">
+     * #THROWS SailoException
+     * #import java.io.*;
+     * #import java.util.*;
+     * #import kanta.SailoException;
+     * 
+     * Collection<Ohje> loytyneetOhjeet = kaikkiOhjeet.get();
+     * loytyneetOhjeet.size() === 0;
+     * 
+     * Ohje ohje1 = new Ohje();
+     * Ohje ohje2 = new Ohje();
+     * 
+     * kaikkiOhjeet.lisaa(ohje1);
+     * kaikkiOhjeet.lisaa(ohje2);
+     * loytyneetOhjeet = kaikkiOhjeet.get();
+     * loytyneetOhjeet.size() === 0;
+     * </pre>
+     */
+    public void lisaaOhje(Ohje ohje) throws SailoException {
+        // asetetaan lisättävälle ohjeelle sama osiotunnus
+        ohje.setOsioId(this.osioId);
+        ohje.setVaihe(this.vaihe++);
+        
+        // muodostaa yhteyden tietokantaan, pyytää ohjeelta lisäyslausekkeen ja suorittaa
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = ohje.getLisayslauseke(yhteys) ) {
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia lisäyksessä tietokannan kanssa: " + exception.getMessage());
+        }
+        
+        this.ohjeidenOhjeet.add(ohje);
+    }
+    
+    
+    /**
+     * Palauttaa kaikki tietokannasta löytyvät omat ohjeet
+     * 
+     * @return kokoelma luokan ohjeista
+     * @throws SailoException jos hakemisessa tulee ongelmia
+     */
+    public Collection<Ohje> get() throws SailoException {
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Ohjeet WHERE osio_id = ?") ) {
+            ArrayList<Ohje> loydetytOhjeet = new ArrayList<Ohje>();
+            sql.setInt(1, this.osioId);
+            
+            try ( ResultSet tulokset = sql.executeQuery() ) {
+                while (tulokset.next()) {
+                    Ohje ohje = new Ohje();
+                    ohje.parse(tulokset);
+                    loydetytOhjeet.add(ohje);
+                }
+            }
+            return loydetytOhjeet;
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia ohjeiden haussa tietokannan kanssa: " + exception.getMessage());
+        }
+    }
+    
+    
+    /**
+     * Poistaa annetun ohjeen ja päivittää tarvittavasti muiden ohjeiden vaiheita
+     * 
+     * @param ohje poistettava ohje
+     * @throws SailoException jos poistamisessa ilmenee ongelmia
+     */
+    public void poistaOhje(Ohje ohje) throws SailoException {
+        // muodostaa yhteyden tietokantaan, pyytää ohjeelta poistolausekkeen ja suorittaa
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = ohje.getPoistolauseke(yhteys) ) {
+            
+            // poistettava vaihe muistiin ja poistetaan ohje
+            int poistettavaVaihe = ohje.getVaihe();
+            sql.executeUpdate();
+            
+            // päivitetään tarvittavia vaiheita -1 pienemmiksi
+            try (PreparedStatement sqlVaihepaivitys = yhteys.prepareStatement("UPDATE Ohjeet SET vaihe = vaihe - 1 WHERE osio_id = ? AND vaihe > ?")) {
+                sqlVaihepaivitys.setInt(1, this.osioId);
+                sqlVaihepaivitys.setInt(2, poistettavaVaihe);
+                sqlVaihepaivitys.executeUpdate();
+            }
+            
+            for (int i = poistettavaVaihe; i < this.ohjeidenOhjeet.size(); i++) {
+                this.ohjeidenOhjeet.get(i).setVaihe(this.ohjeidenOhjeet.get(i).getVaihe() - 1);
+            }
+            this.vaihe--;
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia poistossa tietokannan kanssa: " + exception.getMessage());
+        }
     }
     
     
@@ -596,6 +761,43 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
+        try {
+            Ohjeet ohjeet = new Ohjeet(1, "testiohjeet");
+            System.out.println(ohjeet.get());
+            
+            Ohje ohje1 = new Ohje("Lisää kananmunat");
+            Ohje ohje2 = new Ohje("Lisää sokeri");
+            Ohje ohje3 = new Ohje("Sekoita");
+            Ohje ohje4 = new Ohje("Maista");
+            Ohje ohje5 = new Ohje("Lisää mausteet");
+            ohjeet.lisaaOhje(ohje1);
+            ohjeet.lisaaOhje(ohje2);
+            ohjeet.lisaaOhje(ohje3);
+            System.out.println(ohjeet.get());
+            
+            ohjeet.poistaOhje(ohje2);
+            System.out.println(ohjeet.get());
+            
+            ohjeet.poistaOhje(ohje1);
+            System.out.println(ohjeet.get());
+            
+            ohjeet.lisaaOhje(ohje4);
+            System.out.println(ohjeet.get());
+            
+            ohjeet.poistaOhje(ohje3);
+            System.out.println(ohjeet.get());
+            
+            ohjeet.poistaOhje(ohje4);
+            System.out.println(ohjeet.get());
+            
+            ohjeet.lisaaOhje(ohje5);
+            System.out.println(ohjeet.get());
+            
+        } catch (SailoException e) {
+            e.printStackTrace();
+        }
+        
+        /*
         Ohjeet ohjeet = new Ohjeet(5);
         ohjeet.setTiedostoNimi("ohjeet.txt");
         
@@ -659,5 +861,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
         
         System.out.println("osio 4 ohjeet tiedostosta: " + ohjeetTiedostosta2);
         ohjeetTiedostosta2.tulostaOhjeet(System.out);
+        */
     }
 }
