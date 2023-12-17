@@ -274,6 +274,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
                 this.ohjeidenOhjeet.get(i).setVaihe(this.ohjeidenOhjeet.get(i).getVaihe() - 1);
             }
             this.vaihe--;
+            this.ohjeidenOhjeet.remove(ohje);
             
         } catch (SQLException exception) {
             throw new SailoException("Ongelmia poistossa tietokannan kanssa: " + exception.getMessage());
@@ -762,7 +763,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public static void main(String[] args) {
         try {
-            Ohjeet ohjeet = new Ohjeet(1, "testiohjeet");
+            Ohjeet ohjeet = new Ohjeet(1, "testidb");
             System.out.println(ohjeet.get());
             
             Ohje ohje1 = new Ohje("Lisää kananmunat");

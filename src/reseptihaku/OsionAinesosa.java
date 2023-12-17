@@ -1,5 +1,10 @@
 package reseptihaku;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
 
@@ -13,6 +18,8 @@ public class OsionAinesosa {
     
     private String ainesosaNimi = "ainesosa";
     private String maara        = "";
+    
+    private int osioId 			= -1;
     
     
     /**
@@ -135,6 +142,85 @@ public class OsionAinesosa {
     public void setMaara(String maara) {
         if (maara == null) return;
         this.maara = maara;
+    }
+    
+    
+    /**
+     * Asettaa osion tunnuksen johon ainesosa kuuluu
+     * 
+     * @param id osion tunnus
+     */
+    public void setOsioId(int id) {
+    	this.osioId = id;
+    }
+    
+    
+    /**
+     * Antaa tietokannan SQL-luontilausekkeen Ainesosat-taululle
+     * 
+     * @return Ainesosat-taulukon luontilauseke
+     */
+    public String getLuontilauseke() {
+        StringBuilder lauseke = new StringBuilder();
+        lauseke.append("CREATE TABLE Ainesosat (");
+        
+        lauseke.append("osio_id INTEGER, ");
+        lauseke.append("nimi VARCHAR(100), ");
+        lauseke.append("maara VARCHAR(100), ");
+        lauseke.append("PRIMARY KEY (osio_id, nimi), ");
+        lauseke.append("FOREIGN KEY (osio_id) REFERENCES Osiot(osio_id)");
+        
+        lauseke.append(")");
+        return lauseke.toString();
+    }
+    
+    
+    /**
+     * Antaa ainesosan lisäyslausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return lisäyslauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getLisayslauseke(Connection yhteys) throws SQLException {
+        PreparedStatement sql = yhteys.prepareStatement("INSERT INTO Ainesosat (osio_id, nimi, maara) VALUES (?, ?, ?)");
+        
+        sql.setInt(1, this.osioId);
+        sql.setString(2, this.ainesosaNimi);
+        sql.setString(3, this.maara);
+        
+        return sql;
+    }
+    
+    
+    /**
+     * Antaa ainesosan poistolausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return poistolauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getPoistolauseke(Connection yhteys) throws SQLException {
+        PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Ainesosat WHERE osio_id = ? AND nimi = ?");
+        
+        // ainesosa yksilöity PK = osio_id, nimi
+        sql.setInt(1, this.osioId);
+        sql.setString(2, this.ainesosaNimi);
+        
+        return sql;
+    }
+    
+    
+    /**
+     * Parsii annetuista tiedoista omat tietonsa
+     * 
+     * @param tulokset mistä tiedot saadaan
+     * @throws SQLException jos tulee ongelmia
+     */
+    public void parse(ResultSet tulokset) throws SQLException {
+        setOsioId(tulokset.getInt("osio_id"));
+        setAinesosa(tulokset.getString("nimi"));
+        setMaara(tulokset.getString("maara"));
     }
     
     
@@ -288,5 +374,7 @@ public class OsionAinesosa {
         OsionAinesosa oa2 = new OsionAinesosa("sinihomejuusto", "2kg");
         System.out.println(oa1.hashCode());
         System.out.println(oa2.hashCode());
+        
+        System.out.println(oa1.getLuontilauseke());
     }
 }

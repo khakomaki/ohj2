@@ -8,7 +8,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -31,6 +37,8 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     private int osioId              = -1;
     private boolean muutettu        = true;
     
+    private static OsionAinesosa esimerkkiAinesosa 	= new OsionAinesosa();
+    private Tietokanta tietokanta 					= null;
     
     /**
      * Hallitsee osion ainesosia ja määriä.
@@ -61,6 +69,36 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     public OsionAinesosat(int osioId) {
         super(2.0, 0);
         this.osioId = osioId;
+    }
+    
+    
+    /**
+     * Hallitsee tietokannassa sijaitsevia ainesosa-olioita
+     * 
+     * @param osioId osion tunnus
+     * @param tietokantaNimi tietokannan nimi
+     * @throws SailoException jos tulee ongelmia
+     */
+    public OsionAinesosat(int osioId, String tietokantaNimi) throws SailoException {
+        this.osioId = osioId;
+        this.tietokanta = Tietokanta.alustaTietokanta(tietokantaNimi);
+        
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
+            // haetaan tietokannan metadatasta omaa tietokantaa, luodaan jos ei ole
+            DatabaseMetaData metadata = yhteys.getMetaData();
+            
+            try ( ResultSet taulu = metadata.getTables(null, null, "Ainesosat", null)) {
+                // luodaan uusi taulu jos ei voida siirtyä seuraavaan
+                if ( !taulu.next() ) {
+                    try ( PreparedStatement sql = yhteys.prepareStatement(esimerkkiAinesosa.getLuontilauseke()) ) {
+                        sql.execute();
+                    }
+                }
+            }
+            
+        } catch ( SQLException exception ) {
+            throw new SailoException("Ongelmia ainesosien luonnissa tietokannan kanssa: " + exception.getMessage());
+        }
     }
     
     
@@ -126,6 +164,88 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         
         add(osionAinesosa);
         this.muutettu = true;
+    }
+    
+    
+    /**
+     * Lisää ainesosan
+     * 
+     * @param ainesosa lisättävä ainesosa
+     * 
+     * @throws SailoException jos lisäämisen kanssa tulee ongelmia
+     * 
+     * @example
+     * <pre name="test">
+     * #THROWS SailoException
+     * #import java.io.*;
+     * #import java.util.*;
+     * #import kanta.SailoException;
+     * 
+     * Collection<OsionAinesosa> loytyneetAinesosat = kaikkiAinesosat.get();
+     * loytyneetAinesosat.size() === 0;
+     * 
+     * OsionAinesosa ainesosa1 = new OsionAinesosa();
+     * OsionAinesosa ainesosa2 = new OsionAinesosa();
+     * 
+     * kaikkiAinesosat.lisaa(ainesosa1);
+     * kaikkiAinesosat.lisaa(ainesosa2);
+     * loytyneetAinesosat = kaikkiAinesosat.get();
+     * loytyneetAinesosat.size() === 0;
+     * </pre>
+     */
+    public void lisaaAinesosa(OsionAinesosa ainesosa) throws SailoException {
+        // asetetaan lisättävälle ainesosalle sama osiotunnus
+    	ainesosa.setOsioId(this.osioId);
+        
+        // muodostaa yhteyden tietokantaan, pyytää ainesosalta lisäyslausekkeen ja suorittaa
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = ainesosa.getLisayslauseke(yhteys) ) {
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia lisäyksessä tietokannan kanssa: " + exception.getMessage());
+        }
+    }
+    
+    
+    /**
+     * Palauttaa kaikki tietokannasta löytyvät omat ainesosat
+     * 
+     * @return kokoelma luokan ainesosista
+     * @throws SailoException jos hakemisessa tulee ongelmia
+     */
+    public Collection<OsionAinesosa> get() throws SailoException {
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Ainesosat WHERE osio_id = ?") ) {
+            ArrayList<OsionAinesosa> loydetytAinesosat = new ArrayList<OsionAinesosa>();
+            sql.setInt(1, this.osioId);
+            
+            try ( ResultSet tulokset = sql.executeQuery() ) {
+                while (tulokset.next()) {
+                    OsionAinesosa ainesosa = new OsionAinesosa();
+                    ainesosa.parse(tulokset);
+                    loydetytAinesosat.add(ainesosa);
+                }
+            }
+            return loydetytAinesosat;
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia ainesosien haussa tietokannan kanssa: " + exception.getMessage());
+        }
+    }
+    
+    
+    /**
+     * Poistaa annetun ainesosan
+     * 
+     * @param ainesosa poistettava ainesosa
+     * @throws SailoException jos poistamisessa ilmenee ongelmia
+     */
+    public void poistaAinesosa(OsionAinesosa ainesosa) throws SailoException {
+        // muodostaa yhteyden tietokantaan, pyytää ohjeelta poistolausekkeen ja suorittaa
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = ainesosa.getPoistolauseke(yhteys) ) {
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia poistossa tietokannan kanssa: " + exception.getMessage());
+        }
     }
     
     
@@ -428,6 +548,26 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @param args ei käytössä
      */
     public static void main(String[] args) {
+    	try {
+			OsionAinesosat oat = new OsionAinesosat(1, "testidb");
+			
+			OsionAinesosa oa1 = new OsionAinesosa("porkkanaa", "300g");
+			OsionAinesosa oa2 = new OsionAinesosa("perunaa", "3kpl");
+			oat.lisaaAinesosa(oa1);
+			oat.lisaaAinesosa(oa2);
+			System.out.println(oat.get());
+			
+			oat.poistaAinesosa(oa1);
+			System.out.println(oat.get());
+			
+			oat.poistaAinesosa(oa2);
+			System.out.println(oat.get());
+			
+		} catch (SailoException exception) {
+			System.err.println(exception.getMessage());
+		}
+    	
+    	/*
         int nykyisenOsionId = 1;
         OsionAinesosat osionAinesosat = new OsionAinesosat(nykyisenOsionId);
         System.out.println(osionAinesosat.toString());
@@ -456,5 +596,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         } catch (SailoException e) {
             System.out.println(e.getMessage());
         }
+        */
     }
 }
