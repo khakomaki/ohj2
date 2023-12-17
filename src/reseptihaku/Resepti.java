@@ -6,6 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -208,6 +212,31 @@ public class Resepti {
     }
     
     
+    /**
+     * Asettaa reseptin tunnuksen ja päivittää annettavaa tunnusta tarvittaessa
+     * 
+     * @param ID reseptin tunnus
+     */
+    private void setID(int ID) {
+    	this.reseptiId = ID;
+    	if (Resepti.annettavaId <= this.reseptiId) Resepti.annettavaId = this.reseptiId + 1;
+    }
+    
+    
+    /**
+     * Tarkistaa tietokannan tiedoista onko tunnus muuttunut ja päivittää tarvittaessa omia tietoja
+     * 
+     * @param tulokset mistä tiedot katsotaan
+     * @throws SQLException jos tulee ongelmia
+     */
+    public void tarkistaID(ResultSet tulokset) throws SQLException {
+    	if (!tulokset.next()) return;
+    	int ID = tulokset.getInt(1);
+    	if (ID == this.reseptiId);
+    	setID(ID);
+    }
+    
+    
     private void luoVaihtoehtoAttribuutit() {
         this.hinta = new VaihtoehtoAttribuutti("Hinta", hintaVaihtoehdot);
         this.valmistusaika = new VaihtoehtoAttribuutti("Valmistusaika", valmistusaikaVaihtoehdot);
@@ -377,6 +406,78 @@ public class Resepti {
      */
     public int getTunnus() {
         return this.reseptiId;
+    }
+    
+    
+    /**
+     * Antaa tietokannan SQL-luontilausekkeen Reseptit-taululle
+     * 
+     * @return Reseptit-taulukon luontilauseke
+     */
+    public String getLuontilauseke() {
+        StringBuilder lauseke = new StringBuilder();
+        lauseke.append("CREATE TABLE Reseptit (");
+        
+        lauseke.append("resepti_id INTEGER PRIMARY KEY AUTOINCREMENT, ");
+        lauseke.append("nimi VARCHAR(100) NOT NULL, ");
+        lauseke.append("kuvaus VARCHAR(255), ");
+        lauseke.append("hinta INTEGER, ");
+        lauseke.append("valmistusaika INTEGER, ");
+        lauseke.append("tahdet INTEGER, ");
+        lauseke.append("vaativuus INTEGER");
+        
+        lauseke.append(")");
+        return lauseke.toString();
+    }
+    
+    
+    /**
+     * Antaa reseptin lisäyslausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return lisäyslauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getLisayslauseke(Connection yhteys) throws SQLException {
+        PreparedStatement sql = yhteys.prepareStatement("INSERT INTO Reseptit (nimi, kuvaus, hinta, valmistusaika, tahdet, vaativuus) VALUES (?, ?, ?, ?, ?, ?)");
+        
+        sql.setString(1, getNimi());
+        sql.setString(2, getKuvaus());
+        sql.setInt(3, getHinta());
+        sql.setInt(4, getValmistusaika());
+        sql.setInt(5, getTahdet());
+        sql.setInt(6, getVaativuus());
+        
+        return sql;
+    }
+    
+    
+    /**
+     * Antaa reseptin poistolausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return poistolauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getPoistolauseke(Connection yhteys) throws SQLException {
+        PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Reseptit WHERE resepti_id = ?");
+        
+        // resepti yksilöity PK = resepti_id
+        sql.setInt(1, this.reseptiId);
+        
+        return sql;
+    }
+    
+    
+    /**
+     * Parsii annetuista tiedoista omat tietonsa
+     * 
+     * @param tulokset mistä tiedot saadaan
+     * @throws SQLException jos tulee ongelmia
+     */
+    public void parse(ResultSet tulokset) throws SQLException {
+    	setID(tulokset.getInt("resepti_id"));
+        setUusiNimi(tulokset.getString("nimi"));
     }
     
     

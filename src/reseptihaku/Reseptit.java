@@ -6,7 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +38,8 @@ public class Reseptit implements Hallitsija<Resepti> {
     private String tiedostopolku        = "reseptidata/";
     private int lkm                     = 0;
     
-    private final static Resepti esimerkkiresepti = new Resepti();
+    private final static Resepti esimerkkiresepti 	= new Resepti();
+    private Tietokanta tietokanta 					= null;
     
     /**
      * Reseptit.
@@ -48,6 +55,34 @@ public class Reseptit implements Hallitsija<Resepti> {
      */
     public Reseptit() {
         //
+    }
+    
+    
+    /**
+     * Hallitsee tietokannassa sijaitsevia Resepti-olioita
+     * 
+     * @param tietokantaNimi tietokannan nimi
+     * @throws SailoException jos tulee ongelmia
+     */
+    public Reseptit(String tietokantaNimi) throws SailoException {
+        this.tietokanta = Tietokanta.alustaTietokanta(tietokantaNimi);
+        
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
+            // haetaan tietokannan metadatasta omaa tietokantaa, luodaan jos ei ole
+            DatabaseMetaData metadata = yhteys.getMetaData();
+            
+            try ( ResultSet taulu = metadata.getTables(null, null, "Reseptit", null)) {
+                // luodaan uusi taulu jos ei voida siirtyä seuraavaan
+                if ( !taulu.next() ) {
+                    try ( PreparedStatement sql = yhteys.prepareStatement(esimerkkiresepti.getLuontilauseke()) ) {
+                        sql.execute();
+                    }
+                }
+            }
+            
+        } catch ( SQLException exception ) {
+            throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa: " + exception.getMessage());
+        }
     }
     
     
@@ -154,6 +189,73 @@ public class Reseptit implements Hallitsija<Resepti> {
         Resepti lisattavaResepti = resepti;
         reseptit.add(lisattavaResepti);
         this.lkm++;
+    }
+    
+    
+    /**
+     * Lisää reseptin
+     * 
+     * @param resepti lisättävä resepti
+     * 
+     * @throws SailoException jos lisäämisen kanssa tulee ongelmia
+     */
+    public void lisaaResepti(Resepti resepti) throws SailoException {
+        
+        // muodostaa yhteyden tietokantaan, pyytää reseptiltä lisäyslausekkeen ja suorittaa
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = resepti.getLisayslauseke(yhteys) ) {
+            sql.executeUpdate();
+            
+            // tarkistetaan saiko resepti uuden tunnuksen
+            try ( ResultSet tulokset = sql.getGeneratedKeys() ) {
+                resepti.tarkistaID(tulokset);
+             }
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia lisäyksessä tietokannan kanssa: " + exception.getMessage());
+        }
+    }
+    
+    
+    /**
+     * Palauttaa kaikki tietokannasta löytyvät reseptit
+     * 
+     * @return kokoelma resepteistä
+     * @throws SailoException jos hakemisessa tulee ongelmia
+     */
+    public Collection<Resepti> get() throws SailoException {
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Reseptit") ) {
+            ArrayList<Resepti> loydetytReseptit = new ArrayList<Resepti>();
+            
+            // suoritetaan kysely ja parsitaan tuloksista Resepti-olioita
+            try ( ResultSet tulokset = sql.executeQuery() ) {
+                while (tulokset.next()) {
+                    Resepti resepti = new Resepti();
+                    resepti.parse(tulokset);
+                    loydetytReseptit.add(resepti);
+                }
+            }
+            return loydetytReseptit;
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia reseptien haussa tietokannan kanssa: " + exception.getMessage());
+        }
+    }
+    
+    
+    /**
+     * Poistaa annetun reseptin
+     * 
+     * @param resepti poistettava resepti
+     * @throws SailoException jos poistamisessa ilmenee ongelmia
+     */
+    public void poistaResepti(Resepti resepti) throws SailoException {
+        // muodostaa yhteyden tietokantaan, pyytää osiolta poistolausekkeen ja suorittaa
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = resepti.getPoistolauseke(yhteys) ) {
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia poistossa tietokannan kanssa: " + exception.getMessage());
+        }
     }
     
     
@@ -757,6 +859,23 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
+    	try {
+			Reseptit reseptit = new Reseptit("testidb");
+			
+			Resepti resepti1 = new Resepti("Mansikkakakku");
+			Resepti resepti2 = new Resepti("Juustokakku");
+			reseptit.lisaaResepti(resepti1);
+			reseptit.lisaaResepti(resepti2);
+			System.out.println(reseptit.get());
+			
+			reseptit.poistaResepti(resepti1);
+			System.out.println(reseptit.get());
+			
+		} catch (SailoException exception) {
+			System.err.println(exception.getMessage());
+		}
+    	
+    	/*
         Reseptit reseptit = new Reseptit();
         try {
             reseptit.setTiedostoPolku("lisääReseptejä/");
@@ -832,5 +951,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         } catch (SailoException e) {
             e.printStackTrace();
         }
+        */
     }
 }
