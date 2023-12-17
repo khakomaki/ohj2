@@ -1,6 +1,10 @@
 package reseptihaku;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
@@ -23,6 +27,8 @@ public class Osio {
     private boolean muutettu                = true;
     
     private static int annettavaId          = 1;
+    
+    private int reseptiID					= -1;
     
     /**
      * @param id osion tunnus
@@ -109,6 +115,27 @@ public class Osio {
         
         if (Osio.annettavaId < id) Osio.annettavaId = id;
         return rekisteroi();
+    }
+    
+    
+    /**
+     * Asettaa reseptin tunnuksen johon osio kuuluu
+     * 
+     * @param id reseptin tunnus
+     */
+    public void setReseptiID(int id) {
+    	this.reseptiID = id;
+    }
+    
+    
+    /**
+     * Asettaa osion tunnuksen ja päivittää annettavaa tunnusta tarvittaessa
+     * 
+     * @param ID osion tunnus
+     */
+    private void setID(int ID) {
+    	this.osioId = ID;
+    	if (Osio.annettavaId <= this.osioId) Osio.annettavaId = this.osioId + 1;
     }
     
     
@@ -267,6 +294,86 @@ public class Osio {
      */
     public void poistaOhje(Ohje ohje) {
         this.ohjeet.poista(ohje);
+    }
+    
+    
+    /**
+     * Antaa tietokannan SQL-luontilausekkeen Osiot-taululle
+     * 
+     * @return Osiot-taulukon luontilauseke
+     */
+    public String getLuontilauseke() {
+        StringBuilder lauseke = new StringBuilder();
+        lauseke.append("CREATE TABLE Osiot (");
+        
+        lauseke.append("resepti_id INTEGER, ");
+        lauseke.append("osio_id INTEGER PRIMARY KEY AUTOINCREMENT, ");
+        lauseke.append("nimi VARCHAR(100) NOT NULL, ");
+        lauseke.append("FOREIGN KEY (resepti_id) REFERENCES Reseptit(resepti_id)");
+        
+        lauseke.append(")");
+        return lauseke.toString();
+    }
+    
+    
+    /**
+     * Antaa osion lisäyslausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return lisäyslauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getLisayslauseke(Connection yhteys) throws SQLException {
+        PreparedStatement sql = yhteys.prepareStatement("INSERT INTO Osiot (resepti_id, nimi) VALUES (?, ?)");
+        
+        sql.setInt(1, this.reseptiID);
+        sql.setString(2, this.nimi);
+        
+        return sql;
+    }
+    
+    
+    /**
+     * Antaa osion poistolausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return poistolauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getPoistolauseke(Connection yhteys) throws SQLException {
+        PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Osiot WHERE osio_id = ?");
+        
+        // osio yksilöity PK = osio_id
+        sql.setInt(1, this.osioId);
+        
+        return sql;
+    }
+    
+    
+    /**
+     * Parsii annetuista tiedoista omat tietonsa
+     * 
+     * @param tulokset mistä tiedot saadaan
+     * @throws SQLException jos tulee ongelmia
+     */
+    public void parse(ResultSet tulokset) throws SQLException {
+    	setReseptiID(tulokset.getInt("resepti_id"));
+    	setID(tulokset.getInt("osio_id"));
+        setUusiNimi(tulokset.getString("nimi"));
+    }
+    
+    
+    /**
+     * Tarkistaa tietokannan tiedoista onko tunnus muuttunut ja päivittää tarvittaessa omia tietoja
+     * 
+     * @param tulokset mistä tiedot katsotaan
+     * @throws SQLException jos tulee ongelmia
+     */
+    public void tarkistaID(ResultSet tulokset) throws SQLException {
+    	if (!tulokset.next()) return;
+    	int ID = tulokset.getInt(1);
+    	if (ID == this.osioId);
+    	setID(ID);
     }
     
     
@@ -547,5 +654,7 @@ public class Osio {
         
         lattytaikina.setUusiNimi("Lettutaikina");
         System.out.println("\n" + lattytaikina.toString());
+        
+        System.out.println(lattytaikina.getLuontilauseke());
     }
 }
