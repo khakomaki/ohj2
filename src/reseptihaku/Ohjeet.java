@@ -30,6 +30,16 @@ import kanta.SailoException;
  * Ohjeet hallitsee ohje-olioita.
  */
 public class Ohjeet implements Hallitsija<Ohje> {
+	
+    private String tiedostonimi     = "ohjeet.dat";
+    private String tiedostopolku    = "reseptidata/Reseptin nimi/Osion nimi/";
+    private int osioId              = -1;
+    private List<Ohje> ohjeet       = new ArrayList<Ohje>();
+    private boolean muutettu        = false;
+    
+    private static Ohje esimerkkiOhje   = new Ohje();
+    private Tietokanta tietokanta       = null;
+    
     /**
      * Alustukset testejä varten
      * 
@@ -53,20 +63,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * }
      * </pre>
      */
-    
-    
-    private String tiedostonimi     = "ohjeet.dat";
-    private String tiedostopolku    = "reseptidata/Reseptin nimi/Osion nimi/";
-    private int osioId              = -1;
-    private int lkm                 = 0;
-    private List<Ohje> ohjeet       = new ArrayList<Ohje>();
-    private boolean muutettu        = false;
-    
-    private List<Ohje> ohjeidenOhjeet   = new ArrayList<Ohje>();
-    private static Ohje esimerkkiOhje   = new Ohje();
-    private Tietokanta tietokanta       = null;
-    private int vaihe                   = 1;
-    
     
     /**
      * Hallitsee Ohje-oliota
@@ -174,8 +170,8 @@ public class Ohjeet implements Hallitsija<Ohje> {
         // luo uuden ohjeen jos annetaan null
         if (ohje == null) lisattavaOhje = new Ohje();
         this.ohjeet.add(lisattavaOhje);
-        this.lkm++;
-        lisattavaOhje.setVaihe(this.lkm);
+        lisattavaOhje.setVaihe(this.ohjeet.size());
+        lisattavaOhje.setOsioId(this.osioId);
         
         this.muutettu = true;
     }
@@ -210,7 +206,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
     public void lisaaOhje(Ohje ohje) throws SailoException {
         // asetetaan lisättävälle ohjeelle sama osiotunnus
         ohje.setOsioId(this.osioId);
-        ohje.setVaihe(this.vaihe++);
+        ohje.setVaihe(this.ohjeet.size() + 1);
         
         // muodostaa yhteyden tietokantaan, pyytää ohjeelta lisäyslausekkeen ja suorittaa
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = ohje.getLisayslauseke(yhteys) ) {
@@ -220,7 +216,8 @@ public class Ohjeet implements Hallitsija<Ohje> {
             throw new SailoException("Ongelmia lisäyksessä tietokannan kanssa: " + exception.getMessage());
         }
         
-        this.ohjeidenOhjeet.add(ohje);
+        this.ohjeet.add(ohje);
+        this.muutettu = true;
     }
     
     
@@ -270,15 +267,34 @@ public class Ohjeet implements Hallitsija<Ohje> {
                 sqlVaihepaivitys.executeUpdate();
             }
             
-            for (int i = poistettavaVaihe; i < this.ohjeidenOhjeet.size(); i++) {
-                this.ohjeidenOhjeet.get(i).setVaihe(this.ohjeidenOhjeet.get(i).getVaihe() - 1);
+            for (int i = poistettavaVaihe; i < this.ohjeet.size(); i++) {
+                this.ohjeet.get(i).setVaihe(this.ohjeet.get(i).getVaihe() - 1);
             }
-            this.vaihe--;
-            this.ohjeidenOhjeet.remove(ohje);
+            this.ohjeet.remove(ohje);
             
         } catch (SQLException exception) {
             throw new SailoException("Ongelmia poistossa tietokannan kanssa: " + exception.getMessage());
         }
+    }
+    
+    
+    public void tallennaOhjeet() throws SailoException {
+    	
+    	try (Connection yhteys = this.tietokanta.annaTietokantaYhteys()) {
+        	// poistetaan nykyiset osion ohjeet
+            try (PreparedStatement sqlPoisto = yhteys.prepareStatement("DELETE FROM Ohjeet WHERE osio_id = ?")) {
+                sqlPoisto.setInt(1, this.osioId);
+                sqlPoisto.executeUpdate();
+            }
+            
+            // lisätään omat ohjeet tietokantaan
+            try (PreparedStatement sqlLisays = Ohjeet.esimerkkiOhje.getMoniLisayslauseke(yhteys, this.ohjeet)) {
+            	sqlLisays.executeUpdate();
+            }
+            
+    	} catch (SQLException exception) {
+    		throw new SailoException("Ongelmia tallentamisessa tietokannan kanssa: " + exception.getMessage());
+    	}
     }
     
     
@@ -324,10 +340,9 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public void poista(int indeksi) {
         // ei tehdä mitään jos indeksi ei ole mieluisa
-        if (indeksi < 0 || lkm <= indeksi) return;
+        if (indeksi < 0 || this.ohjeet.size() <= indeksi) return;
         
         ohjeet.remove(indeksi);
-        this.lkm--;
         paivitaVaiheet(indeksi);
         
         this.muutettu = true;
@@ -366,10 +381,9 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     @Override
     public void poista(Ohje poistettava) {
-        for (int i = 0; i < this.lkm; i++) {
+        for (int i = 0; i < this.ohjeet.size(); i++) {
             if (this.ohjeet.get(i).equals(poistettava)) {
                 ohjeet.remove(i);
-                this.lkm--;
                 paivitaVaiheet(i);
                 this.muutettu = true;
                 break;
@@ -392,7 +406,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * </pre>
      */
     public Ohje anna(int indeksi) {
-        if (indeksi < 0 || this.lkm <= indeksi) return null;
+        if (indeksi < 0 || this.ohjeet.size() <= indeksi) return null;
         return ohjeet.get(indeksi);
     }
     
@@ -573,7 +587,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * </pre>
      */
     public int getLkm() {
-        return this.lkm;
+        return this.ohjeet.size();
     }
     
     
@@ -596,7 +610,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
     private void paivitaVaiheet(int indeksista) {
         if (indeksista < 0) return;
         
-        for (int i = indeksista; i < this.lkm; i++) {
+        for (int i = indeksista; i < this.ohjeet.size(); i++) {
             Ohje ohje = this.ohjeet.get(i);
             ohje.setVaihe(i + 1);
         }
@@ -608,7 +622,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public void tulostaOhjeet(OutputStream os) {
         PrintStream out = new PrintStream(os);
-        for (int i = 0; i < this.lkm; i++) {
+        for (int i = 0; i < this.ohjeet.size(); i++) {
             // vaihe numero
             out.print(i + 1);
             out.print(" ");
@@ -645,11 +659,10 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     public Ohjeet clone() {
         Ohjeet kopio = new Ohjeet();
-        kopio.lkm = this.lkm;
         kopio.osioId = this.osioId;
         kopio.tiedostonimi = this.tiedostonimi;
         
-        for (int i = 0; i < this.lkm; i++) {
+        for (int i = 0; i < this.ohjeet.size(); i++) {
             kopio.ohjeet.add(this.ohjeet.get(i).clone());
         }
         
@@ -685,12 +698,12 @@ public class Ohjeet implements Hallitsija<Ohje> {
         if (verrattava == null) return false;
         if (verrattava.getClass() != this.getClass()) return false;
         Ohjeet verrattavaOhjeet = (Ohjeet)verrattava;
-        if (verrattavaOhjeet.lkm != this.lkm) return false;
+        if (verrattavaOhjeet.ohjeet.size() != this.ohjeet.size()) return false;
         if (verrattavaOhjeet.osioId != this.osioId) return false;
         if (!verrattavaOhjeet.tiedostonimi.equals(this.tiedostonimi)) return false;
         
         // verrataan yksittäiset ohjeet
-        for (int i = 0; i < this.lkm; i++) {
+        for (int i = 0; i < this.ohjeet.size(); i++) {
             if (!verrattavaOhjeet.ohjeet.get(i).equals(this.ohjeet.get(i))) return false;
         }
         
@@ -751,7 +764,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
         sb.append('|');
         sb.append(this.osioId);
         sb.append('|');
-        sb.append(this.lkm);
+        sb.append(this.ohjeet.size());
         return sb.toString();
     }
     
@@ -762,34 +775,25 @@ public class Ohjeet implements Hallitsija<Ohje> {
     public static void main(String[] args) {
         try {
             Ohjeet ohjeet = new Ohjeet(1, "testidb");
-            System.out.println(ohjeet.get());
             
             Ohje ohje1 = new Ohje("Lisää kananmunat");
             Ohje ohje2 = new Ohje("Lisää sokeri");
             Ohje ohje3 = new Ohje("Sekoita");
             Ohje ohje4 = new Ohje("Maista");
             Ohje ohje5 = new Ohje("Lisää mausteet");
-            ohjeet.lisaaOhje(ohje1);
-            ohjeet.lisaaOhje(ohje2);
-            ohjeet.lisaaOhje(ohje3);
+            ohjeet.lisaa(ohje1);
+            ohjeet.lisaa(ohje2);
+            ohjeet.lisaa(ohje3);
             System.out.println(ohjeet.get());
             
-            ohjeet.poistaOhje(ohje2);
+            ohjeet.tallennaOhjeet();
             System.out.println(ohjeet.get());
             
-            ohjeet.poistaOhje(ohje1);
-            System.out.println(ohjeet.get());
-            
-            ohjeet.lisaaOhje(ohje4);
-            System.out.println(ohjeet.get());
-            
-            ohjeet.poistaOhje(ohje3);
-            System.out.println(ohjeet.get());
-            
-            ohjeet.poistaOhje(ohje4);
-            System.out.println(ohjeet.get());
-            
-            ohjeet.lisaaOhje(ohje5);
+            ohjeet.poista(ohje1);
+            ohjeet.poista(ohje2);
+            ohjeet.lisaa(ohje4);
+            ohjeet.lisaa(ohje5);
+            ohjeet.tallennaOhjeet();
             System.out.println(ohjeet.get());
             
         } catch (SailoException e) {

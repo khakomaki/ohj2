@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
@@ -188,6 +189,39 @@ public class Ohje {
         sql.setString(3, this.ohjeistus);
         
         return sql;
+    }
+    
+    
+    /**
+     * Antaa useamman ohjeen lisäyslausekkeen annetuille ohjeille
+     * 
+     * @param yhteys tietokantayhteys
+     * @param ohjeet lisättävät ohjeet
+     * @return lisäyslauseke usealle ohjeelle
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getMoniLisayslauseke(Connection yhteys, List<Ohje> ohjeet) throws SQLException {
+    	StringBuilder sqlLause = new StringBuilder("INSERT INTO Ohjeet (osio_id, vaihe, ohjeistus) VALUES ");
+
+    	// ohjeiden attribuuttien arvoille paikat
+    	for (int i = 0; i < ohjeet.size(); i++) {
+    		sqlLause.append("(?, ?, ?),");
+    	}
+    	
+    	// poistaa viimeisen pilkun
+    	sqlLause.deleteCharAt(sqlLause.length() - 1);
+    	
+    	PreparedStatement sql = yhteys.prepareStatement(sqlLause.toString());
+    	
+    	// asetetaan arvot
+    	int parametri = 1;
+    	for (Ohje ohje : ohjeet) {
+    		sql.setInt(parametri++, ohje.osioId);
+    		sql.setInt(parametri++, ohje.vaihe);
+    		sql.setString(parametri++, ohje.ohjeistus);
+    	}
+    	
+    	return sql;
     }
     
     
