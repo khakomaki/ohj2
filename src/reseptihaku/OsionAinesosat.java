@@ -430,8 +430,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
             // ainesosien tiedot kirjoittajaan
             for (int i = 0; i < this.size(); i++) {
-                fo.print(this.osioId);
-                fo.print('|');
                 fo.println(anna(i));
             }
         } catch (FileNotFoundException exception) {

@@ -220,6 +220,13 @@ public class OsionAinesosa {
     }
     
     
+    public PreparedStatement getMuutoslauseke(Connection yhteys) throws SQLException {
+    	PreparedStatement sql = yhteys.prepareStatement("UPDATE ");
+    	
+    	return sql;
+    }
+    
+    
     /**
      * Parsii annetuista tiedoista omat tietonsa
      * 
@@ -242,19 +249,19 @@ public class OsionAinesosa {
      * <pre name="test">
      * OsionAinesosa peruna = new OsionAinesosa();
      * peruna.parse("1|peruna|300g");
-     * peruna.toString() === "-1|peruna|300g";
+     * peruna.toString() === "1|peruna|300g";
      * 
      * peruna.parse("  15   |  keltainen peruna    |  1kg     ");
-     * peruna.toString() === "-1|keltainen peruna|1kg";
+     * peruna.toString() === "15|keltainen peruna|1kg";
      * 
      * peruna.parse("15|peruna 300g");
-     * peruna.toString() === "-1|peruna 300g|1kg";
+     * peruna.toString() === "15|peruna 300g|1kg";
      * 
      * peruna.parse("17 pataatti 280g");
-     * peruna.toString() === "-1|peruna 300g|1kg";
+     * peruna.toString() === "17|peruna 300g|1kg";
      * 
      * peruna.parse("|");
-     * peruna.toString() === "-1|peruna 300g|1kg";
+     * peruna.toString() === "17|peruna 300g|1kg";
      * </pre>
      */
     public void parse(String rivi) {
@@ -262,9 +269,7 @@ public class OsionAinesosa {
         
         StringBuilder sb = new StringBuilder(rivi);
         
-        // ei tallenna ensimmäisen kentän tietoja (osio_id)
-        Mjonot.erota(sb, '|');
-        
+        setOsioId(Mjonot.erota(sb, '|', this.osioId));
         setAinesosa(Mjonot.erota(sb, '|', this.ainesosaNimi));
         setMaara(Mjonot.erota(sb, '|', this.maara));
     }
@@ -288,6 +293,7 @@ public class OsionAinesosa {
      */
     public OsionAinesosa clone() {
         OsionAinesosa kopio = new OsionAinesosa();
+        kopio.osioId = this.osioId;
         kopio.ainesosaNimi = this.ainesosaNimi;
         kopio.maara = this.maara;
         return kopio;
@@ -314,6 +320,7 @@ public class OsionAinesosa {
      */
     public int hashCode() {
         int hash = 1;
+        hash = Hajautus.hajautus(hash, this.osioId);
         hash = Hajautus.hajautusObject(hash, this.ainesosaNimi, this.maara);
         return hash;
     }
@@ -344,6 +351,7 @@ public class OsionAinesosa {
         if (verrattava.getClass() != this.getClass()) return false;
         
         OsionAinesosa verrattavaOA = (OsionAinesosa)verrattava;
+        if (verrattavaOA.osioId != this.osioId) return false;
         if (!verrattavaOA.ainesosaNimi.equals(this.ainesosaNimi)) return false;
         if (!verrattavaOA.maara.equals(this.maara)) return false;
         
