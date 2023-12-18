@@ -542,8 +542,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
         try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
             // ohjeiden tiedot kirjoittajaan
             for (Ohje ohje : this.ohjeet) {
-                fo.print(this.osioId);
-                fo.print('|');
                 fo.println(ohje);
             }
         } catch (FileNotFoundException exception) {

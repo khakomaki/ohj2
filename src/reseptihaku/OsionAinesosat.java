@@ -133,6 +133,10 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      */
     public void setOsioId(int id) {
         this.osioId = id;
+        
+        for (OsionAinesosa oa : this) {
+        	oa.setOsioId(id);
+        }
     }
     
     
@@ -185,7 +189,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     @Override
     public void lisaa(OsionAinesosa osionAinesosa) {
         if (osionAinesosa == null) return;
-        
+        osionAinesosa.setOsioId(this.osioId);
         add(osionAinesosa);
         this.muutettu = true;
     }

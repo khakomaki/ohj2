@@ -16,10 +16,9 @@ import kanta.Hajautus;
  */
 public class OsionAinesosa {
     
+	private int osioId 			= -1;
     private String ainesosaNimi = "ainesosa";
     private String maara        = "";
-    
-    private int osioId 			= -1;
     
     
     /**
@@ -28,7 +27,7 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa oletus = new OsionAinesosa();
-     * oletus.toString() === "ainesosa|";
+     * oletus.toString() === "-1|ainesosa|";
      * </pre>
      */
     public OsionAinesosa() {
@@ -45,7 +44,7 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
-     * peruna.toString() === "peruna|1kg";
+     * peruna.toString() === "-1|peruna|1kg";
      * </pre>
      */
     public OsionAinesosa(String ainesosa, String maara) {
@@ -62,7 +61,7 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
-     * peruna.toString() === "peruna|1kg";
+     * peruna.toString() === "-1|peruna|1kg";
      * peruna.getAinesosa() === "peruna";
      * </pre>
      */
@@ -80,7 +79,7 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
-     * peruna.toString() === "peruna|1kg";
+     * peruna.toString() === "-1|peruna|1kg";
      * peruna.getAinesosa() === "peruna";
      * 
      * peruna.setAinesosa("makkara");
@@ -108,7 +107,7 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
-     * peruna.toString() === "peruna|1kg";
+     * peruna.toString() === "-1|peruna|1kg";
      * peruna.getMaara() === "1kg";
      * </pre>
      */
@@ -126,7 +125,7 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa peruna = new OsionAinesosa("peruna", "1kg");
-     * peruna.toString() === "peruna|1kg";
+     * peruna.toString() === "-1|peruna|1kg";
      * peruna.getMaara() === "1kg";
      * 
      * peruna.setMaara("2kg");
@@ -142,6 +141,16 @@ public class OsionAinesosa {
     public void setMaara(String maara) {
         if (maara == null) return;
         this.maara = maara;
+    }
+    
+    
+    /**
+     * Antaa osion tunnuksen johon ainesosa kuuluu
+     * 
+     * @return osion tunnus
+     */
+    public int getOsioId() {
+    	return this.osioId;
     }
     
     
@@ -233,22 +242,19 @@ public class OsionAinesosa {
      * <pre name="test">
      * OsionAinesosa peruna = new OsionAinesosa();
      * peruna.parse("1|peruna|300g");
-     * peruna.toString() === "peruna|300g";
-     * 
-     * peruna.parse(null);
-     * peruna.toString() === "peruna|300g";
+     * peruna.toString() === "-1|peruna|300g";
      * 
      * peruna.parse("  15   |  keltainen peruna    |  1kg     ");
-     * peruna.toString() === "keltainen peruna|1kg";
+     * peruna.toString() === "-1|keltainen peruna|1kg";
      * 
      * peruna.parse("15|peruna 300g");
-     * peruna.toString() === "peruna 300g|1kg";
+     * peruna.toString() === "-1|peruna 300g|1kg";
      * 
      * peruna.parse("17 pataatti 280g");
-     * peruna.toString() === "peruna 300g|1kg";
+     * peruna.toString() === "-1|peruna 300g|1kg";
      * 
      * peruna.parse("|");
-     * peruna.toString() === "peruna 300g|1kg";
+     * peruna.toString() === "-1|peruna 300g|1kg";
      * </pre>
      */
     public void parse(String rivi) {
@@ -271,7 +277,7 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa juusto = new OsionAinesosa("juusto", "2kg");
-     * juusto.toString() === "juusto|2kg";
+     * juusto.toString() === "-1|juusto|2kg";
      * 
      * OsionAinesosa juustoKopio = juusto.clone();
      * juustoKopio.toString().equals(juusto.toString()) === true;
@@ -352,11 +358,13 @@ public class OsionAinesosa {
      * @example
      * <pre name="test">
      * OsionAinesosa mozzarella = new OsionAinesosa("Mozzarella", "120g");
-     * mozzarella.toString() === "Mozzarella|120g";
+     * mozzarella.toString() === "-1|Mozzarella|120g";
      * </pre>
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(this.osioId);
+        sb.append('|');
         sb.append(this.ainesosaNimi);
         sb.append('|');
         sb.append(this.maara);
