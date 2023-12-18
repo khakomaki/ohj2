@@ -29,6 +29,29 @@ import kanta.Validoi;
  * Osiot hallitsee osio-olioita.
  */
 public class Osiot implements Hallitsija<Osio> {
+    /**
+     * Alustukset testejä varten
+     * 
+     * @example
+     * <pre name="testJAVA">
+     * private Osiot kaikkiOsiot;
+     * private String tiedNimi;
+     * private File tiedosto;
+     * 
+     * @Before
+     * public void alusta() throws SailoException {
+     *     tiedNimi = "testiOsiot";
+     *     tiedosto = new File(tiedNimi + ".db");
+     *     tiedosto.delete();
+     *     kaikkiOsiot = new Osiot(1, tiedNimi);
+     * }
+     * 
+     * @After
+     * public void siivoa() {
+     *     tiedosto.delete();
+     * }
+     * </pre>
+     */
 
     private String tiedostonimi     = "resepti_osiot.dat";
     private String tiedostopolku    = "reseptidata/Reseptin nimi/";
@@ -216,13 +239,17 @@ public class Osiot implements Hallitsija<Osio> {
      * Collection<Osio> loytyneetOsiot = kaikkiOsiot.get();
      * loytyneetOsiot.size() === 0;
      * 
-     * Osio osio1 = new Osio();
-     * Osio osio2 = new Osio();
+     * Osio osio1 = new Osio("Muropohja");
+     * Osio osio2 = new Osio("Täyte");
      * 
-     * kaikkiOsiot.lisaa(osio1);
-     * kaikkiOsiot.lisaa(osio2);
+     * kaikkiOsiot.lisaaOsio(osio1);
+     * kaikkiOsiot.lisaaOsio(osio2);
      * loytyneetOsiot = kaikkiOsiot.get();
-     * loytyneetOsiot.size() === 0;
+     * loytyneetOsiot.size() === 2;
+     * 
+     * kaikkiOsiot.poistaOsio(osio1);
+     * loytyneetOsiot = kaikkiOsiot.get();
+     * loytyneetOsiot.size() === 1;
      * </pre>
      */
     public void lisaaOsio(Osio osio) throws SailoException {

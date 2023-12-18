@@ -198,13 +198,13 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * Collection<Ohje> loytyneetOhjeet = kaikkiOhjeet.get();
      * loytyneetOhjeet.size() === 0;
      * 
-     * Ohje ohje1 = new Ohje();
-     * Ohje ohje2 = new Ohje();
+     * Ohje ohje1 = new Ohje("Lisää suola");
+     * Ohje ohje2 = new Ohje("Lisää sokeri");
      * 
-     * kaikkiOhjeet.lisaa(ohje1);
-     * kaikkiOhjeet.lisaa(ohje2);
+     * kaikkiOhjeet.lisaaOhje(ohje1);
+     * kaikkiOhjeet.lisaaOhje(ohje2);
      * loytyneetOhjeet = kaikkiOhjeet.get();
-     * loytyneetOhjeet.size() === 0;
+     * loytyneetOhjeet.size() === 2;
      * </pre>
      */
     public void lisaaOhje(Ohje ohje) throws SailoException {

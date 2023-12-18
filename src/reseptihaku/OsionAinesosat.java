@@ -31,7 +31,30 @@ import kanta.TietueHallitsija;
  * Osion ainesosat hallitsee osion ainesosa -olioita.
  */
 public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements Hallitsija<OsionAinesosa> {
-    
+    /**
+     * Alustukset testejä varten
+     * 
+     * @example
+     * <pre name="testJAVA">
+     * private OsionAinesosat kaikkiAinesosat;
+     * private String tiedNimi;
+     * private File tiedosto;
+     * 
+     * @Before
+     * public void alusta() throws SailoException {
+     *     tiedNimi = "testiAinesosat";
+     *     tiedosto = new File(tiedNimi + ".db");
+     *     tiedosto.delete();
+     *     kaikkiAinesosat = new OsionAinesosat(1, tiedNimi);
+     * }
+     * 
+     * @After
+     * public void siivoa() {
+     *     tiedosto.delete();
+     * }
+     * </pre>
+     */
+	
     private String tiedostonimi     = "osion_ainesosat.dat";
     private String tiedostopolku    = "reseptidata/Reseptin nimi/Osion nimi/";
     private int osioId              = -1;
@@ -80,7 +103,8 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @throws SailoException jos tulee ongelmia
      */
     public OsionAinesosat(int osioId, String tietokantaNimi) throws SailoException {
-        this.osioId = osioId;
+        super(2.0, 0);
+    	this.osioId = osioId;
         this.tietokanta = Tietokanta.alustaTietokanta(tietokantaNimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
@@ -184,13 +208,17 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * Collection<OsionAinesosa> loytyneetAinesosat = kaikkiAinesosat.get();
      * loytyneetAinesosat.size() === 0;
      * 
-     * OsionAinesosa ainesosa1 = new OsionAinesosa();
-     * OsionAinesosa ainesosa2 = new OsionAinesosa();
+     * OsionAinesosa ainesosa1 = new OsionAinesosa("Mansikka", "5dl");
+     * OsionAinesosa ainesosa2 = new OsionAinesosa("Mustikka", "2dl");
      * 
-     * kaikkiAinesosat.lisaa(ainesosa1);
-     * kaikkiAinesosat.lisaa(ainesosa2);
+     * kaikkiAinesosat.lisaaAinesosa(ainesosa1);
+     * kaikkiAinesosat.lisaaAinesosa(ainesosa2);
      * loytyneetAinesosat = kaikkiAinesosat.get();
-     * loytyneetAinesosat.size() === 0;
+     * loytyneetAinesosat.size() === 2;
+     * 
+     * kaikkiAinesosat.poistaAinesosa(ainesosa1);
+     * loytyneetAinesosat = kaikkiAinesosat.get();
+     * loytyneetAinesosat.size() === 1;
      * </pre>
      */
     public void lisaaAinesosa(OsionAinesosa ainesosa) throws SailoException {

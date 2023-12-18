@@ -32,6 +32,29 @@ import kanta.Validoi;
  * Reseptit hallitsee resepti-olioita.
  */
 public class Reseptit implements Hallitsija<Resepti> {
+    /**
+     * Alustukset testejä varten
+     * 
+     * @example
+     * <pre name="testJAVA">
+     * private Reseptit kaikkiReseptit;
+     * private String tiedNimi;
+     * private File tiedosto;
+     * 
+     * @Before
+     * public void alusta() throws SailoException {
+     *     tiedNimi = "testiReseptit";
+     *     tiedosto = new File(tiedNimi + ".db");
+     *     tiedosto.delete();
+     *     kaikkiReseptit = new Reseptit(tiedNimi);
+     * }
+     * 
+     * @After
+     * public void siivoa() {
+     *     tiedosto.delete();
+     * }
+     * </pre>
+     */
 
     private List<Resepti> reseptit      = new ArrayList<Resepti>();
     private String tiedostonimi         = "reseptit.dat";
@@ -198,6 +221,29 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @param resepti lisättävä resepti
      * 
      * @throws SailoException jos lisäämisen kanssa tulee ongelmia
+     * 
+     * @example
+     * <pre name="test">
+     * #THROWS SailoException
+     * #import java.io.*;
+     * #import java.util.*;
+     * #import kanta.SailoException;
+     * 
+     * Collection<Resepti> loytyneetReseptit = kaikkiReseptit.get();
+     * loytyneetReseptit.size() === 0;
+     * 
+     * Resepti resepti1 = new Resepti("Mustikkapiirakka");
+     * Resepti resepti2 = new Resepti("Mustikkamuffinit");
+     * 
+     * kaikkiReseptit.lisaaResepti(resepti1);
+     * kaikkiReseptit.lisaaResepti(resepti2);
+     * loytyneetReseptit = kaikkiReseptit.get();
+     * loytyneetReseptit.size() === 2;
+     * 
+     * kaikkiReseptit.poistaResepti(resepti1);
+     * loytyneetReseptit = kaikkiReseptit.get();
+     * loytyneetReseptit.size() === 1;
+     * </pre>
      */
     public void lisaaResepti(Resepti resepti) throws SailoException {
         
