@@ -42,7 +42,12 @@ public class Osio {
      */
     public Osio(int id, String nimi) {
         this.osioId = id;
-        this.ohjeet = new Ohjeet(this.osioId);
+        try {
+			this.ohjeet = new Ohjeet(this.osioId);
+		} catch (SailoException exception) {
+			// TODO
+			System.err.println(exception.getMessage());
+		}
         setUusiNimi(nimi);
         
         luoOsionAinesosat();
@@ -60,7 +65,12 @@ public class Osio {
      * </pre>
      */
     public Osio(String nimi) {
-        this.ohjeet = new Ohjeet(this.osioId);
+        try {
+			this.ohjeet = new Ohjeet(this.osioId);
+		} catch (SailoException exception) {
+			// TODO
+			System.err.println(exception.getMessage());
+		}
         setUusiNimi(nimi);
         
         luoOsionAinesosat();
@@ -77,7 +87,12 @@ public class Osio {
      * </pre>
      */
     public Osio() {
-        this.ohjeet = new Ohjeet(this.osioId);
+        try {
+			this.ohjeet = new Ohjeet(this.osioId);
+		} catch (SailoException exception) {
+			// TODO
+			System.err.println(exception.getMessage());
+		}
         
         luoOsionAinesosat();
     }
@@ -96,7 +111,7 @@ public class Osio {
         this.osionAinesosat.setOsioId(this.osioId);
         Osio.annettavaId++;
         
-        // päivittää osio tunnuksen ohjeille ja ainesosille
+        // päivittää osio tunnuksen ohjeille ja ainesosille TODO poista toisto
         this.ohjeet.setOsioId(this.osioId);
         this.osionAinesosat.setOsioId(this.osioId);
         

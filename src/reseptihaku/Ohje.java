@@ -305,6 +305,7 @@ public class Ohje {
      */
     public Ohje clone() {
         Ohje kopio = new Ohje();
+        kopio.osioId = this.osioId;
         kopio.ohjeistus = this.ohjeistus;
         kopio.vaihe = this.vaihe;
         return kopio;
