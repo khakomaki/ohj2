@@ -124,7 +124,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             }
             
         } catch ( SQLException exception ) {
-            throw new SailoException("Ongelmia ohjeiden luonnissa tietokannan kanssa: " + exception.getMessage());
+            throw new SailoException("Ongelmia ohjeiden luonnissa tietokannan kanssa!");
         }
     }
     
@@ -218,7 +218,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia lisäyksessä tietokannan kanssa: " + exception.getMessage());
+            throw new SailoException("Ongelmia ohjeen lisäyksessä tietokannan kanssa!");
         }
         
         this.ohjeet.add(ohje);
@@ -246,7 +246,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             return loydetytOhjeet;
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ohjeiden haussa tietokannan kanssa: " + exception.getMessage());
+            throw new SailoException("Ongelmia ohjeiden haussa tietokannan kanssa!");
         }
     }
     
@@ -266,7 +266,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             sql.executeUpdate();
             
             // päivitetään tarvittavia vaiheita -1 pienemmiksi
-            try (PreparedStatement sqlVaihepaivitys = yhteys.prepareStatement("UPDATE Ohjeet SET vaihe = vaihe - 1 WHERE osio_id = ? AND vaihe > ?")) {
+            try (PreparedStatement sqlVaihepaivitys = Ohjeet.esimerkkiOhje.getVaiheidenPaivityslauseke(yhteys, this.osioId, poistettavaVaihe)) {
                 sqlVaihepaivitys.setInt(1, this.osioId);
                 sqlVaihepaivitys.setInt(2, poistettavaVaihe);
                 sqlVaihepaivitys.executeUpdate();
@@ -278,7 +278,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             this.ohjeet.remove(ohje);
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia poistossa tietokannan kanssa: " + exception.getMessage());
+            throw new SailoException("Ongelmia ohjeen poistossa tietokannan kanssa!");
         }
     }
     
@@ -305,7 +305,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             }
             
     	} catch (SQLException exception) {
-    		throw new SailoException("Ongelmia tallentamisessa tietokannan kanssa: " + exception.getMessage());
+    		throw new SailoException("Ongelmia ohjeiden tallentamisessa tietokannan kanssa!");
     	}
     }
     
@@ -329,7 +329,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ohjeiden lukemisessa tietokannan kanssa: " + exception.getMessage());
+            throw new SailoException("Ongelmia ohjeiden lukemisessa tietokannan kanssa!");
         }
     }
     
@@ -486,12 +486,12 @@ public class Ohjeet implements Hallitsija<Ohje> {
     
     /**
      * Asettaa tiedostopolun.
-     * Ei anna asettaa null tai alle 1 pitkää.
+     * Ei anna asettaa null.
      * 
      * @param tiedostopolku mihin polkuun tiedosto tallennetaan
      */
     public void setTiedostoPolku(String tiedostopolku) {
-        if (tiedostopolku == null || tiedostopolku.length() <= 0) return;
+        if (tiedostopolku == null) return;
         this.tiedostopolku = tiedostopolku;
     }
     
