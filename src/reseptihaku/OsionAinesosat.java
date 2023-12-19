@@ -1,13 +1,7 @@
 package reseptihaku;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -16,13 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Scanner;
 
 import kanta.Hajautus;
 import kanta.Hallitsija;
-import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 import kanta.TietueHallitsija;
+import kanta.Validoi;
 
 /**
  * @author hakom
@@ -31,21 +24,31 @@ import kanta.TietueHallitsija;
  * Osion ainesosat hallitsee osion ainesosa -olioita.
  */
 public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements Hallitsija<OsionAinesosa> {
+	
+	private String tiedostopolku    = "reseptidata/";
+    private String tiedostonimi     = "ainesosat";
+    private int osioId              = -1;
+    private Tietokanta tietokanta 	= null;
+    
+    private static OsionAinesosa esimerkkiAinesosa = new OsionAinesosa();
+    
     /**
      * Alustukset testejä varten
      * 
      * @example
      * <pre name="testJAVA">
      * private OsionAinesosat kaikkiAinesosat;
+     * private String tiedPolku;
      * private String tiedNimi;
      * private File tiedosto;
      * 
      * @Before
      * public void alusta() throws SailoException {
+     *     tiedPolku = "testidata/";
      *     tiedNimi = "testiAinesosat";
-     *     tiedosto = new File(tiedNimi + ".db");
+     *     tiedosto = new File(tiedPolku + tiedNimi + ".db");
      *     tiedosto.delete();
-     *     kaikkiAinesosat = new OsionAinesosat(1, tiedNimi);
+     *     kaikkiAinesosat = new OsionAinesosat(1, tiedPolku, tiedNimi);
      * }
      * 
      * @After
@@ -54,14 +57,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * }
      * </pre>
      */
-	
-    private String tiedostonimi     = "osion_ainesosat.dat";
-    private String tiedostopolku    = "reseptidata/Reseptin nimi/Osion nimi/";
-    private int osioId              = -1;
-    private boolean muutettu        = true;
-    
-    private static OsionAinesosa esimerkkiAinesosa 	= new OsionAinesosa();
-    private Tietokanta tietokanta 					= null;
     
     /**
      * Hallitsee osion ainesosia ja määriä.
@@ -69,12 +64,14 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * OsionAinesosat oletus = new OsionAinesosat();
-     * oletus.toString() === "-1|osion_ainesosat.dat|0";
+     * oletus.toString() === "-1|ainesosat|0";
      * </pre>
      */
-    public OsionAinesosat() {
+    public OsionAinesosat() throws SailoException {
         super(2.0, 0);
+        alustaTietokanta();
     }
     
     
@@ -85,13 +82,15 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * OsionAinesosat muropohjaAinesosat = new OsionAinesosat(2);
-     * muropohjaAinesosat.toString() === "2|osion_ainesosat.dat|0";
+     * muropohjaAinesosat.toString() === "2|ainesosat|0";
      * </pre>
      */
-    public OsionAinesosat(int osioId) {
+    public OsionAinesosat(int osioId) throws SailoException {
         super(2.0, 0);
         this.osioId = osioId;
+        alustaTietokanta();
     }
     
     
@@ -102,10 +101,23 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @param tietokantaNimi tietokannan nimi
      * @throws SailoException jos tulee ongelmia
      */
-    public OsionAinesosat(int osioId, String tietokantaNimi) throws SailoException {
+    public OsionAinesosat(int osioId, String tiedostopolku, String tiedostonimi) throws SailoException {
         super(2.0, 0);
     	this.osioId = osioId;
-        this.tietokanta = Tietokanta.alustaTietokanta(tietokantaNimi);
+    	setTiedostoPolku(tiedostopolku);
+    	setTiedostoNimi(tiedostonimi);
+    	alustaTietokanta();
+    }
+    
+    
+    /**
+     * Alustaa oman tietokannan.
+     * Luo oman taulun jos sellaista ei vielä ole.
+     * 
+     * @throws SailoException jos tulee ongelmia tietokannan kanssa
+     */
+    private void alustaTietokanta() throws SailoException {
+        this.tietokanta = Tietokanta.alustaTietokanta(tiedostopolku + tiedostonimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
             // haetaan tietokannan metadatasta omaa tietokantaa, luodaan jos ei ole
@@ -151,7 +163,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         if (tiedostonimi == null) return;
         if (tiedostonimi.length() < 1) return;
         this.tiedostonimi = tiedostonimi;
-        this.muutettu = true;
     }
     
     
@@ -163,8 +174,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     public void setTiedostoPolku(String tiedostopolku) {
         if (tiedostopolku == null) return;
         
-        this.tiedostopolku = tiedostopolku; // esim. reseptidata/Mustikkapiirakka/Muropohja/
-        this.muutettu = true;
+        this.tiedostopolku = tiedostopolku;
     }
     
     
@@ -176,12 +186,13 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * OsionAinesosat muropohjaAinesosat = new OsionAinesosat(2);
-     * muropohjaAinesosat.toString() === "2|osion_ainesosat.dat|0";
+     * muropohjaAinesosat.toString() === "2|ainesosat|0";
      * 
      * muropohjaAinesosat.lisaa(new OsionAinesosa("kananmuna", "2kpl"));
      * muropohjaAinesosat.lisaa(new OsionAinesosa("sokeri", "1dl"));
-     * muropohjaAinesosat.toString() === "2|osion_ainesosat.dat|2";
+     * muropohjaAinesosat.toString() === "2|ainesosat|2";
      * muropohjaAinesosat.anna(0).getAinesosa() === "kananmuna";
      * muropohjaAinesosat.anna(1).getMaara() === "1dl";
      * </pre>
@@ -191,7 +202,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
         if (osionAinesosa == null) return;
         osionAinesosa.setOsioId(this.osioId);
         add(osionAinesosa);
-        this.muutettu = true;
     }
     
     
@@ -282,6 +292,63 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     
     
     /**
+     * Tallentaa nykyiset ainesosat tietokantaan
+     * 
+     * @throws SailoException jos tallentamisessa ilmenee ongelmia
+     */
+    public void tallenna() throws SailoException {
+    	// varmistetaan ettei ole samaa ainesosaa useampaan kertaan
+    	List<String> ainesosaNimet = new ArrayList<String>();
+    	for (OsionAinesosa ainesosa : this) {
+    		ainesosaNimet.add(ainesosa.getAinesosa());
+    	}
+    	if (Validoi.onkoDuplikaatteja(ainesosaNimet)) throw new SailoException("Samassa osiossa on sama ainesosa useaan kertaan!");
+    	
+    	try (Connection yhteys = this.tietokanta.annaTietokantaYhteys()) {
+        	// poistetaan nykyiset osion ohjeet
+            try (PreparedStatement sqlPoisto = yhteys.prepareStatement("DELETE FROM Ainesosat WHERE osio_id = ?")) {
+                sqlPoisto.setInt(1, this.osioId);
+                sqlPoisto.executeUpdate();
+            }
+            
+            // lisätään omat ohjeet tietokantaan, jos sellaisia on
+            if (0 < this.size()) {
+                try (PreparedStatement sqlLisays = OsionAinesosat.esimerkkiAinesosa.getMoniLisayslauseke(yhteys, this.anna())) {
+                	sqlLisays.executeUpdate();
+                }
+            }
+            
+    	} catch (SQLException exception) {
+    		throw new SailoException("Ongelmia ainesosien tallentamisessa tietokannan kanssa!");
+    	}
+    }
+    
+    
+    /**
+     * Lukee omaa osion tunnusta vastaavat tiedot tietokannasta
+     * 
+     * @throws SailoException jos tietokannasta lukemisessa ilmenee ongelmia
+     */
+    public void lueTiedostosta() throws SailoException {
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Ainesosat WHERE osio_id = ?") ) {
+            sql.setInt(1, this.osioId);
+            
+            // luodaan sql-kyselyn tulosten verran ainesosa-olioita
+            try ( ResultSet tulokset = sql.executeQuery() ) {
+                while (tulokset.next()) {
+                    OsionAinesosa ainesosa = new OsionAinesosa();
+                    ainesosa.parse(tulokset);
+                    this.add(ainesosa);
+                }
+            }
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia ohjeiden lukemisessa tietokannan kanssa: " + exception.getMessage());
+        }
+    }
+    
+    
+    /**
      * Luo osion ainesosan.
      * Ei lisää vielä osion ainesosiin.
      */
@@ -299,7 +366,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     @Override
     public void poista(OsionAinesosa osionAinesosa) {
         remove(osionAinesosa);
-        this.muutettu = true;
     }
     
     
@@ -309,6 +375,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * OsionAinesosat oat = new OsionAinesosat();
      * oat.anna(-5) == null === true;
      * oat.anna(0) == null === true;
@@ -339,106 +406,28 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     
     
     /**
+     * Tulostaa ainesosat tietoineen annettuun tietovirtaan
+     * 
      * @param os tietovirta johon halutaan tulostaa
      */
     public void tulostaOsionAinesosat(OutputStream os) {
         PrintStream out = new PrintStream(os);
-        for (int i = 0; i < size(); i++) {
-            OsionAinesosa osionAinesosa = this.anna(i);
-            
-            // tulostaa ainesosista tunnusta vastaavan ainesosan nimen
-            out.print(osionAinesosa.getAinesosa());
+        for (OsionAinesosa ainesosa : this) {
+            out.print(ainesosa.getAinesosa());
             out.print(" : ");
-            
-            // tulostaa ainesosan määrän ja rivin vaihdon
-            out.print(osionAinesosa.getMaara());
+            out.print(ainesosa.getMaara());
             out.print("\n");
         }
     }
     
     
     /**
-     * Kertoo onko osion ainesosiin tullut tallentamattomia muutoksia
+     * Kertoo onko ohjeisiin tullut tallentamattomia muutoksia
      * 
      * @return onko tallentamattomia muutoksia
      */
     public boolean onkoTallentamattomiaMuutoksia() {
-        return this.muutettu;
-    }
-    
-    
-    /**
-     * Lukee Osion Ainesosien tiedot tiedostosta
-     * 
-     * @throws SailoException jos tallennus epäonnistuu
-     */
-    public void lueTiedostosta() throws SailoException {
-        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostopolku + this.tiedostonimi)))) {
-            while (fi.hasNext()) {
-                String rivi = fi.nextLine().strip();
-                
-                // skipataan tyhjät ja kommenttirivit
-                if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
-                
-                // käsketään osion ainesosan parsimaan tiedot ja lisätään nykyisiin ainesosiin
-                OsionAinesosa osionAinesosa = new OsionAinesosa();
-                osionAinesosa.parse(rivi);
-                lisaa(osionAinesosa);
-            }
-            
-            this.muutettu = false;
-            
-        } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
-        }
-    }
-    
-    
-    /**
-     * Tallentaa osion ainesosat tiedostoon.
-     * Varmuuskopioi tallennustiedoston ennen kuin tallentaa uudestaan ainesosat.
-     * Luo tallennustiedoston jos sellaista ei vielä ollut.
-     * 
-     * @throws SailoException jos tallennus epäonnistuu
-     */
-    public void tallenna() throws SailoException {
-        if (!onkoTallentamattomiaMuutoksia()) return;
-        
-        File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
-        File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
-        
-        // koitetaan poistaa edellistä varmuuskopiota
-        // heitetään virhe jos sellainen on olemassa eikä voida poistaa
-        if (!varmuuskopio.delete() && varmuuskopio.exists()) {
-            throw new SailoException("Ei voida poistaa varmuuskopio-tiedostoa");
-        }
-        
-        // koitetaan luoda tiedosto jos sellaista ei vielä ole
-        if (!tiedosto.exists()) {
-            try {
-                tiedosto.createNewFile();
-            } catch (IOException exception) {
-                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
-            }
-        }
-        
-        // koitetaan nimetä olemassaoleva tiedosto varmuuskopioksi
-        if (!tiedosto.renameTo(varmuuskopio)) {
-            throw new SailoException("Ei voida nimetä uudelleen tallennus-tiedostoa");
-        }
-        
-        try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
-            // ainesosien tiedot kirjoittajaan
-            for (int i = 0; i < this.size(); i++) {
-                fo.println(anna(i));
-            }
-        } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
-        } catch (IOException exception) {
-            throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
-        }
-        
-        this.muutettu = false;
+        return true; // TODO poista kun ei käytetä muualla
     }
     
     
@@ -446,13 +435,14 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     /**
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * OsionAinesosat oat = new OsionAinesosat(55);
      * oat.lisaa(new OsionAinesosa("riisi", "5dl"));
      * oat.lisaa(new OsionAinesosa("soijakastike", "2rkl"));
      * 
      * OsionAinesosat oatKopio = oat.clone();
      * oat.equals(oatKopio) === true;
-     * oat.toString() === "55|osion_ainesosat.dat|2";
+     * oat.toString() === "55|ainesosat|2";
      * 
      * oat.lisaa(new OsionAinesosa("sipuli", "1kpl"));
      * oat.equals(oatKopio) === false;
@@ -462,15 +452,20 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * </pre>
      */
     public OsionAinesosat clone() {
-        OsionAinesosat kopio = new OsionAinesosat();
-        kopio.osioId = this.osioId;
-        kopio.tiedostonimi = this.tiedostonimi;
-        
-        // kopioidaan kaikki alkiot kopioon
-        for (OsionAinesosa oa : this) {
-            kopio.lisaa(oa);
-        }
-        
+    	OsionAinesosat kopio = null;
+    	try {
+            kopio = new OsionAinesosat();
+            kopio.osioId = this.osioId;
+            kopio.tiedostonimi = this.tiedostonimi;
+            
+            for (OsionAinesosa oa : this) {
+                kopio.lisaa(oa);
+            }
+            
+    	} catch (SailoException exception) {
+    		System.err.println(exception.getMessage());
+    	}
+
         return kopio;
     }
     
@@ -478,6 +473,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     /**
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * OsionAinesosat oa1 = new OsionAinesosat(1);
      * OsionAinesosat oa2 = new OsionAinesosat(1);
      * oa1.equals(oa2) === true;
@@ -519,6 +515,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * OsionAinesosat oa1 = new OsionAinesosat(1);
      * OsionAinesosat oa2 = new OsionAinesosat(1);
      * oa1.hashCode() == oa2.hashCode() === true;
@@ -557,8 +554,9 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * OsionAinesosat oa = new OsionAinesosat(1);
-     * oa.toString() === "1|osion_ainesosat.dat|0";
+     * oa.toString() === "1|ainesosat|0";
      * </pre>
      */
     public String toString() {
@@ -579,53 +577,42 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      */
     public static void main(String[] args) {
     	try {
-			OsionAinesosat oat = new OsionAinesosat(1, "testidb");
+			OsionAinesosat oat = new OsionAinesosat(1, "reseptidata/", "testiAinesosat");
 			
 			OsionAinesosa oa1 = new OsionAinesosa("porkkanaa", "300g");
 			OsionAinesosa oa2 = new OsionAinesosa("perunaa", "3kpl");
-			oat.lisaaAinesosa(oa1);
-			oat.lisaaAinesosa(oa2);
+			oat.lisaa(oa1);
+			oat.lisaa(oa2);
+			System.out.println(oat.anna());
 			System.out.println(oat.get());
+			System.out.println();
 			
-			oat.poistaAinesosa(oa1);
+			oat.tallenna();
+			System.out.println(oat.anna());
 			System.out.println(oat.get());
+			System.out.println();
 			
-			oat.poistaAinesosa(oa2);
+			oat.poista(oa1);
+			System.out.println(oat.anna());
 			System.out.println(oat.get());
+			System.out.println();
+			
+			oat.tallenna();
+			System.out.println(oat.anna());
+			System.out.println(oat.get());
+			System.out.println();
+			
+			OsionAinesosat oat2 = new OsionAinesosat(1, "reseptidata/", "testiAinesosat");
+			System.out.println(oat2.anna());
+			System.out.println(oat2.get());
+			System.out.println();
+			
+			oat2.lueTiedostosta();
+			System.out.println(oat2.anna());
+			System.out.println(oat2.get());
 			
 		} catch (SailoException exception) {
 			System.err.println(exception.getMessage());
 		}
-    	
-    	/*
-        int nykyisenOsionId = 1;
-        OsionAinesosat osionAinesosat = new OsionAinesosat(nykyisenOsionId);
-        System.out.println(osionAinesosat.toString());
-        
-        osionAinesosat.setTiedostoNimi("soppa.txt");
-        osionAinesosat.lisaa(new OsionAinesosa("perunoita", "500g"));
-        osionAinesosat.lisaa(new OsionAinesosa("porkkanoita", "2kpl"));
-        osionAinesosat.lisaa(new OsionAinesosa("sipulia", "1kpl"));
-        osionAinesosat.lisaa(new OsionAinesosa("suolaa", "3/4rkl"));
-        
-        System.out.println(osionAinesosat.toString());
-        
-        System.out.println("\nAinesosa tunnukset ja määrät:");
-        osionAinesosat.tulostaOsionAinesosat(System.out);
-        
-        try {
-            osionAinesosat.tallenna();
-        } catch (SailoException e) {
-            System.out.println(e.getMessage());
-        }
-        
-        OsionAinesosat tiedostosta = new OsionAinesosat();
-        tiedostosta.setTiedostoNimi("soppa.txt");
-        try {
-            tiedostosta.lueTiedostosta();
-        } catch (SailoException e) {
-            System.out.println(e.getMessage());
-        }
-        */
     }
 }

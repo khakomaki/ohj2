@@ -158,7 +158,11 @@ public class Osio {
      * Luo osion ainesosat
      */
     private void luoOsionAinesosat() {
-        this.osionAinesosat = new OsionAinesosat(this.osioId);
+    	try {
+    		this.osionAinesosat = new OsionAinesosat(this.osioId);
+    	} catch (SailoException exception) {
+    		System.err.println(exception.getMessage()); // TODO
+    	}
     }
     
     

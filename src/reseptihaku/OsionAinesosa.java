@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
@@ -202,6 +203,31 @@ public class OsionAinesosa {
     }
     
     
+    public PreparedStatement getMoniLisayslauseke(Connection yhteys, List<OsionAinesosa> ainesosat) throws SQLException {
+    	StringBuilder sqlLause = new StringBuilder("INSERT INTO Ainesosat (osio_id, nimi, maara) VALUES ");
+
+    	// ainesosien attribuuttien arvoille paikat
+    	for (int i = 0; i < ainesosat.size(); i++) {
+    		sqlLause.append("(?, ?, ?),");
+    	}
+    	
+    	// poistaa viimeisen pilkun
+    	sqlLause.deleteCharAt(sqlLause.length() - 1);
+    	
+    	PreparedStatement sql = yhteys.prepareStatement(sqlLause.toString());
+    	
+    	// asetetaan arvot
+    	int parametri = 1;
+    	for (OsionAinesosa ainesosa : ainesosat) {
+    		sql.setInt(parametri++, ainesosa.osioId);
+    		sql.setString(parametri++, ainesosa.ainesosaNimi);
+    		sql.setString(parametri++, ainesosa.maara);
+    	}
+    	
+    	return sql;
+    }
+    
+    
     /**
      * Antaa ainesosan poistolausekkeen
      * 
@@ -217,13 +243,6 @@ public class OsionAinesosa {
         sql.setString(2, this.ainesosaNimi);
         
         return sql;
-    }
-    
-    
-    public PreparedStatement getMuutoslauseke(Connection yhteys) throws SQLException {
-    	PreparedStatement sql = yhteys.prepareStatement("UPDATE ");
-    	
-    	return sql;
     }
     
     
