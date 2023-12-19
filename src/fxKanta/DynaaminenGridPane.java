@@ -74,7 +74,9 @@ public class DynaaminenGridPane<T> extends GridPane {
      * Päivittää GridPanen rivit
      */
     public void paivita() {
-        this.getChildren().clear(); // tyhjentää GridPanen
+    	// tyhjentää GridPanen
+        this.getChildren().clear();
+        this.getRowConstraints().clear();
         
         int rivi = 0;
         
