@@ -110,7 +110,7 @@ public class Resepti {
      */
     public Resepti(String nimi) {
         setNimi(nimi);
-        this.osiot = new Osiot(this.reseptiId);
+        luoOsiot();
         luoVaihtoehtoAttribuutit();
     }
     
@@ -127,8 +127,20 @@ public class Resepti {
      */
     public Resepti() {
         setNimi(null);
-        this.osiot = new Osiot(this.reseptiId);
+        luoOsiot();
         luoVaihtoehtoAttribuutit();
+    }
+    
+    
+    /**
+     * Luo reseptin osiot
+     */
+    private void luoOsiot() {
+    	try {
+    		this.osiot = new Osiot(this.reseptiId);
+    	} catch (SailoException exception) {
+    		System.err.println(exception.getMessage());
+    	}
     }
     
     

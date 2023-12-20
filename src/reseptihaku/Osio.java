@@ -1,6 +1,5 @@
 package reseptihaku;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,16 +18,11 @@ import kanta.Validoi;
  */
 public class Osio {
     
+	private int reseptiID					= -1;
     private int osioId                      = -1;
     private String nimi                     = "Osion nimi";
-    private OsionAinesosat osionAinesosat;
-    private Ohjeet ohjeet;
-    private String tiedostopolku            = "reseptidata/Reseptin nimi/";
-    private boolean muutettu                = true;
-    
-    private static int annettavaId          = 1;
-    
-    private int reseptiID					= -1;
+    private OsionAinesosat osionAinesosat	= null;
+    private Ohjeet ohjeet					= null;
     
     /**
      * @param id osion tunnus
@@ -37,19 +31,13 @@ public class Osio {
      * @example
      * <pre name="test">
      * Osio pizzapohja = new Osio(2, "Pizzapohja");
-     * pizzapohja.toString() === "2|Pizzapohja";
+     * pizzapohja.toString() === "-1|2|Pizzapohja";
      * </pre>
      */
     public Osio(int id, String nimi) {
         this.osioId = id;
-        try {
-			this.ohjeet = new Ohjeet(this.osioId);
-		} catch (SailoException exception) {
-			// TODO
-			System.err.println(exception.getMessage());
-		}
         setUusiNimi(nimi);
-        
+        luoOsionOhjeet();
         luoOsionAinesosat();
     }
     
@@ -61,18 +49,12 @@ public class Osio {
      * @example
      * <pre name="test">
      * Osio pizzapohja = new Osio("Pizzapohja");
-     * pizzapohja.toString() === "-1|Pizzapohja";
+     * pizzapohja.toString() === "-1|-1|Pizzapohja";
      * </pre>
      */
     public Osio(String nimi) {
-        try {
-			this.ohjeet = new Ohjeet(this.osioId);
-		} catch (SailoException exception) {
-			// TODO
-			System.err.println(exception.getMessage());
-		}
         setUusiNimi(nimi);
-        
+        luoOsionOhjeet();
         luoOsionAinesosat();
     }
     
@@ -83,53 +65,12 @@ public class Osio {
      * @example
      * <pre name="test">
      * Osio osio = new Osio();
-     * osio.toString() === "-1|Osion nimi";
+     * osio.toString() === "-1|-1|Osion nimi";
      * </pre>
      */
     public Osio() {
-        try {
-			this.ohjeet = new Ohjeet(this.osioId);
-		} catch (SailoException exception) {
-			// TODO
-			System.err.println(exception.getMessage());
-		}
-        
+        luoOsionOhjeet();
         luoOsionAinesosat();
-    }
-    
-    
-    /**
-     * Antaa osiolle tunnuksen
-     * 
-     * @return annettu osion tunnus
-     */
-    public int rekisteroi() {
-        if (0 < this.osioId) return this.osioId; // jos on jo rekisteröity
-        
-        this.osioId = Osio.annettavaId;
-        this.ohjeet.setOsioId(this.osioId);
-        this.osionAinesosat.setOsioId(this.osioId);
-        Osio.annettavaId++;
-        
-        // päivittää osio tunnuksen ohjeille ja ainesosille TODO poista toisto
-        this.ohjeet.setOsioId(this.osioId);
-        this.osionAinesosat.setOsioId(this.osioId);
-        
-        return this.osioId;
-    }
-    
-    
-    /**
-     * Antaa osiolle tunnuksen
-     * 
-     * @param id mikä tunnus yritetään laittaa
-     * @return mikä tunnus laitettiin
-     */
-    public int rekisteroi(int id) {
-        if (0 < this.osioId) return this.osioId; // jos on jo rekisteröity
-        
-        if (Osio.annettavaId < id) Osio.annettavaId = id;
-        return rekisteroi();
     }
     
     
@@ -144,13 +85,37 @@ public class Osio {
     
     
     /**
-     * Asettaa osion tunnuksen ja päivittää annettavaa tunnusta tarvittaessa
+     * Asettaa osion tunnuksen, jos sitä ei vielä ole asetettu.
      * 
-     * @param ID osion tunnus
+     * @param id asetettava osion tunnus
      */
-    private void setID(int ID) {
-    	this.osioId = ID;
-    	if (Osio.annettavaId <= this.osioId) Osio.annettavaId = this.osioId + 1;
+    private void setID(int id) {
+    	if (id < this.osioId) return;
+    	this.osioId = id;
+    	this.osionAinesosat.setOsioId(this.osioId);
+    	this.ohjeet.setOsioId(this.osioId);
+    }
+    
+    
+    /**
+     * Antaa osion tunnuksen
+     * 
+     * @return osion tunnus
+     */
+    public int getID() {
+    	return this.osioId;
+    }
+    
+    
+    /**
+     * Luo osion ohjeet
+     */
+    private void luoOsionOhjeet() {
+        try {
+			this.ohjeet = new Ohjeet(this.osioId);
+		} catch (SailoException exception) {
+			System.err.println(exception.getMessage()); // TODO
+		}
     }
     
     
@@ -167,33 +132,36 @@ public class Osio {
     
     
     /**
+     * Asettaa osion nimen.
+     * Ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null.
+     * 
      * @param nimi osion nimi
      * 
      * @example
      * <pre name="test">
      * Osio kakkupohja = new Osio(8, "Kakkupohja");
-     * kakkupohja.toString() === "8|Kakkupohja";
+     * kakkupohja.toString() === "-1|8|Kakkupohja";
      * 
      * kakkupohja.setUusiNimi("");
-     * kakkupohja.toString() === "8|Kakkupohja";
+     * kakkupohja.toString() === "-1|8|Kakkupohja";
      * 
      * kakkupohja.setUusiNimi("Piirakkapohja");
-     * kakkupohja.toString() === "8|Piirakkapohja";
+     * kakkupohja.toString() === "-1|8|Piirakkapohja";
      * 
      * kakkupohja.setUusiNimi(null);
-     * kakkupohja.toString() === "8|Piirakkapohja";
+     * kakkupohja.toString() === "-1|8|Piirakkapohja";
      * </pre>
      */
     public void setUusiNimi(String nimi) {
-        // ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
         if (nimi == null) return;
         if (nimi.length() < 1) return;
         this.nimi = nimi;
-        this.muutettu = true;
     }
     
     
     /**
+     * Antaa osion nimen
+     * 
      * @return osion nimi
      * 
      * @example
@@ -213,35 +181,14 @@ public class Osio {
      * @param tiedostopolku mihin tallennetaan ja luetaan
      */
     public void setTiedostopolku(String tiedostopolku) {
-        if (tiedostopolku == null) return;
-        
-        this.tiedostopolku = tiedostopolku; // esim. reseptidata/Mustikkapiirakka/
-        
-        // luo tiedostopolun omille tiedoille siltä varalta että sitä ei ole
-        File dir = new File(getAlihakemistoPolku());
-        dir.mkdirs();
-        
-        this.ohjeet.setTiedostoPolku(getAlihakemistoPolku());
-        this.osionAinesosat.setTiedostoPolku(getAlihakemistoPolku());
-        this.muutettu = true;
+        this.ohjeet.setTiedostoPolku(tiedostopolku);
+        this.osionAinesosat.setTiedostoPolku(tiedostopolku);
     }
     
     
     /**
-     * Antaa osion alihakemistopolun. (muotoa "reseptidata/Reseptin nimi/Osion nimi/")
+     * Antaa osion ainesosat
      * 
-     * @return osion alihakemistopolku
-     */
-    public String getAlihakemistoPolku() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.tiedostopolku);
-        sb.append(this.getNimi());
-        sb.append("/");
-        return sb.toString();
-    }
-    
-    
-    /**
      * @return osion ainesosat -olio
      */
     public OsionAinesosat annaOsionAinesosat() {
@@ -250,6 +197,8 @@ public class Osio {
     
     
     /**
+     * Antaa osion ohjeet
+     * 
      * @return osion ohjeet
      */
     public Ohjeet annaOsionOhjeet() {
@@ -272,6 +221,8 @@ public class Osio {
     
     
     /**
+     * Lisää ainesosan
+     * 
      * @param ainesosa lisättävä osion ainesosa
      */
     public void lisaaAinesosa(OsionAinesosa ainesosa) {
@@ -290,6 +241,8 @@ public class Osio {
     
     
     /**
+     * Lisää ohjeen
+     * 
      * @param ohje lisättävä ohje
      */
     public void lisaaOhje(Ohje ohje) {
@@ -298,6 +251,8 @@ public class Osio {
     
     
     /**
+     * Luo ja lisää ohjeen
+     * 
      * @param ohjeistus lisättävän ohjeen ohjeistusteksti
      */
     public void lisaaOhje(String ohjeistus) {
@@ -370,6 +325,23 @@ public class Osio {
     
     
     /**
+     * Antaa osion päivityslausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return päivityslauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ilmenee ongelmia
+     */
+    public PreparedStatement getPaivityslauseke(Connection yhteys) throws SQLException {
+    	PreparedStatement sql = yhteys.prepareStatement("UPDATE Osiot SET osio_id = ?, nimi = ?");
+    	
+    	sql.setInt(1, this.osioId);
+    	sql.setString(2, this.nimi);
+    	
+    	return sql;
+    }
+    
+    
+    /**
      * Parsii annetuista tiedoista omat tietonsa
      * 
      * @param tulokset mistä tiedot saadaan
@@ -391,8 +363,30 @@ public class Osio {
     public void tarkistaID(ResultSet tulokset) throws SQLException {
     	if (!tulokset.next()) return;
     	int ID = tulokset.getInt(1);
-    	if (ID == this.osioId);
+    	if (ID == this.osioId) return;
     	setID(ID);
+    }
+    
+    
+    /**
+     * Tallentaa osion sisältämät ohjeet ja ainesosat
+     * 
+     * @throws SailoException jos tallentamisessa ilmenee ongelmia
+     */
+    public void tallenna() throws SailoException {
+    	this.osionAinesosat.tallenna();
+    	this.ohjeet.tallenna();
+    }
+    
+    
+    /**
+     * Lukee osion sisältämät ohjeet ja ainesosat tietokannasta
+     * 
+     * @throws SailoException jos tietojen lukemisessa ilmenee ongelmia
+     */
+    public void lueTiedostosta() throws SailoException {
+    	this.osionAinesosat.lueTiedostosta();
+    	this.ohjeet.lueTiedostosta();
     }
     
     
@@ -402,9 +396,7 @@ public class Osio {
      * @return onko osioon tullut muutoksia
      */
     public boolean onkoTallentamattomiaMuutoksia() {
-        if (this.ohjeet.onkoTallentamattomiaMuutoksia()) return true;
-        if (this.osionAinesosat.onkoTallentamattomiaMuutoksia()) return true;
-        return this.muutettu;
+        return true; // TODO poista kun ei käytetä enää muualla
     }
     
     
@@ -412,22 +404,6 @@ public class Osio {
      * Koittaa parsia osion tiedot annetusta rivistä
      * 
      * @param rivi mistä koitetaan lukea osion tiedot
-     * 
-     * @example
-     * <pre name="test">
-     * Osio osio = new Osio();
-     * osio.parse("1|1|Muropohja");
-     * osio.toString().endsWith("|Muropohja") === true;
-     * 
-     * osio.parse("  5   |  2    |       Pizzapohja   ");
-     * osio.toString().endsWith("|Pizzapohja") === true;
-     * 
-     * osio.parse("1|Muropohja");
-     * osio.toString().endsWith("|Pizzapohja") === true;
-     * 
-     * osio.parse("1 1 Muropohja");
-     * osio.toString().endsWith("|Pizzapohja") === true;
-     * </pre>
      */
     public void parse(String rivi) {
         if (rivi == null || rivi.length() < 1) return;
@@ -437,8 +413,8 @@ public class Osio {
         // ei huomioida ensimmäisen kentän tietoja (resepti_id)
         Mjonot.erota(sb, '|');
         
-        rekisteroi(Mjonot.erota(sb, '|', this.osioId));
-        this.nimi = Mjonot.erota(sb, '|', this.nimi);
+        setID(Mjonot.erota(sb, '|', this.osioId));
+        setUusiNimi(Mjonot.erota(sb, '|', this.nimi));
     }
     
     
@@ -455,43 +431,6 @@ public class Osio {
         if (this.ohjeet.getLkm() <= 0 && this.osionAinesosat.size() <= 0) return "Osio ei sisällä yhtään ohjetta tai ainesosaa!";
         
         return null;
-    }
-    
-    
-    /**
-     * Lukee osion tiedot tiedostosta
-     * 
-     * @throws SailoException jos tiedoston lukeminen ei onnistu
-     */
-    public void lueTiedostosta() throws SailoException {
-        this.osionAinesosat.setTiedostoPolku(getAlihakemistoPolku());
-        this.ohjeet.setTiedostoPolku(getAlihakemistoPolku());
-        
-        this.osionAinesosat.lueTiedostosta();
-        this.ohjeet.lueTiedostosta();
-    }
-    
-    
-    /**
-     * tallentaa osion tiedot tiedostoihin
-     * 
-     * @throws SailoException jos tallentaminen epäonnistuu
-     */
-    public void tallenna() throws SailoException {
-        if (!onkoTallentamattomiaMuutoksia()) return;
-        
-        // tarkitestaan voidaanko tallentaa
-        String virhe = voidaankoTallentaa();
-        if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
-        
-        // rekisteröi osion jos sille ei ole annettu vielä omaa tunnusta
-        if (this.osioId < 0) rekisteroi();
-        
-        this.osionAinesosat.setTiedostoPolku(getAlihakemistoPolku());
-        this.ohjeet.setTiedostoPolku(getAlihakemistoPolku());
-        
-        this.osionAinesosat.tallenna();
-        this.ohjeet.tallenna();
     }
     
     
@@ -536,6 +475,8 @@ public class Osio {
     
     @Override
     /**
+     * Luo kopion osioista
+     * 
      * @example
      * <pre name="test">
      * Osio sampylat = new Osio("Sämpylät");
@@ -571,7 +512,7 @@ public class Osio {
         Osio kopio = new Osio();
         kopio.osioId = this.osioId;
         kopio.nimi = this.nimi;
-        kopio.osioId = this.osioId;
+        kopio.reseptiID = this.reseptiID;
         
         // kopioidaan osion omat ainesosat ja ohjeet
         kopio.osionAinesosat = this.osionAinesosat.clone();
@@ -583,6 +524,8 @@ public class Osio {
     
     @Override
     /**
+     * Vertaa onko annettu osio sama kuin nykyinen
+     * 
      * @example
      * <pre name="test">
      * Osio pohja1 = new Osio(1, "Kakkupohja");
@@ -605,6 +548,7 @@ public class Osio {
         Osio verrattavaOsio = (Osio)verrattava;
         if (!verrattavaOsio.nimi.equals(this.nimi)) return false;
         if (verrattavaOsio.osioId != this.osioId) return false;
+        if (verrattavaOsio.reseptiID != this.reseptiID) return false;
         if (!verrattavaOsio.osionAinesosat.equals(this.osionAinesosat)) return false;
         if (!verrattavaOsio.ohjeet.equals(this.ohjeet)) return false;
         
@@ -614,6 +558,8 @@ public class Osio {
     
     @Override
     /**
+     * Antaa hash-arvon
+     * 
      * @example
      * <pre name="test">
      * Osio pohja1 = new Osio(1, "Kakkupohja");
@@ -632,18 +578,22 @@ public class Osio {
     public int hashCode() {
         int hash = 1;
         hash = Hajautus.hajautus(hash, this.nimi);
-        hash = Hajautus.hajautusInt(hash, this.osioId, this.osionAinesosat.hashCode(), this.ohjeet.hashCode());
+        hash = Hajautus.hajautusInt(hash, this.reseptiID, this.osioId, this.osionAinesosat.hashCode(), this.ohjeet.hashCode());
         return hash;
     }
     
     
     @Override
     /**
+     * Osion tiedot String-muodossa "reseptitunnus | osiotunnus | osion nimi"
+     * 
      * Osio pizzapohja = new Osio(13, "Hampurilaissämpylät");
-     * pizzapohja.toString() === "13|Hampurilaissämpylät";
+     * pizzapohja.toString() === "-1|13|Hampurilaissämpylät";
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(this.reseptiID);
+        sb.append('|');
         sb.append(this.osioId);
         sb.append('|');
         sb.append(this.nimi);
@@ -659,21 +609,28 @@ public class Osio {
     public static void main(String[] args) {
         Osio lattytaikina = new Osio(1, "Lättytaikina");
         System.out.println(lattytaikina.toString());
+        System.out.println(lattytaikina.getLuontilauseke());
         
-        OsionAinesosat osionAinesosat = lattytaikina.annaOsionAinesosat();
-        osionAinesosat.lisaa(new OsionAinesosa("maitoa", "5dl"));
-        osionAinesosat.lisaa(new OsionAinesosa("kananmunia", "3kpl"));
-        osionAinesosat.lisaa(new OsionAinesosa("sokeria", "2rkl"));
-        osionAinesosat.lisaa(new OsionAinesosa("vehnäjauhoja", "3dl"));
-        osionAinesosat.lisaa(new OsionAinesosa("suolaa", "1tl"));
-        osionAinesosat.lisaa(new OsionAinesosa("voi", ""));
-        System.out.println(osionAinesosat.toString() + "\n");
+        lattytaikina.lisaaAinesosa(new OsionAinesosa("maitoa", "5dl"));
+        lattytaikina.lisaaAinesosa(new OsionAinesosa("kananmunia", "3kpl"));
+        lattytaikina.lisaaAinesosa(new OsionAinesosa("sokeria", "2rkl"));
+        lattytaikina.lisaaAinesosa(new OsionAinesosa("vehnäjauhoja", "3dl"));
+        lattytaikina.lisaaAinesosa(new OsionAinesosa("suolaa", "1tl"));
+        lattytaikina.lisaaAinesosa(new OsionAinesosa("voi", ""));
+        lattytaikina.annaOsionAinesosat().tulostaOsionAinesosat(System.out);
         
-        osionAinesosat.tulostaOsionAinesosat(System.out);
+        lattytaikina.lisaaOhje(new Ohje("Sekoita kuivat ainekset"));
+        lattytaikina.lisaaOhje(new Ohje("Sulata voi"));
+        lattytaikina.lisaaOhje(new Ohje("Lisää sulatettu voi jauhoihin"));
+        lattytaikina.lisaaOhje(new Ohje("Lisää maito"));
+        lattytaikina.lisaaOhje(new Ohje("Sekoita hyvin"));
         
-        lattytaikina.setUusiNimi("Lettutaikina");
         System.out.println("\n" + lattytaikina.toString());
         
-        System.out.println(lattytaikina.getLuontilauseke());
+        try {
+			lattytaikina.tallenna();
+		} catch (SailoException exception) {
+			System.err.println(exception.getMessage());
+		}
     }
 }
