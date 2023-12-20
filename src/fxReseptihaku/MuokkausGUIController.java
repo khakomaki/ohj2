@@ -99,9 +99,12 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         this.alkuperainenResepti = oletus;
         
         // luodaan kopio annetusta reseptistä muokattavaksi tai uusi jos annettu on null
-        if (oletus == null) { 
-            this.valittuResepti = new Resepti();
-            
+        if (oletus == null) {
+        	try {
+        		this.valittuResepti = new Resepti();
+        	} catch (SailoException exception) {
+        		exception.getMessage();
+        	}
             // lisätään uuteen reseptiin osio tyhjällä ainesosalla ja ohjeella
             Osio osio = new Osio();
             osio.lisaaAinesosa(new OsionAinesosa());

@@ -1,31 +1,22 @@
 package reseptihaku;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
 
 import fi.jyu.mit.ohj2.Mjonot;
 import kanta.Hajautus;
-import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 import kanta.Satunnaisluku;
 import kanta.VaihtoehtoAttribuutti;
-import kanta.Validoi;
 
 /**
  * @author hakom
@@ -45,13 +36,9 @@ public class Resepti {
     private VaihtoehtoAttribuutti valmistusaika = null;
     private VaihtoehtoAttribuutti tahdet        = null;
     private VaihtoehtoAttribuutti vaativuus     = null;
-    private String tiedostonimi                 = "reseptit.dat";
     private String tiedostopolku                = "reseptidata/";
-    private String rekisteroitynimi             = "";
-    private boolean muutettu                    = true;
-    
-    private static int annettavaId  = 1;
-    private static Set<String> rekisteroidytNimet = new HashSet<String>();
+    private String tiedostonimi                 = "reseptit";
+    private Tietokanta tietokanta				= null;
     
     private static final Map<Integer, String> hintaVaihtoehdot;
     private static final Map<Integer, String> valmistusaikaVaihtoehdot;
@@ -104,14 +91,18 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
+     * #import kanta.SailoException;
+     * 
      * Resepti makaronilaatikko = new Resepti("Makaronilaatikko");
      * makaronilaatikko.toString() === "-1|Makaronilaatikko|-1|-1|-1|-1";
      * </pre>
      */
-    public Resepti(String nimi) {
+    public Resepti(String nimi) throws SailoException {
         setNimi(nimi);
         luoOsiot();
         luoVaihtoehtoAttribuutit();
+        alustaTietokanta();
     }
     
     
@@ -121,14 +112,16 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.toString() === "-1|Reseptin nimi|-1|-1|-1|-1";
      * </pre>
      */
-    public Resepti() {
+    public Resepti() throws SailoException {
         setNimi(null);
         luoOsiot();
         luoVaihtoehtoAttribuutit();
+        alustaTietokanta();
     }
     
     
@@ -145,82 +138,29 @@ public class Resepti {
     
     
     /**
-     * Luo reseptille id:n
+     * Alustaa reseptien tietokannan
      * 
-     * @return reseptin tunnus
-     * 
-     * @example
-     * Resepti lihapullat = new Resepti("Lihapullat");
-     * lihapullat.toString() === "-1|Lihapullat|-1|-1|-1|-1";
-     * int n = lihapullat.rekisteroiTunnus();
-     * 
-     * Resepti perunamuusi = new Resepti("Perunamuusi");
-     * perunamuusi.rekisteroiTunnus() === n + 1;
+     * @throws SailoException jos tietokannan alustamisessa ilmenee ongelmia
      */
-    private int rekisteroiTunnus() {
-        if (0 < this.reseptiId) return this.reseptiId; // jos on jo rekisteröity
+    private void alustaTietokanta() throws SailoException {
+        this.tietokanta = Tietokanta.alustaTietokanta(this.tiedostopolku + this.tiedostonimi);
         
-        this.reseptiId = Resepti.annettavaId;
-        this.osiot.setReseptiTunnus(this.reseptiId);
-        Resepti.annettavaId++;
-        return this.reseptiId;
-    }
-    
-    
-    /**
-     * Yrittää asettaa reseptille annetun tunnuksen
-     * 
-     * @param id mikä tunnus yritetään laittaa
-     * @return asetettu reseptin tunnus
-     */
-    private int rekisteroiTunnus(int id) {
-        if (0 < this.reseptiId) return this.reseptiId; // jos on jo rekisteröity
-        
-        if (Resepti.annettavaId < id) Resepti.annettavaId = id;
-        return rekisteroiTunnus();
-    }
-    
-    
-    /**
-     * Koittaa rekisteröidä annetun nimen.
-     * Jos onnistuu niin vaihtaa nykyisen nimen samaksi.
-     * 
-     * @param rekisteroitavaNimi mitä nimeä koitetaan rekisteröidä
-     * @return rekisteröity nimi
-     */
-    private String rekisteroiNimi(String rekisteroitavaNimi) {
-        // ei vaihda jos ei ole tallennettava tai sellainen on jo rekisteröity
-        if (!Validoi.onkoNimiTallennettavissa(rekisteroitavaNimi)) return this.rekisteroitynimi;
-        if (Resepti.rekisteroidytNimet.contains(rekisteroitavaNimi)) return this.rekisteroitynimi;
-        
-        this.rekisteroitynimi = rekisteroitavaNimi;
-        Resepti.rekisteroidytNimet.add(this.rekisteroitynimi);
-        setUusiNimi(this.rekisteroitynimi); // nimi vastaamaan rekisteröityä nimeä
-        
-        return this.rekisteroitynimi;
-    }
-    
-    
-    /**
-     * Koittaa rekisteröidä nykyisen reseptinimen
-     * 
-     * @return rekisteröity nimi
-     */
-    private String rekisteroiNimi() {
-        // ei tee mitään jos nimi on jo sama kuin rekisteröity
-        if (getNimi().equals(this.rekisteroitynimi)) return this.rekisteroitynimi;
-        
-        // poistaa nykyisen rekisteröidyn nimen ja rekisteröi uuden
-        poistaRekisteroidyistaNimista();
-        return rekisteroiNimi(this.getNimi());
-    }
-    
-    
-    /**
-     * Poistaa rekisteröidyn nimen luokan nimistä
-     */
-    private void poistaRekisteroidyistaNimista() {
-        Resepti.rekisteroidytNimet.remove(this.rekisteroitynimi);
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
+            // haetaan tietokannan metadatasta omaa tietokantaa, luodaan jos ei ole
+            DatabaseMetaData metadata = yhteys.getMetaData();
+            
+            try ( ResultSet taulu = metadata.getTables(null, null, "Reseptit", null)) {
+                // luodaan uusi taulu jos ei voida siirtyä seuraavaan
+                if ( !taulu.next() ) {
+                    try ( PreparedStatement sql = yhteys.prepareStatement(getLuontilauseke()) ) {
+                        sql.execute();
+                    }
+                }
+            }
+            
+        } catch ( SQLException exception ) {
+            throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa!");
+        }
     }
     
     
@@ -231,7 +171,17 @@ public class Resepti {
      */
     private void setID(int ID) {
     	this.reseptiId = ID;
-    	if (Resepti.annettavaId <= this.reseptiId) Resepti.annettavaId = this.reseptiId + 1;
+    	this.osiot.setReseptiTunnus(this.reseptiId);
+    }
+    
+    
+    /**
+     * Antaa reseptin tunnuksen
+     * 
+     * @return reseptin tunnus
+     */
+    public int getID() {
+    	return this.reseptiId;
     }
     
     
@@ -249,6 +199,19 @@ public class Resepti {
     }
     
     
+    /**
+     * Asettaa käytettävän tietokannan
+     * 
+     * @param tietokanta reseptin tietokanta
+     */
+    public void setTietokanta(Tietokanta tietokanta) {
+    	this.tietokanta = tietokanta;
+    }
+    
+    
+    /**
+     * Alustaa kaikki reseptin vaihtoehtoattribuutit
+     */
     private void luoVaihtoehtoAttribuutit() {
         this.hinta = new VaihtoehtoAttribuutti("Hinta", hintaVaihtoehdot);
         this.valmistusaika = new VaihtoehtoAttribuutti("Valmistusaika", valmistusaikaVaihtoehdot);
@@ -285,6 +248,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti pizza = new Resepti("Pizza");
      * pizza.toString() === "-1|Pizza|-1|-1|-1|-1";
      * 
@@ -317,6 +281,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti pizza = new Resepti("Pizza");
      * pizza.toString() === "-1|Pizza|-1|-1|-1|-1";
      * 
@@ -334,7 +299,6 @@ public class Resepti {
         // ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
         if (nimi == null || nimi.length() < 1) return;
         this.nimi = nimi;
-        this.muutettu = true;
     }
     
     
@@ -345,6 +309,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti pizza = new Resepti("Margarita pizza");
      * pizza.getNimi().equals("Margarita pizza") === true;
      * </pre>
@@ -362,6 +327,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti sampyla = new Resepti();
      * sampyla.getKuvaus() === "";
      * 
@@ -379,7 +345,6 @@ public class Resepti {
         }
         
         this.kuvaus = kuvaus;
-        this.muutettu = true;
     }
     
     
@@ -390,6 +355,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti sampyla = new Resepti();
      * sampyla.getKuvaus() === "";
      * 
@@ -412,6 +378,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.getTunnus() === -1;
      * </pre>
@@ -482,6 +449,28 @@ public class Resepti {
     
     
     /**
+     * Antaa reseptin tietojen päivityslausekkeen
+     * 
+     * @param yhteys tietokantayhteys
+     * @return päivityslauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ongelmia
+     */
+    public PreparedStatement getPaivityslauseke(Connection yhteys) throws SQLException {
+    	PreparedStatement sql = yhteys.prepareStatement("UPDATE Reseptit SET nimi = ?, kuvaus = ?, hinta = ?, valmistusaika = ?, tahdet = ?, vaativuus = ? WHERE resepti_id = ?");
+    	
+    	sql.setString(1, getNimi());
+    	sql.setString(2, getKuvaus());
+    	sql.setInt(3, getHinta());
+    	sql.setInt(4, getValmistusaika());
+    	sql.setInt(5, getTahdet());
+    	sql.setInt(6, getVaativuus());
+    	sql.setInt(7, getID());
+    	
+    	return sql;
+    }
+    
+    
+    /**
      * Parsii annetuista tiedoista omat tietonsa
      * 
      * @param tulokset mistä tiedot saadaan
@@ -490,54 +479,87 @@ public class Resepti {
     public void parse(ResultSet tulokset) throws SQLException {
     	setID(tulokset.getInt("resepti_id"));
         setUusiNimi(tulokset.getString("nimi"));
+        setHinta(tulokset.getInt("hinta"));
+        setValmistusaika(tulokset.getInt("valmistusaika"));
+        setTahdet(tulokset.getInt("tahdet"));
+        setVaativuus(tulokset.getInt("vaativuus"));
     }
     
     
     /**
-     * Asettaa tiedostopolun ja tallentaa
+     * Lisää reseptin tietokantaan
+     * 
+     * @throws SailoException jos lisäämisessä ilmenee ongelmia
+     */
+    public void lisaaTietokantaan() throws SailoException {
+    	// varmistaa että tietokanta on asetettu
+    	if (this.tietokanta == null) throw new SailoException("Reseptille ei ole vielä asetettu tietokantaa!");
+    	
+        // muodostaa yhteyden tietokantaan, muodostaa lisäyslausekkeen ja suorittaa
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = getLisayslauseke(yhteys) ) {
+            sql.executeUpdate();
+            
+            // tarkistetaan saiko uuden tunnuksen
+            try ( ResultSet tulokset = sql.getGeneratedKeys() ) {
+                tarkistaID(tulokset);
+            }
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia reseptin lisäyksessä tietokannan kanssa!");
+        }
+    }
+    
+    
+    /**
+     * Päivittää reseptin tietokannassa olevat tiedot
+     * 
+     * @throws SailoException jos päivittämisessä ilmenee ongelmia
+     */
+    public void paivitaTietokannassa() throws SailoException {
+    	// varmistaa että tietokanta on asetettu
+    	if (this.tietokanta == null) throw new SailoException("Reseptille ei ole vielä asetettu tietokantaa!");
+    	
+        // muodostaa yhteyden tietokantaan, muodostaa päivityslausekkeen ja suorittaa
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = getPaivityslauseke(yhteys) ) {
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia reseptin päivittämisessä tietokannan kanssa!");
+        }
+    }
+    
+    
+    /**
+     * Poistaa reseptin tietokannasta
+     * 
+     * @throws SailoException jos poistamisessa ilmenee ongelmia
+     */
+    public void poistaTietokannasta() throws SailoException {
+    	// varmistaa että tietokanta on asetettu
+    	if (this.tietokanta == null) throw new SailoException("Reseptille ei ole vielä asetettu tietokantaa!");
+    	
+        // muodostaa yhteyden tietokantaan, muodostaa poistolausekkeen ja suorittaa
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = getPoistolauseke(yhteys) ) {
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia reseptin poistossa tietokannan kanssa!");
+        }
+    }
+    
+    
+    /**
+     * Asettaa tiedostopolun.
+     * Ei tee mitään jos annetaan null.
      * 
      * @param tiedostopolku mihin polkuun tietoja tallennetaan ja luetaan
      * @throws SailoException jos polun vaihtamisessa tulee ongelmia
      */
-    public void setTiedostopolku(String tiedostopolku) throws SailoException {
-        // ei tee mitään jos null tai sama kuin oli
+    public void setTiedostopolku(String tiedostopolku) {
         if (tiedostopolku == null) return;
         
-        this.tiedostopolku = tiedostopolku; // esim. reseptidata/
-        
-        // luo tiedostopolun siltä varalta että sitä ei ole
-        File dir = new File(this.tiedostopolku);
-        dir.mkdirs();
-        
-        this.osiot.setTiedostoPolku(getAlihakemistoPolku()); // esim. reseptidata/Mustikkapiirakka/
-        this.muutettu = true;
-    }
-    
-    
-    /**
-     * Antaa reseptin alihakemistopolun. (muotoa "reseptidata/Reseptin nimi/")
-     * 
-     * @return alihakemistopolku
-     * 
-     * @example
-     * <pre name="test">
-     * #THROWS SailoException
-     * #import kanta.SailoException;
-     * 
-     * Resepti resepti = new Resepti();
-     * resepti.getAlihakemistoPolku() === "reseptidata/Reseptin nimi/";
-     * 
-     * resepti.setTiedostopolku("jälkiruokareseptit/");
-     * resepti.setUusiNimi("Suklaakakku");
-     * resepti.getAlihakemistoPolku() === "jälkiruokareseptit/Suklaakakku/";
-     * </pre>
-     */
-    public String getAlihakemistoPolku() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.tiedostopolku);
-        sb.append(getNimi());
-        sb.append("/");
-        return sb.toString();
+        this.tiedostopolku = tiedostopolku;
+        this.osiot.setTiedostoPolku(this.tiedostopolku);
     }
     
     
@@ -548,6 +570,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.getOsiot().equals(new Osiot()) === true;
      * 
@@ -571,6 +594,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.getOsiot().equals(new Osiot()) === true;
      * 
@@ -601,18 +625,10 @@ public class Resepti {
      * Vaihtaa reseptin hinnan.
      * Ei tee muutoksia jos hintaa ei löydy.
      * 
-     * @example
-     * <pre name="test">
-     * Resepti mokkapalat = new Resepti("Mokkapalat");
-     * mokkapalat.setHinta(2);
-     * mokkapalat.getHinta() === 2;
-     * </pre>
-     * 
      * @param hinta mikä hinta vaihtoehto halutaan asettaa
      */
     public void setHinta(int hinta) {
         this.hinta.setValinta(hinta);
-        this.muutettu = true;
     }
     
     
@@ -623,7 +639,6 @@ public class Resepti {
      */
     public void setValmistusaika(int valmistusaika) {
         this.valmistusaika.setValinta(valmistusaika);
-        this.muutettu = true;
     }
     
     
@@ -634,7 +649,6 @@ public class Resepti {
      */
     public void setTahdet(int tahdet) {
         this.tahdet.setValinta(tahdet);
-        this.muutettu = true;
     }
     
     
@@ -645,7 +659,6 @@ public class Resepti {
      */
     public void setVaativuus(int vaativuus) {
         this.vaativuus.setValinta(vaativuus);
-        this.muutettu = true;
     }
     
     
@@ -663,30 +676,6 @@ public class Resepti {
      * Antaa reseptin hinnan vaihtoehto vastaavana tekstinä.
      * 
      * @return reseptin hinta tekstimuodossa
-     * 
-     * @example
-     * <pre name="test">
-     * Resepti resepti = new Resepti();
-     * resepti.getHintaString() === "";
-     * 
-     * resepti.setHinta(0);
-     * resepti.getHintaString() === "";
-     * 
-     * resepti.setHinta(1);
-     * resepti.getHintaString() === "€";
-     * 
-     * resepti.setHinta(2);
-     * resepti.getHintaString() === "€€";
-     * 
-     * resepti.setHinta(3);
-     * resepti.getHintaString() === "€€€";
-     * 
-     * resepti.setHinta(4);
-     * resepti.getHintaString() === "€€€";
-     * 
-     * resepti.setHinta(-1);
-     * resepti.getHintaString() === "";
-     * </pre>
      */
     public String getHintaString() {
         return this.hinta.getValintaString();
@@ -762,6 +751,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti resepti = new Resepti("Kakku");
      * resepti.getTaulukkoMuodossa() === "Kakku||||";
      * </pre>
@@ -791,6 +781,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti resepti = new Resepti("Juustokakku");
      * resepti.onkoNimessa("kakku") === true;
      * resepti.onkoNimessa("KAKKU") === true;
@@ -816,125 +807,30 @@ public class Resepti {
     
     
     /**
-     * Kertoo onko reseptillä tallentamattomia muutoksia
+     * Tallentaa reseptin tiedot tietokantaan
      * 
-     * @return onko tallentamattomia muutoksia
+     * @throws SailoException jos tallentamisessa ilmenee ongelmia
      */
-    public boolean onkoTallentamattomiaMuutoksia() {
-        if (this.osiot.onkoTallentamattomiaMuutoksia()) return true;
-        return this.muutettu;
+    public void tallenna() throws SailoException {
+    	// lisää reseptin tietokantaan tai päivittää sitä tietokannassa
+    	if (this.reseptiId < 0) {
+    		lisaaTietokantaan();
+    	} else {
+    		paivitaTietokannassa();
+    	}
+    	
+    	// päivittää reseptin osiot
+    	this.osiot.tallenna();
     }
     
     
     /**
-     * Validoi voidaanko resepti tallentaa
-     * 
-     * @return virheteksti tai null jos voidaan tallentaa
-     */
-    public String voidaankoTallentaa() {
-        // kysytään osioilta
-        String osioVirhe = this.osiot.voidaankoTallentaa();
-        if (osioVirhe != null) return osioVirhe;
-        
-        // onko nimi ok
-        if (!rekisteroiNimi().equals(getNimi())) return "Reseptin nimeä ei voida tallentaa tai saman niminen resepti on jo olemassa!";
-        
-        return null;
-    }
-    
-    
-    /**
-     * Lukee reseptin tiedot tiedostosta
+     * Lukee reseptin sisältämät tiedot tietokannasta
      * 
      * @throws SailoException jos tietoja ei saada luettua
      */
     public void lueTiedostosta() throws SailoException {
-        this.osiot.setTiedostoPolku(getAlihakemistoPolku());
         this.osiot.lueTiedostosta();
-        this.muutettu = true;
-    }
-    
-    
-    /**
-     * Tallentaa reseptin tiedot tiedostoon
-     * 
-     * @throws SailoException jos tallentaminen epäonnistuu
-     */
-    public void tallenna() throws SailoException {
-        if (!onkoTallentamattomiaMuutoksia()) return;
-        
-        // tarkistestaan voidaanko tallentaa
-        String virhe = voidaankoTallentaa();
-        if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
-        
-        // antaa reseptille uniikin tunnuksen jos ollaan tallentamassa
-        if (this.reseptiId < 0) rekisteroiTunnus();
-        
-        File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
-        File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
-        
-        // koitetaan poistaa edellistä varmuuskopiota
-        // heitetään virhe jos sellainen on olemassa eikä voida poistaa
-        if (!varmuuskopio.delete() && varmuuskopio.exists()) {
-            throw new SailoException("Ei voida poistaa varmuuskopio-tiedostoa");
-        }
-        
-        // koitetaan luoda tiedosto jos sellaista ei vielä ole
-        if (!tiedosto.exists()) {
-            try {
-                tiedosto.createNewFile();
-            } catch (IOException exception) {
-                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
-            }
-        }
-        
-        // koitetaan nimetä olemassaoleva tiedosto varmuuskopioksi
-        if (!tiedosto.renameTo(varmuuskopio)) {
-            throw new SailoException("Ei voida nimetä uudelleen tallennus-tiedostoa");
-        }
-        
-        try (PrintWriter fo = new PrintWriter(new FileWriter(tiedosto.getCanonicalPath()))) {
-            
-            try (Scanner fi = new Scanner(new FileInputStream(varmuuskopio))) {
-                
-                boolean omatTiedotKirjoitettu = false;
-                
-                while (fi.hasNext()) {
-                    String rivi = fi.nextLine();
-                    
-                    // skipataan tyhjät ja kommenttirivit
-                    if (rivi.isBlank() || rivi.charAt(0) == ';') continue;
-                    
-                    // parsii rivin reseptiId:n, jos ei löydy niin asettaa arvoksi varmasti eri kuin nykyinen reseptiId
-                    StringBuilder riviTiedot = new StringBuilder(rivi);
-                    int rivinReseptiId = Mjonot.erotaInt(riviTiedot, this.reseptiId - 1);
-                    
-                    // syöttää alkuperäisen rivin, jos ei ole sama resepti mitä ollaan tallentamassa
-                    if (rivinReseptiId != this.reseptiId) {
-                        fo.println(rivi);
-                    } else {
-                        // ylikirjoittaa tiedot aiempien päälle
-                        tulostaOmatTiedot(fo);
-                        omatTiedotKirjoitettu = true;
-                    }
-                }
-                
-                // jos tietoja ei ylikirjoitettu
-                if (!omatTiedotKirjoitettu) {
-                    tulostaOmatTiedot(fo);
-                    omatTiedotKirjoitettu = true;
-                }
-            }
-        } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
-        } catch (IOException exception) {
-            throw new SailoException("Tiedostoon \"" + this.tiedostopolku + this.tiedostonimi + "\" kirjoittamisessa ongelma");
-        }
-        
-        // käskee osioita tallentamaan
-        this.osiot.setTiedostoPolku(getAlihakemistoPolku());
-        this.osiot.tallenna();
-        this.muutettu = false;
     }
     
     
@@ -967,6 +863,8 @@ public class Resepti {
      * @param rivi mistä reseptin tiedot yritetään parsia
      * 
      * @example
+     * <pre name="test">
+     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.parse("1|Mustikkapiirakka|halpa ja maukas.|2|2|3|1");
      * resepti.toString().endsWith("|Mustikkapiirakka|2|2|3|1") === true;
@@ -981,14 +879,15 @@ public class Resepti {
      * 
      * resepti.parse("5|Kasvispiirakka 1 3 2 2");
      * resepti.toString().endsWith("5|Kasvispiirakka|2|2|3|1");
+     * </pre>
      */
     public void parse(String rivi) {
         if (rivi == null || rivi.length() < 1) return;
         
         StringBuilder sb = new StringBuilder(rivi);
         
-        rekisteroiTunnus(Mjonot.erota(sb, '|', this.reseptiId));
-        rekisteroiNimi(Mjonot.erota(sb, '|', this.rekisteroitynimi));
+        setID((Mjonot.erota(sb, '|', this.reseptiId)));
+        setUusiNimi((Mjonot.erota(sb, '|', getNimi())));
         setKuvaus(Mjonot.erota(sb, '|', getKuvaus()));
         setHinta(Mjonot.erota(sb, '|', getHinta()));
         setValmistusaika(Mjonot.erota(sb, '|', getValmistusaika()));
@@ -1004,6 +903,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti pizza = new Resepti("Pizza");
      * pizza.setKuvaus("Itsetehdyllä tomaattikastikkeella.");
      * pizza.setHinta(3);
@@ -1030,19 +930,21 @@ public class Resepti {
      */
     @Override
     public Resepti clone() {
-        Resepti kopio = new Resepti();
-        kopio.reseptiId = this.reseptiId;
-        kopio.rekisteroitynimi = this.rekisteroitynimi;
-        kopio.setUusiNimi(this.getNimi());
-        kopio.setHinta(this.getHinta());
-        kopio.setValmistusaika(this.getValmistusaika());
-        kopio.setTahdet(this.getTahdet());
-        kopio.setVaativuus(this.getVaativuus());
-        kopio.setKuvaus(this.getKuvaus());
-        
-        // luodaan täysi kopio reseptin osioista
-        kopio.osiot = this.osiot.clone();
-        
+    	Resepti kopio = null;
+    	try {
+    		kopio = new Resepti();
+            kopio.reseptiId = this.reseptiId;
+            kopio.setUusiNimi(getNimi());
+            kopio.setHinta(getHinta());
+            kopio.setValmistusaika(getValmistusaika());
+            kopio.setTahdet(getTahdet());
+            kopio.setVaativuus(getVaativuus());
+            kopio.setKuvaus(getKuvaus());
+            kopio.osiot = this.osiot.clone();
+            
+    	} catch (SailoException exception) {
+    		System.err.println(exception.getMessage());
+    	}
         return kopio;
     }
     
@@ -1055,6 +957,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti pizza1 = new Resepti("Pizza");
      * pizza1.setKuvaus("Pizzaa.");
      * pizza1.setHinta(1);
@@ -1096,6 +999,8 @@ public class Resepti {
         Resepti verrattavaResepti = (Resepti)verrattava;
         
         if (!this.getNimi().equals(verrattavaResepti.getNimi())) return false;
+        if (!this.tiedostopolku.equals(verrattavaResepti.tiedostopolku)) return false;
+        if (!this.tiedostonimi.equals(verrattavaResepti.tiedostonimi)) return false;
         if (this.getHinta() != verrattavaResepti.getHinta()) return false;
         if (this.getValmistusaika() != verrattavaResepti.getValmistusaika()) return false;
         if (this.getTahdet() != verrattavaResepti.getTahdet()) return false;
@@ -1113,6 +1018,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti mustikkapiirakka = new Resepti("Mustikkapiirakka");
      * Resepti piirakka = new Resepti("Piirakka");
      * mustikkapiirakka.hashCode() == piirakka.hashCode() === false;
@@ -1145,7 +1051,7 @@ public class Resepti {
      */
     public int hashCode() {
         int hash = 1;
-        hash = Hajautus.hajautusObject(hash, this.nimi, this.kuvaus);
+        hash = Hajautus.hajautusObject(hash, this.nimi, this.kuvaus, this.tiedostopolku, this.tiedostonimi);
         hash = Hajautus.hajautusInt(hash, this.reseptiId, this.getHinta(), this.getValmistusaika(), this.getTahdet(), this.getVaativuus(), this.osiot.hashCode());
         return hash;
     }
@@ -1158,6 +1064,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti mustikkapiirakka = new Resepti("");
      * mustikkapiirakka.luoMustikkapiirakka();
      * mustikkapiirakka.toString() === "-1|Mustikkapiirakka|2|2|3|1";
@@ -1175,12 +1082,10 @@ public class Resepti {
     
     
     /**
-     * Arpoo attribuutit id, hinta, valmistusaika, tähdet ja vaativuus reseptille testaamista varten.
+     * Arpoo attribuutit hinta, valmistusaika, tähdet ja vaativuus reseptille testaamista varten.
      * TODO: poista kun ei enää tarvita
      */
     public void satunnaisetAttribuutit() {
-        rekisteroiTunnus();
-        
         setHinta(Satunnaisluku.rand(1, 3));
         setValmistusaika(Satunnaisluku.rand(1, 5));
         setTahdet(Satunnaisluku.rand(1, 5));
@@ -1194,6 +1099,7 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Resepti lihapiirakka = new Resepti("Lihapiirakka");
      * lihapiirakka.toString() === "-1|Lihapiirakka|-1|-1|-1|-1";
      * </pre>
@@ -1221,27 +1127,13 @@ public class Resepti {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
-        Resepti lihapiirakka = new Resepti("Lihapiirakka");
-        lihapiirakka.setTahdet(2);
-        lihapiirakka.setKuvaus("Helppo ja hyvä");
-        System.out.println(lihapiirakka);
-        System.out.println(lihapiirakka.getKuvaus());
-        
-        Resepti mustikkapiirakka = new Resepti("");
-        mustikkapiirakka.luoMustikkapiirakka();
-        System.out.println(mustikkapiirakka);
-        System.out.println(mustikkapiirakka.getKuvaus());
-        
-        System.out.println(mustikkapiirakka.rekisteroiTunnus());
-        System.out.println(mustikkapiirakka);
-        
-        lihapiirakka.rekisteroiTunnus();
-        System.out.println(lihapiirakka);
-        
-        try {
-            lihapiirakka.tallenna();
-        } catch (SailoException e) {
-            System.out.println(e.getMessage());
-        }
+    	try {
+    		Resepti lihapiirakka = new Resepti("Lihapiirakka");
+            lihapiirakka.setTahdet(2);
+            lihapiirakka.setKuvaus("Helppo ja hyvä");
+            
+    	} catch (SailoException exception) {
+    		System.err.println(exception.getMessage());
+    	}
     }
 }

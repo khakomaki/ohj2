@@ -332,10 +332,11 @@ public class Osio {
      * @throws SQLException jos lausekkeen muodostamisessa ilmenee ongelmia
      */
     public PreparedStatement getPaivityslauseke(Connection yhteys) throws SQLException {
-    	PreparedStatement sql = yhteys.prepareStatement("UPDATE Osiot SET osio_id = ?, nimi = ?");
+    	PreparedStatement sql = yhteys.prepareStatement("UPDATE Osiot SET resepti_id = ?, nimi = ? WHERE osio_id = ?");
     	
-    	sql.setInt(1, this.osioId);
+    	sql.setInt(1, this.reseptiID);
     	sql.setString(2, this.nimi);
+    	sql.setInt(3, this.osioId);
     	
     	return sql;
     }

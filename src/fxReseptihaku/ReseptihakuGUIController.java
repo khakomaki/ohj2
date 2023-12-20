@@ -1,6 +1,5 @@
 package fxReseptihaku;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -397,8 +396,9 @@ public class ReseptihakuGUIController implements Initializable {
      */
     public void lueTiedostosta() {
         try {
-            // this.reseptit.lueTiedostosta();
+            this.reseptit.lueTiedostosta();
             // TODO testidata pois kuin ei enää tarvita
+        	/*
             File reseptidata = new File("reseptidata/");
             if (!reseptidata.exists()) {
                 this.reseptit.setTiedostoPolku("testidata/");
@@ -409,6 +409,7 @@ public class ReseptihakuGUIController implements Initializable {
                 this.reseptit.setTiedostoPolku("reseptidata/");
                 this.reseptit.lueTiedostosta();
             }
+            */
         } catch (SailoException exception) {
             Dialogs.showMessageDialog("Tiedoston lukemisessa ongelmia: " + exception.getMessage());
         }

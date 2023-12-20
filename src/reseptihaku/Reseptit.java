@@ -1,9 +1,5 @@
 package reseptihaku;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.sql.Connection;
@@ -16,14 +12,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 
 import kanta.Hajautus;
 import kanta.Hallitsija;
-import kanta.MerkkijonoKasittely;
 import kanta.SailoException;
 import kanta.VaihtoehtoAttribuutti;
-import kanta.Validoi;
 
 /**
  * @author hakom
@@ -32,63 +25,52 @@ import kanta.Validoi;
  * Reseptit hallitsee resepti-olioita.
  */
 public class Reseptit implements Hallitsija<Resepti> {
-    /**
-     * Alustukset testejä varten
-     * 
-     * @example
-     * <pre name="testJAVA">
-     * private Reseptit kaikkiReseptit;
-     * private String tiedNimi;
-     * private File tiedosto;
-     * 
-     * @Before
-     * public void alusta() throws SailoException {
-     *     tiedNimi = "testiReseptit";
-     *     tiedosto = new File(tiedNimi + ".db");
-     *     tiedosto.delete();
-     *     kaikkiReseptit = new Reseptit(tiedNimi);
-     * }
-     * 
-     * @After
-     * public void siivoa() {
-     *     tiedosto.delete();
-     * }
-     * </pre>
-     */
 
-    private List<Resepti> reseptit      = new ArrayList<Resepti>();
-    private String tiedostonimi         = "reseptit.dat";
-    private String tiedostopolku        = "reseptidata/";
-    private int lkm                     = 0;
+    private List<Resepti> reseptit	= new ArrayList<Resepti>();
+    private String tiedostonimi     = "reseptit";
+    private String tiedostopolku    = "reseptidata/";
+    private Tietokanta tietokanta 	= null;
     
-    private final static Resepti esimerkkiresepti 	= new Resepti();
-    private Tietokanta tietokanta 					= null;
+    private final static Resepti esimerkkiresepti;
     
-    /**
-     * Reseptit.
-     * Hallitsee yksittäisiä reseptejä.
-     * 
-     * Alustaa tallennustiedoston nimellä "reseptit.dat".
-     * 
-     * @example
-     * <pre name="test">
-     * Reseptit reseptit = new Reseptit();
-     * reseptit.toString() === "0|reseptit.dat";
-     * </pre>
-     */
-    public Reseptit() {
-        //
+    // alustetaan esimerkkiresepti joka voi heittää virheen
+    static {
+    	Resepti esimResepti = null;
+    	
+    	try {
+    		esimResepti = new Resepti();
+    	} catch (SailoException exception) {
+    		System.err.println(exception.getMessage());
+    	}
+    	
+    	esimerkkiresepti = esimResepti;
     }
     
     
     /**
-     * Hallitsee tietokannassa sijaitsevia Resepti-olioita
+     * Hallitsee resepti-olioita
      * 
-     * @param tietokantaNimi tietokannan nimi
-     * @throws SailoException jos tulee ongelmia
+     * @example
+     * <pre name="test">
+     * #THROWS SailoException
+     * #import kanta.SailoException;
+     * 
+     * Reseptit reseptit = new Reseptit();
+     * reseptit.toString() === "0|reseptit";
+     * </pre>
      */
-    public Reseptit(String tietokantaNimi) throws SailoException {
-        this.tietokanta = Tietokanta.alustaTietokanta(tietokantaNimi);
+    public Reseptit() throws SailoException {
+        alustaTietokanta();
+    }
+    
+    
+    /**
+     * Alustaa reseptien tietokannan
+     * 
+     * @throws SailoException jos tietokannan alustamisessa ilmenee ongelmia
+     */
+    private void alustaTietokanta() throws SailoException {
+        this.tietokanta = Tietokanta.alustaTietokanta(this.tiedostopolku + this.tiedostonimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
             // haetaan tietokannan metadatasta omaa tietokantaa, luodaan jos ei ole
@@ -97,14 +79,14 @@ public class Reseptit implements Hallitsija<Resepti> {
             try ( ResultSet taulu = metadata.getTables(null, null, "Reseptit", null)) {
                 // luodaan uusi taulu jos ei voida siirtyä seuraavaan
                 if ( !taulu.next() ) {
-                    try ( PreparedStatement sql = yhteys.prepareStatement(esimerkkiresepti.getLuontilauseke()) ) {
+                    try ( PreparedStatement sql = yhteys.prepareStatement(Reseptit.esimerkkiresepti.getLuontilauseke()) ) {
                         sql.execute();
                     }
                 }
             }
             
         } catch ( SQLException exception ) {
-            throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa: " + exception.getMessage());
+            throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa!");
         }
     }
     
@@ -117,11 +99,12 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit = new Reseptit();
-     * reseptit.toString() === "0|reseptit.dat";
+     * reseptit.toString() === "0|reseptit";
      * 
      * reseptit.setTiedostoNimi("");
-     * reseptit.toString() === "0|reseptit.dat";
+     * reseptit.toString() === "0|reseptit";
      * 
      * reseptit.setTiedostoNimi("salaiset_reseptit.txt");
      * reseptit.toString() === "0|salaiset_reseptit.txt";
@@ -139,21 +122,16 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
-     * Asettaa reseptin tallennus polun
+     * Asettaa reseptin tallennuspolun.
+     * Ei tee mitään jos annettu null.
      * 
      * @param tiedostopolku mihin reseptit tallennetaan
      * @throws SailoException jos polun asettaminen aiheuttaa ongelmia
      */
-    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
-        // ei tee mitään jos null tai sama kuin oli
-        if (tiedostopolku == null) return;
-        
-        this.tiedostopolku = tiedostopolku; // esim. reseptidata/
-        
-        // luo tiedostopolun siltä varalta että sitä ei ole
-        File dir = new File(this.tiedostopolku);
-        dir.mkdirs();
-        
+    public void setTiedostoPolku(String tiedostopolku) {
+        if (tiedostopolku == null) return;        
+        this.tiedostopolku = tiedostopolku;
+
         for (Resepti resepti : this.reseptit) {
             resepti.setTiedostopolku(this.tiedostopolku);
         }
@@ -169,21 +147,22 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit = new Reseptit();
      * Resepti resepti1 = reseptit.lisaa("Mustikkapiirakka");
      * Resepti resepti2 = reseptit.lisaa("Lihapiirakka");
      * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
-     * reseptit.toString() === "3|reseptit.dat";
+     * reseptit.toString() === "3|reseptit";
      * 
      * reseptit.anna(0).equals(resepti1) === true
      * reseptit.anna(1).equals(resepti2) === true;
      * reseptit.anna(2).equals(resepti3) === true;
      * </pre>
      */
-    public Resepti lisaa(String nimi) {
+    public Resepti lisaa(String nimi) throws SailoException {
         Resepti resepti = new Resepti(nimi);
+        resepti.setTiedostopolku(this.tiedostopolku);
         reseptit.add(resepti);
-        this.lkm++;
         return resepti;
     }
     
@@ -196,22 +175,23 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit = new Reseptit();
      * 
      * Resepti mustikkapiirakka = new Resepti("Mustikkapiirakka");
      * reseptit.lisaa(mustikkapiirakka);
-     * reseptit.toString() === "1|reseptit.dat";
+     * reseptit.toString() === "1|reseptit";
      * 
      * reseptit.lisaa(new Resepti());
-     * reseptit.toString() === "2|reseptit.dat";
+     * reseptit.toString() === "2|reseptit";
      * </pre>
      */
     @Override
     public void lisaa(Resepti resepti) {
         if (resepti == null) return;
-        Resepti lisattavaResepti = resepti;
-        reseptit.add(lisattavaResepti);
-        this.lkm++;
+        resepti.setTietokanta(this.tietokanta);
+        resepti.setTiedostopolku(this.tiedostopolku);
+        reseptit.add(resepti);
     }
     
     
@@ -221,44 +201,11 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @param resepti lisättävä resepti
      * 
      * @throws SailoException jos lisäämisen kanssa tulee ongelmia
-     * 
-     * @example
-     * <pre name="test">
-     * #THROWS SailoException
-     * #import java.io.*;
-     * #import java.util.*;
-     * #import kanta.SailoException;
-     * 
-     * Collection<Resepti> loytyneetReseptit = kaikkiReseptit.get();
-     * loytyneetReseptit.size() === 0;
-     * 
-     * Resepti resepti1 = new Resepti("Mustikkapiirakka");
-     * Resepti resepti2 = new Resepti("Mustikkamuffinit");
-     * 
-     * kaikkiReseptit.lisaaResepti(resepti1);
-     * kaikkiReseptit.lisaaResepti(resepti2);
-     * loytyneetReseptit = kaikkiReseptit.get();
-     * loytyneetReseptit.size() === 2;
-     * 
-     * kaikkiReseptit.poistaResepti(resepti1);
-     * loytyneetReseptit = kaikkiReseptit.get();
-     * loytyneetReseptit.size() === 1;
-     * </pre>
      */
     public void lisaaResepti(Resepti resepti) throws SailoException {
-        
-        // muodostaa yhteyden tietokantaan, pyytää reseptiltä lisäyslausekkeen ja suorittaa
-        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = resepti.getLisayslauseke(yhteys) ) {
-            sql.executeUpdate();
-            
-            // tarkistetaan saiko resepti uuden tunnuksen
-            try ( ResultSet tulokset = sql.getGeneratedKeys() ) {
-                resepti.tarkistaID(tulokset);
-             }
-            
-        } catch (SQLException exception) {
-            throw new SailoException("Ongelmia lisäyksessä tietokannan kanssa: " + exception.getMessage());
-        }
+    	resepti.setTietokanta(this.tietokanta);
+        resepti.lisaaTietokantaan();
+        this.reseptit.add(resepti);
     }
     
     
@@ -283,25 +230,20 @@ public class Reseptit implements Hallitsija<Resepti> {
             return loydetytReseptit;
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia reseptien haussa tietokannan kanssa: " + exception.getMessage());
+            throw new SailoException("Ongelmia reseptien haussa tietokannan kanssa!");
         }
     }
     
     
     /**
-     * Poistaa annetun reseptin
+     * Poistaa annetun reseptin tietokannasta ja resepteistä
      * 
      * @param resepti poistettava resepti
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
     public void poistaResepti(Resepti resepti) throws SailoException {
-        // muodostaa yhteyden tietokantaan, pyytää osiolta poistolausekkeen ja suorittaa
-        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = resepti.getPoistolauseke(yhteys) ) {
-            sql.executeUpdate();
-            
-        } catch (SQLException exception) {
-            throw new SailoException("Ongelmia poistossa tietokannan kanssa: " + exception.getMessage());
-        }
+    	resepti.poistaTietokannasta();
+    	this.reseptit.remove(resepti);
     }
     
     
@@ -311,7 +253,14 @@ public class Reseptit implements Hallitsija<Resepti> {
      */
     @Override
     public Resepti luo() {
-        return new Resepti();
+    	Resepti resepti = null;
+    	try {
+    		resepti = new Resepti();
+    	} catch (SailoException exception) {
+    		System.err.println(exception.getMessage());
+    	}
+    	
+        return resepti;
     }
     
     
@@ -324,11 +273,12 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit = new Reseptit();
      * Resepti resepti1 = reseptit.lisaa("Mustikkapiirakka");
      * Resepti resepti2 = reseptit.lisaa("Lihapiirakka");
      * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
-     * reseptit.toString() === "3|reseptit.dat";
+     * reseptit.toString() === "3|reseptit";
      * 
      * reseptit.anna(-1) == null === true;
      * reseptit.anna(0) == resepti1 === true;
@@ -337,7 +287,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * </pre>
      */
     public Resepti anna(int indeksi) {
-        if (indeksi < 0 || this.lkm < indeksi) return null;
+        if (indeksi < 0 || this.reseptit.size() < indeksi) return null;
         return reseptit.get(indeksi);
     }
     
@@ -360,6 +310,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit = new Reseptit();
      * Resepti resepti1 = reseptit.lisaa("Mustikkapiirakka");
      * Resepti resepti2 = reseptit.lisaa("Lihapiirakka");
@@ -391,14 +342,15 @@ public class Reseptit implements Hallitsija<Resepti> {
     public void vaihdaResepti(Resepti vanhaResepti, Resepti uusiResepti) {
         if (vanhaResepti == null || uusiResepti == null) return;
         
-        // varmistaa että uusi resepti käyttää samaa Ainesosat-viitettä kuin luokka
-        Resepti vaihdettavaResepti = uusiResepti;
-        
         // etsii vaihdettavan indeksin, poistuu jos ei löydy
         int vanhaReseptiIndeksi = this.reseptit.indexOf(vanhaResepti);
         if (vanhaReseptiIndeksi < 0) return;
         
-        this.reseptit.set(vanhaReseptiIndeksi, vaihdettavaResepti);
+        // varmistaa tiedostopolun ja tietokannan olevan samoja
+        uusiResepti.setTietokanta(this.tietokanta);
+        uusiResepti.setTiedostopolku(this.tiedostopolku);
+        
+        this.reseptit.set(vanhaReseptiIndeksi, uusiResepti);
     }
     
     
@@ -415,7 +367,7 @@ public class Reseptit implements Hallitsija<Resepti> {
         if (maara < 0) return;
         
         // tulostaa lukumäärän verran jos annettu määrä olisi enemmän
-        if (this.lkm < maara) tulostettavaMaara = this.lkm;
+        if (this.reseptit.size() < maara) tulostettavaMaara = this.reseptit.size();
         
         PrintStream out = new PrintStream(os);
         for (int i = 0; i < tulostettavaMaara; i++) {
@@ -431,7 +383,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @param os tietovirta johon halutaan tulostaa
      */
     public void tulostaReseptit(OutputStream os) {
-        tulostaReseptit(os, this.lkm);
+        tulostaReseptit(os, this.reseptit.size());
     }
     
     
@@ -442,29 +394,30 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit = new Reseptit();
      * Resepti resepti1 = reseptit.lisaa("Mustikkapiirakka");
      * Resepti resepti2 = reseptit.lisaa("Lihapiirakka");
      * Resepti resepti3 = reseptit.lisaa("Kinkkupiirakka");
-     * reseptit.toString() === "3|reseptit.dat";
+     * reseptit.toString() === "3|reseptit";
      * 
      * reseptit.poista(resepti2);
-     * reseptit.toString() === "2|reseptit.dat";
+     * reseptit.toString() === "2|reseptit";
      * 
      * reseptit.poista(null);
-     * reseptit.toString() === "2|reseptit.dat";
+     * reseptit.toString() === "2|reseptit";
      * 
      * reseptit.poista(resepti1);
-     * reseptit.toString() === "1|reseptit.dat";
+     * reseptit.toString() === "1|reseptit";
      * 
      * reseptit.poista(resepti1);
-     * reseptit.toString() === "1|reseptit.dat";
+     * reseptit.toString() === "1|reseptit";
      * 
      * reseptit.poista(resepti3);
-     * reseptit.toString() === "0|reseptit.dat";
+     * reseptit.toString() === "0|reseptit";
      * 
      * reseptit.poista(resepti1);
-     * reseptit.toString() === "0|reseptit.dat";
+     * reseptit.toString() === "0|reseptit";
      * </pre>
      */
     @Override
@@ -475,7 +428,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         if (poistettavanIndeksi < 0) return;
         
         this.reseptit.remove(poistettavanIndeksi);
-        this.lkm--;
     }
     
     
@@ -655,114 +607,55 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
-     * Validoi voidaanko resepti tallentaa
-     * 
-     * @return virheteksti tai null jos voidaan tallentaa
-     */
-    public String voidaankoTallentaa() {
-        // samoja reseptin nimiä varten
-        List<String> reseptiNimet = new ArrayList<String>();
-        
-        // kysytään resepteiltä
-        for (Resepti resepti : this.reseptit) {
-            String virhe = resepti.voidaankoTallentaa();
-            if (virhe != null) return virhe;
-            reseptiNimet.add(resepti.getNimi());
-        }
-        if (Validoi.onkoDuplikaatteja(reseptiNimet)) return "Sama reseptin nimi useaan kertaan!";
-        
-        return null;
-    }
-    
-    
-    /**
-     * Lukee Reseptien tiedot tiedostosta
-     * 
-     * @throws SailoException jos tallennus epäonnistuu
-     */
-    public void lueTiedostosta() throws SailoException {
-        try (Scanner fi = new Scanner(new FileInputStream(new File(this.tiedostopolku + this.tiedostonimi)))) {
-            while (fi.hasNext()) {
-                String rivi = fi.nextLine().strip();
-                
-                // skipataan tyhjät ja kommenttirivit
-                if (rivi.length() < 0 || rivi.charAt(0) == ';') continue;
-                
-                // käsketään reseptiä parsimaan tiedot ja lisätään nykyisiin resepteihin
-                Resepti resepti = new Resepti();
-                resepti.parse(rivi);
-                lisaa(resepti);
-                
-                // käsketään reseptin lukemaan tietonsa
-                resepti.setTiedostopolku(this.tiedostopolku);
-                resepti.lueTiedostosta();
-            }
-            
-        } catch (FileNotFoundException exception) {
-            throw new SailoException("Tiedostoa \"" + this.tiedostopolku + this.tiedostonimi + "\" ei saada avattua");
-        }
-    }
-    
-    
-    /**
-     * Tallentaa reseptien tiedot tiedostoon
-     * 
-     * @throws SailoException jos tallentaminen epäonnistuu
-     */
-    public void tallenna() throws SailoException {
-        
-        // tarkitestaan voidaanko tallentaa
-        String virhe = voidaankoTallentaa();
-        if (virhe != null) throw new SailoException("Ei voida tallentaa: " + virhe);
-        
-        // vaihdetaan nykyinen tiedosto varmuuskopioksi
-        File tiedosto = new File(this.tiedostopolku + this.tiedostonimi);
-        File varmuuskopio = new File(this.tiedostopolku + MerkkijonoKasittely.vaihdaTiedostopaate(this.tiedostonimi, "bak"));
-        // koitetaan poistaa edellistä varmuuskopiota
-        // heitetään virhe jos sellainen on olemassa eikä voida poistaa
-        if (!varmuuskopio.delete() && varmuuskopio.exists()) {
-            throw new SailoException("Ei voida poistaa varmuuskopio-tiedostoa");
-        }
-        // koitetaan luoda tiedosto jos sellaista ei vielä ole
-        if (!tiedosto.exists()) {
-            try {
-                tiedosto.createNewFile();
-            } catch (IOException exception) {
-                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
-            }
-        }
-        // koitetaan nimetä olemassaoleva tiedosto varmuuskopioksi
-        if (!tiedosto.renameTo(varmuuskopio)) {
-            throw new SailoException("Ei voida nimetä uudelleen tallennus-tiedostoa");
-        }
-        
-        boolean tallennustiedostoLuotu = false;
-        for (Resepti resepti : this.reseptit) {
-            resepti.tallenna();
-            tallennustiedostoLuotu = true;
-        }
-        
-        // luodaan tyhjä tallennustiedosto jos ei ollut yhtään reseptiä joka loisi tiedoston
-        if (!tallennustiedostoLuotu) {
-            try {
-                tiedosto.createNewFile();
-            } catch (IOException exception) {
-                throw new SailoException("Ei voida luoda tallennus-tiedostoa");
-            }
-        }
-    }
-    
-    
-    /**
      * Luo lisää mustikkapiirakan resepteihin testaamista varten.
      * TODO: poista kun ei enää tarvita
      * @return mustikkapiirakka resepti
      */
-    public Resepti lisaaMustikkapiirakka() {
+    public Resepti lisaaMustikkapiirakka() throws SailoException {
         Resepti mustikkapiirakka = new Resepti("");
         mustikkapiirakka.luoMustikkapiirakka();
         lisaa(mustikkapiirakka);
         return mustikkapiirakka;
+    }
+    
+    
+    /**
+     * Tallentaa reseptit tietokantaan
+     * 
+     * @throws SailoException jos tallentamisessa ilmenee ongelmia
+     */
+    public void tallenna() throws SailoException {
+    	for (Resepti resepti : this.reseptit) {
+    		resepti.tallenna();
+    	}
+    }
+    
+    
+    /**
+     * Lukee reseptien tiedot tietokannasta
+     * 
+     * @throws SailoException jos tietojen lukemisessa ilmenee ongelmia
+     */
+    public void lueTiedostosta() throws SailoException {
+        try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Reseptit") ) {
+            
+            // luodaan sql-kyselyn tulosten verran resepti-olioita
+            try ( ResultSet tulokset = sql.executeQuery() ) {
+                while (tulokset.next()) {
+                    Resepti resepti = new Resepti();
+                    resepti.parse(tulokset);
+                    this.reseptit.add(resepti);
+                }
+            }
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia reseptien lukemisessa tietokannan kanssa!");
+        }
+        
+        // lukee osioiden omat tiedot tietokannasta
+        for (Resepti resepti : this.reseptit) {
+        	resepti.lueTiedostosta();
+        }
     }
     
     
@@ -772,28 +665,33 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit = new Reseptit();
      * reseptit.lisaa(new Resepti("Mustikkapiirakka"));
      * reseptit.lisaa(new Resepti("Juustokakku"));
-     * reseptit.toString() === "2|reseptit.dat";
+     * reseptit.toString() === "2|reseptit";
      * 
      * Reseptit reseptitKopio = reseptit.clone();
-     * reseptitKopio.toString() === "2|reseptit.dat";
+     * reseptitKopio.toString() === "2|reseptit";
      * 
      * reseptit.setTiedostoNimi("herkut.txt");
      * reseptit.toString() === "2|herkut.txt";
-     * reseptitKopio.toString() === "2|reseptit.dat";
+     * reseptitKopio.toString() === "2|reseptit";
      * </pre>
      */
     public Reseptit clone() {
-        Reseptit kopio = new Reseptit();
-        kopio.lkm = this.lkm;
-        kopio.tiedostonimi = this.tiedostonimi;
-        
-        // kopioidaan kaikki yksittäiset reseptit kopioon
-        for (int i = 0; i < this.lkm; i++) {
-            kopio.reseptit.add(this.reseptit.get(i).clone());
-        }
+    	Reseptit kopio = null;
+    	
+    	try {
+    		kopio = new Reseptit();
+            kopio.tiedostonimi = this.tiedostonimi;
+            for (Resepti resepti : this.reseptit) {
+                kopio.reseptit.add(resepti.clone());
+            }
+            
+    	} catch (SailoException exception) {
+    		System.err.println(exception.getMessage());
+    	}
         
         return kopio;
     }
@@ -805,6 +703,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit1 = new Reseptit();
      * Reseptit reseptit2 = new Reseptit();
      * reseptit1.equals(reseptit2) === true;
@@ -830,11 +729,12 @@ public class Reseptit implements Hallitsija<Resepti> {
         if (verrattava.getClass() != this.getClass()) return false;
         Reseptit verrattavaReseptit = (Reseptit)verrattava;
         
-        if (verrattavaReseptit.lkm != this.lkm) return false;
+        if (verrattavaReseptit.reseptit.size() != this.reseptit.size()) return false;
+        if (!verrattavaReseptit.tiedostopolku.equals(this.tiedostopolku)) return false;
         if (!verrattavaReseptit.tiedostonimi.equals(this.tiedostonimi)) return false;
         
         // verrataan yksittäisiä reseptejä toisiinsa
-        for (int i = 0; i < this.lkm; i++) {
+        for (int i = 0; i < this.reseptit.size(); i++) {
             if (!verrattavaReseptit.reseptit.get(i).equals(this.reseptit.get(i))) return false;
         }
         
@@ -848,6 +748,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit1 = new Reseptit();
      * Reseptit reseptit2 = new Reseptit();
      * reseptit1.hashCode() == reseptit2.hashCode() === true;
@@ -870,7 +771,6 @@ public class Reseptit implements Hallitsija<Resepti> {
     public int hashCode() {
         int hash = 1;
         hash = Hajautus.hajautus(hash, this.tiedostonimi);
-        hash = Hajautus.hajautus(hash, this.lkm);
         
         for (Resepti resepti : this.reseptit) {
             hash = Hajautus.hajautus(hash, resepti.hashCode());
@@ -886,13 +786,14 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @example
      * <pre name="test">
+     * #THROWS SailoException
      * Reseptit reseptit = new Reseptit();
-     * reseptit.toString() === "0|reseptit.dat";
+     * reseptit.toString() === "0|reseptit";
      * </pre>
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.lkm);
+        sb.append(this.reseptit.size());
         sb.append('|');
         sb.append(this.tiedostonimi);
         return sb.toString();
@@ -905,98 +806,76 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
-    	try {
-			Reseptit reseptit = new Reseptit("testidb");
-			
-			Resepti resepti1 = new Resepti("Mansikkakakku");
-			Resepti resepti2 = new Resepti("Juustokakku");
-			reseptit.lisaaResepti(resepti1);
-			reseptit.lisaaResepti(resepti2);
-			System.out.println(reseptit.get());
-			
-			reseptit.poistaResepti(resepti1);
-			System.out.println(reseptit.get());
-			
-		} catch (SailoException exception) {
-			System.err.println(exception.getMessage());
-		}
-    	
-    	/*
-        Reseptit reseptit = new Reseptit();
         try {
-            reseptit.setTiedostoPolku("lisääReseptejä/");
-        } catch (SailoException e) {
-            e.printStackTrace();
-        }
-        
-        Resepti kinkkukiusaus = new Resepti("Kinkkukiusaus");
-        Osio valmistus = new Osio("Valmistus");
-        valmistus.lisaaAinesosa("Pakaste peruna-sipuli sekoitusta", "1kg");
-        valmistus.lisaaAinesosa("Kinkkusuikaleita", "150g");
-        valmistus.lisaaAinesosa("Suolaa", "1tl");
-        valmistus.lisaaAinesosa("Mustapippuria", "1tl");
-        valmistus.lisaaAinesosa("Ruokakermaa", "2 prk");
-        valmistus.lisaaOhje("Kaada osa pakastesekoituksesta vuokaan");
-        valmistus.lisaaOhje("Levitä kinkkusuikaleet vuokaan");
-        valmistus.lisaaOhje("Kaada loput pakastesekoituksesta vuokaan");
-        valmistus.lisaaOhje("Lisää mausteet ja ruokakerma");
-        valmistus.lisaaOhje("Paista 200°C noin 1h");
-        kinkkukiusaus.lisaaOsio(valmistus);
-        kinkkukiusaus.setKuvaus("Halpaa arkiruokaa pienellä vaivalla");
-        kinkkukiusaus.setTahdet(1);
-        kinkkukiusaus.setValmistusaika(3);
-        reseptit.lisaa(kinkkukiusaus);
-        
-        Resepti lihapullat = new Resepti("Lihapullat");
-        Osio valmistusLihap = new Osio("Valmistus");
-        valmistusLihap.lisaaAinesosa("jauhelihaa", "400g");
-        valmistusLihap.lisaaAinesosa("sipulikeittoaineksia", "1ps");
-        valmistusLihap.lisaaAinesosa("kananmunia", "1kpl");
-        valmistusLihap.lisaaAinesosa("kermaviiliä", "1prk");
-        valmistusLihap.lisaaAinesosa("mustapippuria", "");
-        valmistusLihap.lisaaAinesosa("korppujauhoja", "1/2dl");
-        valmistusLihap.lisaaOhje("Sekoita sipulikeittoainekset, korppujauhot, kermaviili, kananamuna ja mustapippuri keskenään");
-        valmistusLihap.lisaaOhje("Lisää jauheliha ja sekoita tasaiseksi");
-        valmistusLihap.lisaaOhje("Kostuta kädet viileällä vedellä ja pyöritä halutun kokoisia lihapullia");
-        valmistusLihap.lisaaOhje("Paista 225°C noin 15min");
-        lihapullat.lisaaOsio(valmistusLihap);
-        lihapullat.setKuvaus("Sopivat hyvin usean eri lisukkeen, kuten perunamuusin tai ranskalaisten kanssa. Sopivat todella hyvin myös lihapullapastaan. Kermaviilin sijasta voi käyttää 1,5dl vettä.");
-        lihapullat.setHinta(1);
-        lihapullat.setTahdet(5);
-        lihapullat.setValmistusaika(3);
-        lihapullat.setVaativuus(2);
-        reseptit.lisaa(lihapullat);
-        
-        Resepti mustikkamuffinit = new Resepti("Mustikkamuffinit");
-        Osio valmistusMuff = new Osio("Valmistus");
-        valmistusMuff.lisaaAinesosa("vehnäjauhoja", "3.45dl");
-        valmistusMuff.lisaaAinesosa("sokeria", "2.1dl");
-        valmistusMuff.lisaaAinesosa("leivinjauhetta", "1.5tl");
-        valmistusMuff.lisaaAinesosa("voita", "110g");
-        valmistusMuff.lisaaAinesosa("kananmunia", "2kpl");
-        valmistusMuff.lisaaAinesosa("kardemummaa", "1tl");
-        valmistusMuff.lisaaAinesosa("vaniljasokeria", "1tl");
-        valmistusMuff.lisaaAinesosa("maustamatonta jogurttia", "1.5dl");
-        valmistusMuff.lisaaAinesosa("mustikoita", "2dl");
-        valmistusMuff.lisaaAinesosa("muffinivuokia", "10kpl");
-        valmistusMuff.lisaaOhje("Sekoita kuivat ainekset keskenään");
-        valmistusMuff.lisaaOhje("Erilliseen kulhoon, lisää sulatettu voi, jonka on annettu jäähtyä ennen lisäystä");
-        valmistusMuff.lisaaOhje("Lisää kananmunat ja jogurtti sulatettuun voihin");
-        valmistusMuff.lisaaOhje("Nopeasti sekoittaen lisää nestemäinen seos kuiviin aineksiin, vältä turhaa sekoitusta");
-        valmistusMuff.lisaaOhje("Kääntele mustikat taikinan joukkoon");
-        valmistusMuff.lisaaOhje("Jaa muffinivuokiin");
-        valmistusMuff.lisaaOhje("Paista 173°C 28min 30s");
-        mustikkamuffinit.lisaaOsio(valmistusMuff);
-        mustikkamuffinit.setHinta(2);
-        mustikkamuffinit.setValmistusaika(3);
-        mustikkamuffinit.setVaativuus(5);
-        reseptit.lisaa(mustikkamuffinit);
-        
-        try {
+        	Reseptit reseptit = new Reseptit();
+            
+            Resepti kinkkukiusaus = new Resepti("Kinkkukiusaus");
+            Osio valmistus = new Osio("Valmistus");
+            valmistus.lisaaAinesosa("Pakaste peruna-sipuli sekoitusta", "1kg");
+            valmistus.lisaaAinesosa("Kinkkusuikaleita", "150g");
+            valmistus.lisaaAinesosa("Suolaa", "1tl");
+            valmistus.lisaaAinesosa("Mustapippuria", "1tl");
+            valmistus.lisaaAinesosa("Ruokakermaa", "2 prk");
+            valmistus.lisaaOhje("Kaada osa pakastesekoituksesta vuokaan");
+            valmistus.lisaaOhje("Levitä kinkkusuikaleet vuokaan");
+            valmistus.lisaaOhje("Kaada loput pakastesekoituksesta vuokaan");
+            valmistus.lisaaOhje("Lisää mausteet ja ruokakerma");
+            valmistus.lisaaOhje("Paista 200°C noin 1h");
+            kinkkukiusaus.lisaaOsio(valmistus);
+            kinkkukiusaus.setKuvaus("Halpaa arkiruokaa pienellä vaivalla");
+            kinkkukiusaus.setTahdet(1);
+            kinkkukiusaus.setValmistusaika(3);
+            reseptit.lisaa(kinkkukiusaus);
+            
+            Resepti lihapullat = new Resepti("Lihapullat");
+            Osio valmistusLihap = new Osio("Valmistus");
+            valmistusLihap.lisaaAinesosa("jauhelihaa", "400g");
+            valmistusLihap.lisaaAinesosa("sipulikeittoaineksia", "1ps");
+            valmistusLihap.lisaaAinesosa("kananmunia", "1kpl");
+            valmistusLihap.lisaaAinesosa("kermaviiliä", "1prk");
+            valmistusLihap.lisaaAinesosa("mustapippuria", "");
+            valmistusLihap.lisaaAinesosa("korppujauhoja", "1/2dl");
+            valmistusLihap.lisaaOhje("Sekoita sipulikeittoainekset, korppujauhot, kermaviili, kananamuna ja mustapippuri keskenään");
+            valmistusLihap.lisaaOhje("Lisää jauheliha ja sekoita tasaiseksi");
+            valmistusLihap.lisaaOhje("Kostuta kädet viileällä vedellä ja pyöritä halutun kokoisia lihapullia");
+            valmistusLihap.lisaaOhje("Paista 225°C noin 15min");
+            lihapullat.lisaaOsio(valmistusLihap);
+            lihapullat.setKuvaus("Sopivat hyvin usean eri lisukkeen, kuten perunamuusin tai ranskalaisten kanssa. Sopivat todella hyvin myös lihapullapastaan. Kermaviilin sijasta voi käyttää 1,5dl vettä.");
+            lihapullat.setHinta(1);
+            lihapullat.setTahdet(5);
+            lihapullat.setValmistusaika(3);
+            lihapullat.setVaativuus(2);
+            reseptit.lisaa(lihapullat);
+            
+            Resepti mustikkamuffinit = new Resepti("Mustikkamuffinit");
+            Osio valmistusMuff = new Osio("Valmistus");
+            valmistusMuff.lisaaAinesosa("vehnäjauhoja", "3.45dl");
+            valmistusMuff.lisaaAinesosa("sokeria", "2.1dl");
+            valmistusMuff.lisaaAinesosa("leivinjauhetta", "1.5tl");
+            valmistusMuff.lisaaAinesosa("voita", "110g");
+            valmistusMuff.lisaaAinesosa("kananmunia", "2kpl");
+            valmistusMuff.lisaaAinesosa("kardemummaa", "1tl");
+            valmistusMuff.lisaaAinesosa("vaniljasokeria", "1tl");
+            valmistusMuff.lisaaAinesosa("maustamatonta jogurttia", "1.5dl");
+            valmistusMuff.lisaaAinesosa("mustikoita", "2dl");
+            valmistusMuff.lisaaAinesosa("muffinivuokia", "10kpl");
+            valmistusMuff.lisaaOhje("Sekoita kuivat ainekset keskenään");
+            valmistusMuff.lisaaOhje("Erilliseen kulhoon, lisää sulatettu voi, jonka on annettu jäähtyä ennen lisäystä");
+            valmistusMuff.lisaaOhje("Lisää kananmunat ja jogurtti sulatettuun voihin");
+            valmistusMuff.lisaaOhje("Nopeasti sekoittaen lisää nestemäinen seos kuiviin aineksiin, vältä turhaa sekoitusta");
+            valmistusMuff.lisaaOhje("Kääntele mustikat taikinan joukkoon");
+            valmistusMuff.lisaaOhje("Jaa muffinivuokiin");
+            valmistusMuff.lisaaOhje("Paista 173°C 28min 30s");
+            mustikkamuffinit.lisaaOsio(valmistusMuff);
+            mustikkamuffinit.setHinta(2);
+            mustikkamuffinit.setValmistusaika(3);
+            mustikkamuffinit.setVaativuus(5);
+            reseptit.lisaa(mustikkamuffinit);
+            
             reseptit.tallenna();
-        } catch (SailoException e) {
-            e.printStackTrace();
+            
+        } catch (SailoException exception) {
+            System.err.println(exception.getMessage());
         }
-        */
     }
 }
