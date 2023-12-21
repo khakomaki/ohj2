@@ -204,15 +204,13 @@ public class ReseptihakuGUIController implements Initializable {
         StringBuilder sb = new StringBuilder(hakutuloksetOtsikko);
         
         if (this.reseptit != null) {
-            // haetaan hakusanaa vastanneet reseptit
-            this.hakuReseptit = this.reseptit.etsiNimella(
-                    hakusana, 
-                    this.minimiValinnat, 
-                    this.maksimiValinnat, 
-                    this.lajitteluPeruste,
-                    this.kaanteinenJarjestys
-            );
-            
+        	// haetaan hakusanaa vastanneet reseptit
+        	try {
+                this.hakuReseptit = this.reseptit.etsiNimella(hakusana, this.minimiValinnat, this.maksimiValinnat, this.lajitteluPeruste, this.kaanteinenJarjestys);
+        	} catch (SailoException exception) {
+        		Dialogs.showMessageDialog(exception.getMessage());
+        	}
+
             // lisää reseptin taulukkomuotoisen tekstin StringBuilderiin
             for (int i = 0; i < this.hakuReseptit.size(); i++) {
                 sb.append(this.hakuReseptit.get(i).getTaulukkoMuodossa());

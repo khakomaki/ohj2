@@ -479,6 +479,7 @@ public class Resepti {
     public void parse(ResultSet tulokset) throws SQLException {
     	setID(tulokset.getInt("resepti_id"));
         setUusiNimi(tulokset.getString("nimi"));
+        setKuvaus(tulokset.getString("kuvaus"));
         setHinta(tulokset.getInt("hinta"));
         setValmistusaika(tulokset.getInt("valmistusaika"));
         setTahdet(tulokset.getInt("tahdet"));
@@ -739,6 +740,32 @@ public class Resepti {
      */
     public String getVaativuusString() {
         return this.vaativuus.getValintaString();
+    }
+    
+    
+    /**
+     * Antaa attribuuttia vastaavan tietokannan sarake nimen
+     * 
+     * @param attribuutti minkä attribuutin nimi halutaan
+     * @return attribuutin sarakkeen nimi tietokannassa
+     */
+    public String getTietokantaNimi(String attribuutti) {
+    	switch(attribuutti) {
+	    	case "Hinta":
+	    		return "hinta";
+	    		
+	    	case "Valmistusaika":
+	    		return "valmistusaika";
+	    		
+	    	case "Tähdet":
+	    		return "tahdet";
+	    	
+	    	case "Vaativuus":
+	    		return "vaativuus";
+	    		
+	    	default:
+	    		return "nimi";
+    	}
     }
     
     

@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -431,112 +430,94 @@ public class Reseptit implements Hallitsija<Resepti> {
     }
     
     
-    /**
-     * Palauttaa hakusanaa vastaavat reseptit.
-     * Jos hakusana on tyhjä, palauttaa kaikki reseptit.
-     * 
-     * @param hakusana millä hakusanalla haetaan kaikki reseptit jotka sisältävät kyseisen sanan
-     * @return kaikki reseptit jotka sisältävät hakusanan
-     */
-    public List<Resepti> etsiNimella(String hakusana) {
-        // TODO listan palauttamisen sijaan esim. Stream
-        List<Resepti> loydetytReseptit = new ArrayList<Resepti>();
-        String kaytettavaHakusana = hakusana.strip();
-        
-        // tyhjällä hakusanalla palautetaan kaikki reseptit
-        if (kaytettavaHakusana.isBlank()) return anna();
-        
-        for (Resepti resepti : this.reseptit) {
-            if (resepti.onkoNimessa(kaytettavaHakusana)) loydetytReseptit.add(resepti);
-        }
-        
-        return loydetytReseptit;
-    }
-    
-    
-    /**
-     * Hakee reseptejä annetulla hakusanalla ja suodattimilla.
-     * Jos suodatin on asetettu, ei sisällytä oletusvalintaa vastaavia hakutuloksissa.
-     * Jos annettua lajittelu perustetta vastaavaa attribuuttia ei löydetä, lajitellaan nimen perusteella.
-     * 
-     * @param hakusana millä hakusanalla reseptiä haetaan
-     * @param minimit suodattimet attribuuttien minimiarvoille
-     * @param maksimit suodattimet attribuuttien maksimiarvoille
-     * @param lajitteluPeruste minkä perusteella lajitellaan tulokset
-     * @param kaanteinenJarjestys annetaanko tulokset käänteisessä järjestyksessä
-     * @return lista löydetyistä resepteistä
-     */
+	/**
+	 * Hakee reseptejä annetulla hakusanalla ja suodattimilla.
+	 * Jos suodatin on asetettu, ei sisällytä oletusvalintaa vastaavia hakutuloksissa.
+	 * Jos annettua lajittelu perustetta vastaavaa attribuuttia ei löydetä, lajitellaan nimen perusteella.
+	 * 
+	 * @param hakusana millä hakusanalla reseptiä haetaan
+	 * @param minimit suodattimet attribuuttien minimiarvoille
+	 * @param maksimit suodattimet attribuuttien maksimiarvoille
+	 * @param lajitteluPeruste minkä perusteella lajitellaan tulokset
+	 * @param kaanteinenJarjestys annetaanko tulokset käänteisessä järjestyksessä
+	 * @return lista löydetyistä resepteistä
+	 */
     public List<Resepti> etsiNimella(
-            String hakusana, 
+    		String hakusana, 
             List<VaihtoehtoAttribuutti> minimit, 
             List<VaihtoehtoAttribuutti> maksimit, 
             String lajitteluPeruste,
             boolean kaanteinenJarjestys
-        ) {
-        
-        // TODO listan palauttamisen sijaan esim. Stream
-        List<Resepti> loydetytReseptit = new ArrayList<Resepti>();
-        
-        // käydään reseptit läpi
-        for (Resepti resepti : this.reseptit) {
-            if (!resepti.onkoNimessa(hakusana)) continue;
-            List<VaihtoehtoAttribuutti> reseptinAttribuutit = resepti.getAttribuutit();
-            boolean suodataPois = false;
-            
-            // minimit
-            for (int i = 0; i < minimit.size(); i++) {
-                VaihtoehtoAttribuutti attribuutti = reseptinAttribuutit.get(i);
-                int minimi = minimit.get(i).getValinta();
-                
-                // skipataan käyttöliittymän oletusvalinnat
-                if (attribuutti.onkoOletusValinta(minimi)) continue;
-                
-                // laitetaan suodattumaan pois jos ei täsmää tai on oletusvalinta
-                if (attribuutti.getValinta() < minimi || attribuutti.onkoOletusValinta(attribuutti.getValinta())) suodataPois = true;
-            }
-            
-            // maksimit
-            for (int i = 0; i < maksimit.size(); i++) {
-                VaihtoehtoAttribuutti attribuutti = reseptinAttribuutit.get(i);
-                int maksimi = maksimit.get(i).getValinta();
-                
-                // skipataan käyttöliittymän oletusvalinnat
-                if (attribuutti.onkoOletusValinta(maksimi)) continue;
-                
-                // laitetaan suodattumaan pois jos ei täsmää tai on oletusvalinta
-                if (maksimi < attribuutti.getValinta() || attribuutti.onkoOletusValinta(attribuutti.getValinta())) suodataPois = true;
-            }
-            
-            // pääsee lisäämään vain jos kaikki ehdot täyttyvät
-            if (suodataPois) continue; 
-            loydetytReseptit.add(resepti);
-        }
-        
-        // tulosten lajittelu
-        boolean lajiteltu = false;
-        List<VaihtoehtoAttribuutti> attribuutit = Reseptit.getOletusAttribuutit();
-        
-        for (int i = 0; i < attribuutit.size(); i++) {
-            // suoritetaan vertailu jos vastaa nimeä
-            if (attribuutit.get(i).onkoNimi(lajitteluPeruste)) {
-                // vertailija
-                Comparator<Resepti> vertailija = new VertaileAttribuutteja(i);
-                if (kaanteinenJarjestys) vertailija = vertailija.reversed(); // käänteinen
-                Collections.sort(loydetytReseptit, vertailija);
-                
-                lajiteltu = true;
-                break;
-            }
-        }
-        
-        // jos attribuuteista ei löytynyt lajittelu perustetta, lajitellaan nimellä
-        if (!lajiteltu) {
-            Comparator<Resepti> vertailija = new VertaileNimia();
-            if (kaanteinenJarjestys) vertailija = vertailija.reversed(); // käänteinen
-            Collections.sort(loydetytReseptit, vertailija);
-        }
-        
-        return loydetytReseptit;
+        ) throws SailoException {
+    	
+    	List<Resepti> loydetytReseptit = new ArrayList<Resepti>();
+    	
+    	try (Connection yhteys = this.tietokanta.annaTietokantaYhteys()) {
+    		// muodostaa kysely lausekkeen
+    		StringBuilder sqlKysely = new StringBuilder();
+    		sqlKysely.append("SELECT * FROM Reseptit WHERE nimi LIKE ?");
+    		
+    		// minimi rajoitteet
+    		for (VaihtoehtoAttribuutti minimi : minimit) {
+    			if (!minimi.onkoOletusValinta(minimi.getValinta())) {
+    				sqlKysely.append(" AND ");
+    				sqlKysely.append(Reseptit.esimerkkiresepti.getTietokantaNimi(minimi.getNimi()));
+    				sqlKysely.append(" >= ?");
+    			}
+    		}
+    		// maksimi rajoitteet
+    		for (VaihtoehtoAttribuutti maksimi : maksimit) {
+    			if (!maksimi.onkoOletusValinta(maksimi.getValinta())) {
+    				sqlKysely.append(" AND ");
+    				sqlKysely.append(Reseptit.esimerkkiresepti.getTietokantaNimi(maksimi.getNimi()));
+    				sqlKysely.append(" <= ?");
+    			}
+    		}
+    		
+    		// asettaa lajittelu perusteen, välttää injektiot kysymällä esimerkkireseptiltä
+    		String lajittelu = "nimi";
+    		if (lajitteluPeruste != null) {
+    			lajittelu = Reseptit.esimerkkiresepti.getTietokantaNimi(lajitteluPeruste);
+    		}
+    		sqlKysely.append(" ORDER BY ");
+    		sqlKysely.append(lajittelu);
+    		if (kaanteinenJarjestys) sqlKysely.append(" DESC");
+    		
+    		// suorittaa kyselyn ja parsii reseptit hakutuloksista
+    		try (PreparedStatement sql = yhteys.prepareStatement(sqlKysely.toString())){
+    			int parametri = 1;
+    			sql.setString(parametri++, "%" + hakusana.strip() + "%");
+    			
+    			// minimi rajoitteet
+    			for (VaihtoehtoAttribuutti minimi : minimit) {
+    				int valinta = minimi.getValinta();
+    				if (!minimi.onkoOletusValinta(valinta)) {
+    					sql.setInt(parametri++, valinta);
+    				}
+    			}
+    			// maksimi rajoitteet
+    			for (VaihtoehtoAttribuutti maksimi : maksimit) {
+    				int valinta = maksimi.getValinta();
+    				if (!maksimi.onkoOletusValinta(valinta)) {
+    					sql.setInt(parametri++, valinta);
+    				}
+    			}
+    			
+    			try (ResultSet hakuTulokset = sql.executeQuery()) {
+    				while (hakuTulokset.next()) {
+    					Resepti resepti = new Resepti();
+    					resepti.parse(hakuTulokset);
+    					resepti.lueTiedostosta();
+    					loydetytReseptit.add(resepti);
+    				}
+    			}
+    		}
+    		
+    	} catch (SQLException exception) {
+    		throw new SailoException("Ongelmia reseptien hakemisessa tietokannasta!");
+    	}
+    	
+    	return loydetytReseptit;
     }
     
     
