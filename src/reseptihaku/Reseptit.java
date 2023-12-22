@@ -195,20 +195,6 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
-     * Lisää reseptin
-     * 
-     * @param resepti lisättävä resepti
-     * 
-     * @throws SailoException jos lisäämisen kanssa tulee ongelmia
-     */
-    public void lisaaResepti(Resepti resepti) throws SailoException {
-    	resepti.setTietokanta(this.tietokanta);
-        resepti.lisaaTietokantaan();
-        this.reseptit.add(resepti);
-    }
-    
-    
-    /**
      * Palauttaa kaikki tietokannasta löytyvät reseptit
      * 
      * @return kokoelma resepteistä
@@ -231,18 +217,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         } catch (SQLException exception) {
             throw new SailoException("Ongelmia reseptien haussa tietokannan kanssa!");
         }
-    }
-    
-    
-    /**
-     * Poistaa annetun reseptin tietokannasta ja resepteistä
-     * 
-     * @param resepti poistettava resepti
-     * @throws SailoException jos poistamisessa ilmenee ongelmia
-     */
-    public void poistaResepti(Resepti resepti) throws SailoException {
-    	resepti.poistaTietokannasta();
-    	this.reseptit.remove(resepti);
     }
     
     
@@ -427,6 +401,13 @@ public class Reseptit implements Hallitsija<Resepti> {
         if (poistettavanIndeksi < 0) return;
         
         this.reseptit.remove(poistettavanIndeksi);
+        
+        // poistetaan tietokannasta
+        try {
+        	resepti.poistaTietokannasta();
+        } catch (SailoException exception) {
+        	System.err.println(exception.getMessage());
+        }
     }
     
     

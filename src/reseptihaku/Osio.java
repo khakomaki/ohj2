@@ -392,6 +392,17 @@ public class Osio {
     
     
     /**
+     * Poistaa osion tiedot tietokannasta
+     * 
+     * @throws SailoException jos poistossa ilmenee ongelmia
+     */
+    public void poistaTietokannasta() throws SailoException {
+    	this.osionAinesosat.poistaTietokannasta();
+    	this.ohjeet.poistaTietokannasta();
+    }
+    
+    
+    /**
      * Kertoo onko osioon tullut muutoksia
      * 
      * @return onko osioon tullut muutoksia

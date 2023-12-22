@@ -536,12 +536,21 @@ public class Resepti {
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
     public void poistaTietokannasta() throws SailoException {
+    	// käskee reseptin osioita poistamaan tietonsa
+    	this.osiot.poistaTietokannasta();
+    	
     	// varmistaa että tietokanta on asetettu
     	if (this.tietokanta == null) throw new SailoException("Reseptille ei ole vielä asetettu tietokantaa!");
     	
         // muodostaa yhteyden tietokantaan, muodostaa poistolausekkeen ja suorittaa
-        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = getPoistolauseke(yhteys) ) {
-            sql.executeUpdate();
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys()) {
+            yhteys.setAutoCommit(false); // tietokannassa saatetaan poistaa muistakin tauluista
+        	
+            try (PreparedStatement sql = getPoistolauseke(yhteys)) {
+            	sql.executeUpdate();
+            }
+        	
+        	yhteys.commit();
             
         } catch (SQLException exception) {
             throw new SailoException("Ongelmia reseptin poistossa tietokannan kanssa!");

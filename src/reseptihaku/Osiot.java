@@ -358,6 +358,27 @@ public class Osiot implements Hallitsija<Osio> {
     
     
     /**
+     * Poistaa kaikki osion sisältämät tiedot tietokannasta
+     * 
+     * @throws SailoException jos poistamisessa ilmenee ongelmia
+     */
+    public void poistaTietokannasta() throws SailoException {
+    	// käskee ohjeita ja ainesosia poistamaan tietonsa
+    	for (Osio osio : this.osiot) {
+    		osio.poistaTietokannasta();
+    	}
+    	
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Osiot WHERE resepti_id = ?")) {
+            sql.setInt(1, this.reseptiId);
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+        	throw new SailoException("Ongelmia osioiden poistossa tietokannan kanssa!");
+        }
+    }
+    
+    
+    /**
      * Luo osion.
      * Ei vielä lisää osioihin.
      */

@@ -292,6 +292,22 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     
     
     /**
+     * Poistaa ainesosat tietokannasta
+     * 
+     * @throws SailoException jos poistamisessa ilmenee ongelmia
+     */
+    public void poistaTietokannasta() throws SailoException {
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Ainesosat WHERE osio_id = ?")) {
+            sql.setInt(1, this.osioId);
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+        	throw new SailoException("Ongelmia ainesosien poistossa tietokannan kanssa!");
+        }
+    }
+    
+    
+    /**
      * Tallentaa nykyiset ainesosat tietokantaan
      * 
      * @throws SailoException jos tallentamisessa ilmenee ongelmia

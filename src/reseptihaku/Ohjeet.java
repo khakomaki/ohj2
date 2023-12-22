@@ -284,6 +284,22 @@ public class Ohjeet implements Hallitsija<Ohje> {
     
     
     /**
+     * Poistaa ohjeet tietokannasta
+     * 
+     * @throws SailoException jos poistamisessa ilmenee ongelmia
+     */
+    public void poistaTietokannasta() throws SailoException {
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Ohjeet WHERE osio_id = ?")) {
+            sql.setInt(1, this.osioId);
+            sql.executeUpdate();
+            
+        } catch (SQLException exception) {
+        	throw new SailoException("Ongelmia ohjeiden poistossa tietokannan kanssa!");
+        }
+    }
+    
+    
+    /**
      * Tallentaa nykyiset ohjeet tietokantaan
      * 
      * @throws SailoException jos tulee ongelmia tallentamisessa
