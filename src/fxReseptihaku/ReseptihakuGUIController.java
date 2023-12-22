@@ -126,9 +126,18 @@ public class ReseptihakuGUIController implements Initializable {
         this.suodattimetGridPane.add(lajitteluComboBox, 0, rivi++);
         this.suodattimetGridPane.add(kaanteinenJarjestysCheckBox, 0, rivi++);
         
-        
-        // lisätään reseptejen sisältämät oletus attribuutit
-        for (VaihtoehtoAttribuutti suodatettava : Reseptit.getOletusAttribuutit()) {
+        // kysytään oletusattribuutit
+        List<VaihtoehtoAttribuutti> oletusAttribuutit = null;
+		try {
+			oletusAttribuutit = Reseptit.getOletusAttribuutit();
+		} catch (SailoException exception) {
+			Dialogs.showMessageDialog(exception.getMessage());
+		}
+		
+		if (oletusAttribuutit == null) return;
+		
+		// lisätään reseptejen sisältämät oletus attribuutit
+        for (VaihtoehtoAttribuutti suodatettava : oletusAttribuutit) {
             int sarake = 0;
             Label suodatinNimiLabel = new Label(suodatettava.getNimi());
             this.suodattimetGridPane.add(suodatinNimiLabel, sarake, rivi++);

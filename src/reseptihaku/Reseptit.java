@@ -563,8 +563,18 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @return reseptin oletusattribuutit
      */
-    public static List<VaihtoehtoAttribuutti> getOletusAttribuutit() {
-        return esimerkkiresepti.getAttribuutit();
+    public static List<VaihtoehtoAttribuutti> getOletusAttribuutit() throws SailoException {
+    	// varmistetaan että esimerkkiresepti on alustettu
+    	if (Reseptit.esimerkkiresepti == null) {
+    		try {
+				@SuppressWarnings("unused")
+				Reseptit reseptit = new Reseptit();
+			} catch (SailoException exception) {
+				throw new SailoException("Ei voida luoda reseptejä alustusta varten!");
+			}
+    	}
+    	
+        return Reseptit.esimerkkiresepti.getAttribuutit();
     }
     
     
