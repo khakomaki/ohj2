@@ -100,7 +100,7 @@ public class Tietokanta {
     		File hakemisto = new File(tiedostopolku);
     		return hakemisto.mkdirs();
     	} catch (SecurityException exception) {
-    		throw new SailoException("Ongelmia hakemiston luonnissa tiedostonluonti-oikeuksien kanssa.");
+    		throw new SailoException("Ongelmia hakemiston luonnissa tiedostonluonti-oikeuksien kanssa:\n" + exception.getMessage());
     	}
     }
 }

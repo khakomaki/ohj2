@@ -247,15 +247,15 @@ public class Ohje {
      * Päivittää annetun osio tunnuksen ohjeiden vaiheita, jotka ovat yli annetun vaiheen.
      * Pienentää vaiheita yhdellä.
      * 
-     * @param yhteys
-     * @param osioId
-     * @param suurempiKuinVaihe
-     * @return
-     * @throws SQLException
+     * @param yhteys tietokantayhteys
+     * @param osioId osion tunnus
+     * @param suurempiKuinVaihe mitä vaihetta suuremmat vaiheet päivitetään
+     * @return päivityslauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ilmenee ongelmia
      */
-    public PreparedStatement getVaiheidenPaivityslauseke(Connection yhteys, int osioId, int suurempiKuinVaihe) throws SQLException {
+    public PreparedStatement getVaiheidenPaivityslauseke(Connection yhteys, int osioTunnus, int suurempiKuinVaihe) throws SQLException {
     	PreparedStatement sql = yhteys.prepareStatement("UPDATE Ohjeet SET vaihe = vaihe - 1 WHERE osio_id = ? AND vaihe > ?");
-    	sql.setInt(1, osioId);
+    	sql.setInt(1, osioTunnus);
     	sql.setInt(1, suurempiKuinVaihe);
     	
     	return sql;

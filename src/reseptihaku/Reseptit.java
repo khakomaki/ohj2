@@ -86,7 +86,7 @@ public class Reseptit implements Hallitsija<Resepti> {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa!");
+            throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -219,7 +219,7 @@ public class Reseptit implements Hallitsija<Resepti> {
             return loydetytReseptit;
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia reseptien haussa tietokannan kanssa!");
+            throw new SailoException("Ongelmia reseptien haussa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -502,7 +502,7 @@ public class Reseptit implements Hallitsija<Resepti> {
     		}
     		
     	} catch (SQLException exception) {
-    		throw new SailoException("Ongelmia reseptien hakemisessa tietokannasta!");
+    		throw new SailoException("Ongelmia reseptien hakemisessa tietokannasta:\n" + exception.getMessage());
     	}
     	
     	return loydetytReseptit;
@@ -577,7 +577,7 @@ public class Reseptit implements Hallitsija<Resepti> {
 				@SuppressWarnings("unused")
 				Reseptit reseptit = new Reseptit();
 			} catch (SailoException exception) {
-				throw new SailoException("Ei voida luoda reseptejä alustusta varten!");
+				throw new SailoException("Ei voida luoda reseptejä alustusta varten:\n" + exception.getMessage());
 			}
     	}
     	
@@ -628,7 +628,7 @@ public class Reseptit implements Hallitsija<Resepti> {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia reseptien lukemisessa tietokannan kanssa!");
+            throw new SailoException("Ongelmia reseptien lukemisessa tietokannan kanssa:\n" + exception.getMessage());
         }
         
         // lukee osioiden omat tiedot tietokannasta

@@ -125,7 +125,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ohjeiden luonnissa tietokannan kanssa!");
+            throw new SailoException("Ongelmia ohjeiden luonnissa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -219,7 +219,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ohjeen lisäyksessä tietokannan kanssa!");
+            throw new SailoException("Ongelmia ohjeen lisäyksessä tietokannan kanssa:\n" + exception.getMessage());
         }
         
         this.ohjeet.add(ohje);
@@ -247,7 +247,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             return loydetytOhjeet;
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ohjeiden haussa tietokannan kanssa!");
+            throw new SailoException("Ongelmia ohjeiden haussa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -279,7 +279,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             this.ohjeet.remove(ohje);
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ohjeen poistossa tietokannan kanssa!");
+            throw new SailoException("Ongelmia ohjeen poistossa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -295,7 +295,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-        	throw new SailoException("Ongelmia ohjeiden poistossa tietokannan kanssa!");
+        	throw new SailoException("Ongelmia ohjeiden poistossa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -322,7 +322,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             }
             
     	} catch (SQLException exception) {
-    		throw new SailoException("Ongelmia ohjeiden tallentamisessa tietokannan kanssa!");
+    		throw new SailoException("Ongelmia ohjeiden tallentamisessa tietokannan kanssa:\n" + exception.getMessage());
     	}
     }
     
@@ -346,7 +346,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ohjeiden lukemisessa tietokannan kanssa!");
+            throw new SailoException("Ongelmia ohjeiden lukemisessa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     

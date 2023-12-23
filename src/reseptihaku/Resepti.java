@@ -160,7 +160,7 @@ public class Resepti {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa!");
+            throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -507,7 +507,7 @@ public class Resepti {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia reseptin lisäyksessä tietokannan kanssa!");
+            throw new SailoException("Ongelmia reseptin lisäyksessä tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -526,7 +526,7 @@ public class Resepti {
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia reseptin päivittämisessä tietokannan kanssa!");
+            throw new SailoException("Ongelmia reseptin päivittämisessä tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -554,7 +554,7 @@ public class Resepti {
         	yhteys.commit();
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia reseptin poistossa tietokannan kanssa!");
+            throw new SailoException("Ongelmia reseptin poistossa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     

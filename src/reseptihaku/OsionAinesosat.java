@@ -134,7 +134,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ainesosien luonnissa tietokannan kanssa!");
+            throw new SailoException("Ongelmia ainesosien luonnissa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -246,7 +246,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ainesosan lisäyksessä tietokannan kanssa!");
+            throw new SailoException("Ongelmia ainesosan lisäyksessä tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -271,7 +271,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
             }
             return loydetytAinesosat;
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ainesosien haussa tietokannan kanssa!");
+            throw new SailoException("Ongelmia ainesosien haussa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -288,7 +288,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ainesosan poistossa tietokannan kanssa!");
+            throw new SailoException("Ongelmia ainesosan poistossa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -304,7 +304,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-        	throw new SailoException("Ongelmia ainesosien poistossa tietokannan kanssa!");
+        	throw new SailoException("Ongelmia ainesosien poistossa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -337,7 +337,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
             }
             
     	} catch (SQLException exception) {
-    		throw new SailoException("Ongelmia ainesosien tallentamisessa tietokannan kanssa!");
+    		throw new SailoException("Ongelmia ainesosien tallentamisessa tietokannan kanssa:\n" + exception.getMessage());
     	}
     }
     
@@ -361,7 +361,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia ainesosien lukemisessa tietokannan kanssa!");
+            throw new SailoException("Ongelmia ainesosien lukemisessa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     

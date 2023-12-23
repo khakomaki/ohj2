@@ -114,7 +114,7 @@ public class Osiot implements Hallitsija<Osio> {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia osioiden luonnissa tietokannan kanssa!");
+            throw new SailoException("Ongelmia osioiden luonnissa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -300,7 +300,7 @@ public class Osiot implements Hallitsija<Osio> {
              }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia osion lisäyksessä tietokannan kanssa!");
+            throw new SailoException("Ongelmia osion lisäyksessä tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -325,7 +325,7 @@ public class Osiot implements Hallitsija<Osio> {
             }
             return loydetytOsiot;
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia osioiden haussa tietokannan kanssa!");
+            throw new SailoException("Ongelmia osioiden haussa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -342,7 +342,7 @@ public class Osiot implements Hallitsija<Osio> {
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia osion poistossa tietokannan kanssa!");
+            throw new SailoException("Ongelmia osion poistossa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -361,7 +361,7 @@ public class Osiot implements Hallitsija<Osio> {
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia osion päivityksessä tietokannan kanssa!");
+            throw new SailoException("Ongelmia osion päivityksessä tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -382,7 +382,7 @@ public class Osiot implements Hallitsija<Osio> {
             sql.executeUpdate();
             
         } catch (SQLException exception) {
-        	throw new SailoException("Ongelmia osioiden poistossa tietokannan kanssa!");
+        	throw new SailoException("Ongelmia osioiden poistossa tietokannan kanssa:\n" + exception.getMessage());
         }
     }
     
@@ -517,7 +517,7 @@ public class Osiot implements Hallitsija<Osio> {
             }
             
         } catch (SQLException exception) {
-            throw new SailoException("Ongelmia osioiden lukemisessa tietokannan kanssa!");
+            throw new SailoException("Ongelmia osioiden lukemisessa tietokannan kanssa:\n" + exception.getMessage());
         }
         
         // lukee osioiden omat tiedot tietokannasta

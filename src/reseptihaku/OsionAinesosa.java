@@ -203,6 +203,14 @@ public class OsionAinesosa {
     }
     
     
+    /**
+     * Antaa ainesosien lisäyslausekkeen listalle ainesosia
+     * 
+     * @param yhteys tietokantayhteys
+     * @param ainesosat lisättävät ainesosat
+     * @return lisäyslauseke
+     * @throws SQLException jos lausekkeen muodostamisessa ilmenee ongelmia
+     */
     public PreparedStatement getMoniLisayslauseke(Connection yhteys, List<OsionAinesosa> ainesosat) throws SQLException {
     	StringBuilder sqlLause = new StringBuilder("INSERT INTO Ainesosat (osio_id, nimi, maara) VALUES ");
 
