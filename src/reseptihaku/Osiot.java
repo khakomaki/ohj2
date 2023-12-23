@@ -97,6 +97,7 @@ public class Osiot implements Hallitsija<Osio> {
      * @throws SailoException jos tietokannan alustamisessa ilmenee ongelmia
      */
     private void alustaTietokanta() throws SailoException {
+    	Tietokanta.luoHakemisto(this.tiedostopolku);
         this.tietokanta = Tietokanta.alustaTietokanta(this.tiedostopolku + this.tiedostonimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
@@ -112,7 +113,7 @@ public class Osiot implements Hallitsija<Osio> {
                 }
             }
             
-        } catch ( SQLException exception ) {
+        } catch (SQLException exception) {
             throw new SailoException("Ongelmia osioiden luonnissa tietokannan kanssa!");
         }
     }
@@ -140,19 +141,19 @@ public class Osiot implements Hallitsija<Osio> {
     
     
     /**
-     * Asettaa tiedostopolun johon osion tiedot tallennetaan
+     * Asettaa tiedostopolun johon osion tiedot tallennetaan.
+     * Ei tee mitään jos null tai sama kuin oli
      * 
      * @param tiedostopolku mihin osion tiedot tallennetaan
-     * TODO: päivitä tietokanta kun tiedostopolkua vaihdetaan
      */
-    public void setTiedostoPolku(String tiedostopolku) {
-        // ei tee mitään jos null tai sama kuin oli
-        if (tiedostopolku == null) return;
+    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
+        if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
         this.tiedostopolku = tiedostopolku;
-        
         for (Osio osio : this.osiot) {
             osio.setTiedostopolku(this.tiedostopolku);
         }
+        
+        alustaTietokanta();
     }
     
     
@@ -213,8 +214,12 @@ public class Osiot implements Hallitsija<Osio> {
     public Osio lisaa(String nimi) {
         Osio osio = new Osio(nimi);
         osio.setReseptiID(this.reseptiId);
-        osio.setTiedostopolku(this.tiedostopolku);
         osiot.add(osio);
+        try {
+			osio.setTiedostopolku(this.tiedostopolku);
+		} catch (SailoException exception) {
+			System.err.println(exception.getMessage());
+		}
         return osio;
     }
     
@@ -241,8 +246,12 @@ public class Osiot implements Hallitsija<Osio> {
         if (osio == null) return;
         Osio lisattavaOsio = osio;
         osio.setReseptiID(this.reseptiId);
-        osio.setTiedostopolku(this.tiedostopolku);
         this.osiot.add(lisattavaOsio);
+        try {
+			osio.setTiedostopolku(this.tiedostopolku);
+		} catch (SailoException exception) {
+			System.err.println(exception.getMessage());
+		}
     }
     
     
@@ -478,7 +487,7 @@ public class Osiot implements Hallitsija<Osio> {
     	
     	for (Osio osio : this.osiot) {
     		// lisää tai päivittää osion
-    		if (osio.getID() < 0) {
+    		if (osio.getID() < 0) { // TODO lisää myös jos vaihdettu tietokantaa
     			lisaaOsio(osio);
     		} else {
     			paivitaOsio(osio);
@@ -503,7 +512,7 @@ public class Osiot implements Hallitsija<Osio> {
                 while (tulokset.next()) {
                     Osio osio = new Osio();
                     osio.parse(tulokset);
-                    this.osiot.add(osio);
+                    lisaa(osio);
                 }
             }
             

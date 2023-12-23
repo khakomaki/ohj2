@@ -143,6 +143,7 @@ public class Resepti {
      * @throws SailoException jos tietokannan alustamisessa ilmenee ongelmia
      */
     private void alustaTietokanta() throws SailoException {
+    	Tietokanta.luoHakemisto(this.tiedostopolku);
         this.tietokanta = Tietokanta.alustaTietokanta(this.tiedostopolku + this.tiedostonimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
@@ -158,7 +159,7 @@ public class Resepti {
                 }
             }
             
-        } catch ( SQLException exception ) {
+        } catch (SQLException exception) {
             throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa!");
         }
     }
@@ -560,16 +561,17 @@ public class Resepti {
     
     /**
      * Asettaa tiedostopolun.
-     * Ei tee mitään jos annetaan null.
+     * Ei tee mitään jos annetaan null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin polkuun tietoja tallennetaan ja luetaan
      * @throws SailoException jos polun vaihtamisessa tulee ongelmia
      */
-    public void setTiedostopolku(String tiedostopolku) {
-        if (tiedostopolku == null) return;
-        
+    public void setTiedostopolku(String tiedostopolku) throws SailoException {
+        if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
         this.tiedostopolku = tiedostopolku;
         this.osiot.setTiedostoPolku(this.tiedostopolku);
+        
+        alustaTietokanta();
     }
     
     
@@ -849,7 +851,7 @@ public class Resepti {
      */
     public void tallenna() throws SailoException {
     	// lisää reseptin tietokantaan tai päivittää sitä tietokannassa
-    	if (this.reseptiId < 0) {
+    	if (this.reseptiId < 0) { // TODO lisää myös jos vaihdettu tietokantaa
     		lisaaTietokantaan();
     	} else {
     		paivitaTietokannassa();

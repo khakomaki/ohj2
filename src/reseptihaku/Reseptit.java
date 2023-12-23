@@ -69,6 +69,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @throws SailoException jos tietokannan alustamisessa ilmenee ongelmia
      */
     private void alustaTietokanta() throws SailoException {
+    	Tietokanta.luoHakemisto(this.tiedostopolku);
         this.tietokanta = Tietokanta.alustaTietokanta(this.tiedostopolku + this.tiedostonimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
@@ -84,7 +85,7 @@ public class Reseptit implements Hallitsija<Resepti> {
                 }
             }
             
-        } catch ( SQLException exception ) {
+        } catch (SQLException exception) {
             throw new SailoException("Ongelmia reseptien luonnissa tietokannan kanssa!");
         }
     }
@@ -92,7 +93,7 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     /**
      * Asettaa tiedostonimen johon tallennetaan.
-     * Ei tee muutoksia jos annettu nimi on tyhjä merkkijono tai null
+     * Ei tee muutoksia jos annettu nimi on tyhjä merkkijono, null tai sama kuin aiemmin
      * 
      * @param tiedostonimi tiedostonimi johon kirjoitetaan tiedot
      * 
@@ -113,8 +114,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * </pre>
      */
     public void setTiedostoNimi(String tiedostonimi) {
-        // varmistetaan ettei annettu tiedostonimi ole null tai tyhjä merkkijono
-        if (tiedostonimi == null) return;
+        if (tiedostonimi == null || this.tiedostonimi.equals(tiedostonimi)) return;
         if (tiedostonimi.length() < 1) return;
         this.tiedostonimi = tiedostonimi;
     }
@@ -122,18 +122,18 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     /**
      * Asettaa reseptin tallennuspolun.
-     * Ei tee mitään jos annettu null.
+     * Ei tee mitään jos annettu null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin reseptit tallennetaan
      * @throws SailoException jos polun asettaminen aiheuttaa ongelmia
      */
-    public void setTiedostoPolku(String tiedostopolku) {
-        if (tiedostopolku == null) return;        
+    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
+        if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;        
         this.tiedostopolku = tiedostopolku;
-
         for (Resepti resepti : this.reseptit) {
             resepti.setTiedostopolku(this.tiedostopolku);
         }
+        alustaTietokanta(); // alustetaan tietokanta uuteen polkuun
     }
     
     
@@ -189,8 +189,12 @@ public class Reseptit implements Hallitsija<Resepti> {
     public void lisaa(Resepti resepti) {
         if (resepti == null) return;
         resepti.setTietokanta(this.tietokanta);
-        resepti.setTiedostopolku(this.tiedostopolku);
         reseptit.add(resepti);
+        try {
+			resepti.setTiedostopolku(this.tiedostopolku);
+		} catch (SailoException exception) {
+			System.err.println(exception.getMessage());
+		}
     }
     
     
@@ -321,8 +325,11 @@ public class Reseptit implements Hallitsija<Resepti> {
         
         // varmistaa tiedostopolun ja tietokannan olevan samoja
         uusiResepti.setTietokanta(this.tietokanta);
-        uusiResepti.setTiedostopolku(this.tiedostopolku);
-        
+        try {
+        	uusiResepti.setTiedostopolku(this.tiedostopolku);
+		} catch (SailoException exception) {
+			System.err.println(exception.getMessage());
+		}
         this.reseptit.set(vanhaReseptiIndeksi, uusiResepti);
     }
     
@@ -616,7 +623,7 @@ public class Reseptit implements Hallitsija<Resepti> {
                 while (tulokset.next()) {
                     Resepti resepti = new Resepti();
                     resepti.parse(tulokset);
-                    this.reseptit.add(resepti);
+                    lisaa(resepti);
                 }
             }
             

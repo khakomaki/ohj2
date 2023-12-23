@@ -117,6 +117,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @throws SailoException jos tulee ongelmia tietokannan kanssa
      */
     private void alustaTietokanta() throws SailoException {
+    	Tietokanta.luoHakemisto(this.tiedostopolku);
         this.tietokanta = Tietokanta.alustaTietokanta(tiedostopolku + tiedostonimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
@@ -132,7 +133,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
                 }
             }
             
-        } catch ( SQLException exception ) {
+        } catch (SQLException exception) {
             throw new SailoException("Ongelmia ainesosien luonnissa tietokannan kanssa!");
         }
     }
@@ -167,14 +168,15 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     
     
     /**
-     * Vaihtaa tiedostopolun
+     * Vaihtaa tiedostopolun.
+     * Ei tee mitään jos yritetään asettaa null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin polkuun tiedosto tallennetaan ja mistä sitä luetaan
      */
-    public void setTiedostoPolku(String tiedostopolku) {
-        if (tiedostopolku == null) return;
-        
+    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
+        if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
         this.tiedostopolku = tiedostopolku;
+        alustaTietokanta();
     }
     
     

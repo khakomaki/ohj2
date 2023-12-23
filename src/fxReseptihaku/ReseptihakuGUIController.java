@@ -403,20 +403,14 @@ public class ReseptihakuGUIController implements Initializable {
      */
     public void lueTiedostosta() {
         try {
-            this.reseptit.lueTiedostosta();
+            // this.reseptit.lueTiedostosta();
             // TODO testidata pois kuin ei enää tarvita
-        	/*
-            File reseptidata = new File("reseptidata/");
-            if (!reseptidata.exists()) {
-                this.reseptit.setTiedostoPolku("testidata/");
-                this.reseptit.lueTiedostosta();
-                this.reseptit.setTiedostoPolku("reseptidata/");
-                this.reseptit.tallenna();
-            } else {
-                this.reseptit.setTiedostoPolku("reseptidata/");
-                this.reseptit.lueTiedostosta();
-            }
-            */
+            this.reseptit.setTiedostoPolku("testidata/");
+            this.reseptit.lueTiedostosta();
+            this.reseptit.setTiedostoPolku("reseptidata/");
+            this.reseptit.tallenna();
+            
+            
         } catch (SailoException exception) {
             Dialogs.showMessageDialog("Tiedoston lukemisessa ongelmia: " + exception.getMessage());
         }

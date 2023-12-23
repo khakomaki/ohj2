@@ -108,6 +108,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @throws SailoException jos tulee ongelmia
      */
     private void alustaTietokanta() throws SailoException {
+    	Tietokanta.luoHakemisto(this.tiedostopolku);
         this.tietokanta = Tietokanta.alustaTietokanta(this.tiedostopolku + tiedostonimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
@@ -123,7 +124,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
                 }
             }
             
-        } catch ( SQLException exception ) {
+        } catch (SQLException exception) {
             throw new SailoException("Ongelmia ohjeiden luonnissa tietokannan kanssa!");
         }
     }
@@ -502,13 +503,14 @@ public class Ohjeet implements Hallitsija<Ohje> {
     
     /**
      * Asettaa tiedostopolun.
-     * Ei anna asettaa null.
+     * Ei tee mitään jos yritetään asettaa null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin polkuun tiedosto tallennetaan
      */
-    public void setTiedostoPolku(String tiedostopolku) {
-        if (tiedostopolku == null) return;
+    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
+        if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
         this.tiedostopolku = tiedostopolku;
+        alustaTietokanta();
     }
     
     

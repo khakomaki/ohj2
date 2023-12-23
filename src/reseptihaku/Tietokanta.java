@@ -1,9 +1,12 @@
 package reseptihaku;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
+
+import kanta.SailoException;
 
 /**
  * @author hakom
@@ -84,4 +87,20 @@ public class Tietokanta {
         return DriverManager.getConnection("jdbc:sqlite:" + getTiedostoNimi());
     }
     
+    
+    /**
+     * Koittaa luoda annetun tiedostopolun.
+     * 
+     * @param tiedostopolku luotava tiedostopolku
+     * @return luotiinko uusi hakemisto
+     * @throws SailoException jos hakemiston luonnissa ilmenee ongelmia
+     */
+    public static boolean luoHakemisto(String tiedostopolku) throws SailoException {
+    	try {
+    		File hakemisto = new File(tiedostopolku);
+    		return hakemisto.mkdirs();
+    	} catch (SecurityException exception) {
+    		throw new SailoException("Ongelmia hakemiston luonnissa tiedostonluonti-oikeuksien kanssa.");
+    	}
+    }
 }
