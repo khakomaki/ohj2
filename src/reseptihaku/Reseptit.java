@@ -48,6 +48,7 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     /**
      * Hallitsee resepti-olioita
+     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
@@ -143,6 +144,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * 
      * @param nimi reseptin nimi
      * @return luotu resepti
+     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
@@ -429,6 +431,7 @@ public class Reseptit implements Hallitsija<Resepti> {
 	 * @param lajitteluPeruste minkä perusteella lajitellaan tulokset
 	 * @param kaanteinenJarjestys annetaanko tulokset käänteisessä järjestyksessä
 	 * @return lista löydetyistä resepteistä
+	 * @throws SailoException jos jotain menee pieleen
 	 */
     public List<Resepti> etsiNimella(
     		String hakusana, 
@@ -569,12 +572,12 @@ public class Reseptit implements Hallitsija<Resepti> {
      * Antaa reseptin oletusattribuutit
      * 
      * @return reseptin oletusattribuutit
+     * @throws SailoException jos jotain menee pieleen
      */
     public static List<VaihtoehtoAttribuutti> getOletusAttribuutit() throws SailoException {
     	// varmistetaan että esimerkkiresepti on alustettu
     	if (Reseptit.esimerkkiresepti == null) {
     		try {
-				@SuppressWarnings("unused")
 				Reseptit reseptit = new Reseptit();
 			} catch (SailoException exception) {
 				throw new SailoException("Ei voida luoda reseptejä alustusta varten:\n" + exception.getMessage());
@@ -589,6 +592,7 @@ public class Reseptit implements Hallitsija<Resepti> {
      * Luo lisää mustikkapiirakan resepteihin testaamista varten.
      * TODO: poista kun ei enää tarvita
      * @return mustikkapiirakka resepti
+     * @throws SailoException jos jotain menee pieleen
      */
     public Resepti lisaaMustikkapiirakka() throws SailoException {
         Resepti mustikkapiirakka = new Resepti("");

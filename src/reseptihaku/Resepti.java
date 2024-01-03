@@ -88,6 +88,7 @@ public class Resepti {
      * Reseptin tunnus alustuu -1.
      * 
      * @param nimi reseptin nimi
+     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
@@ -109,6 +110,7 @@ public class Resepti {
     /**
      * Luo Reseptin.
      * Nimi alustuu oletusnimeksi ja reseptin tunnus -1.
+     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">

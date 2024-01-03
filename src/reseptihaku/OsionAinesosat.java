@@ -61,6 +61,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     /**
      * Hallitsee osion ainesosia ja määriä.
      * Alustuu oletuksena osio id:llä -1.
+     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
@@ -79,6 +80,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * Hallitsee osion ainesosia ja määriä
      * 
      * @param osioId mihin osioon ainesosat ja määrät luodaan
+     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
@@ -98,7 +100,8 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * Hallitsee tietokannassa sijaitsevia ainesosa-olioita
      * 
      * @param osioId osion tunnus
-     * @param tietokantaNimi tietokannan nimi
+     * @param tiedostopolku missä sijaitsee
+     * @param tiedostonimi minkä niminen tiedosto
      * @throws SailoException jos tulee ongelmia
      */
     public OsionAinesosat(int osioId, String tiedostopolku, String tiedostonimi) throws SailoException {
@@ -172,6 +175,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * Ei tee mitään jos yritetään asettaa null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin polkuun tiedosto tallennetaan ja mistä sitä luetaan
+     * @throws SailoException jos jotain menee pieleen
      */
     public void setTiedostoPolku(String tiedostopolku) throws SailoException {
         if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;

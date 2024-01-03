@@ -57,6 +57,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
     
     /**
      * Hallitsee Ohje-oliota
+     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
@@ -90,7 +91,8 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * Hallitsee tietokannassa sijaitsevia Ohje-olioita
      * 
      * @param osioId osion tunnus
-     * @param tiedostoNimi tietokannan nimi
+     * @param tiedostopolku tiedostopolku
+     * @param tiedostonimi tiedon nimi
      * @throws SailoException jos tulee ongelmia
      */
     public Ohjeet(int osioId, String tiedostopolku, String tiedostonimi) throws SailoException {
@@ -506,6 +508,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * Ei tee mitään jos yritetään asettaa null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin polkuun tiedosto tallennetaan
+     * @throws SailoException jos jotain menee pieleen
      */
     public void setTiedostoPolku(String tiedostopolku) throws SailoException {
         if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;

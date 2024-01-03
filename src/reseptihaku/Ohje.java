@@ -248,7 +248,7 @@ public class Ohje {
      * Pienentää vaiheita yhdellä.
      * 
      * @param yhteys tietokantayhteys
-     * @param osioId osion tunnus
+     * @param osioTunnus mihin osioon ohjeet kuuluvat
      * @param suurempiKuinVaihe mitä vaihetta suuremmat vaiheet päivitetään
      * @return päivityslauseke
      * @throws SQLException jos lausekkeen muodostamisessa ilmenee ongelmia

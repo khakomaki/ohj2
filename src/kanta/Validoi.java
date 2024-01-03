@@ -38,7 +38,7 @@ public class Validoi {
         try {
             tiedosto.getCanonicalPath();
             return true;
-        } catch (@SuppressWarnings("unused") Exception exception) {
+        } catch (Exception exception) {
             return false;
         }
     }

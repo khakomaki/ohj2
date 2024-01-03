@@ -58,6 +58,7 @@ public class Osiot implements Hallitsija<Osio> {
     
     /**
      * Luo osiot
+     * @throws SailoException jos jotain menee pieleen
      */
     public Osiot() throws SailoException {
     	alustaTietokanta();
@@ -68,6 +69,7 @@ public class Osiot implements Hallitsija<Osio> {
      * Luo osiot
      * 
      * @param reseptinTunnus mille reseptille osiot luodaan
+     * @throws SailoException jos jotain menee pieleen
      */
     public Osiot(int reseptinTunnus) throws SailoException {
         this.reseptiId = reseptinTunnus;
@@ -79,7 +81,8 @@ public class Osiot implements Hallitsija<Osio> {
      * Hallitsee tietokannassa sijaitsevia Osio-olioita
      * 
      * @param reseptiID reseptin tunnus
-     * @param tietokantaNimi tietokannan nimi
+     * @param tiedostopolku missä polussa sijaitsee
+     * @param tiedostonimi tiedoston nimi
      * @throws SailoException jos tulee ongelmia
      */
     public Osiot(int reseptiID, String tiedostopolku, String tiedostonimi) throws SailoException {
@@ -145,6 +148,7 @@ public class Osiot implements Hallitsija<Osio> {
      * Ei tee mitään jos null tai sama kuin oli
      * 
      * @param tiedostopolku mihin osion tiedot tallennetaan
+     * @throws SailoException jos jotain menee pieleen
      */
     public void setTiedostoPolku(String tiedostopolku) throws SailoException {
         if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
