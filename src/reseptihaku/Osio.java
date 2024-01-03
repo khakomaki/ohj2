@@ -111,11 +111,7 @@ public class Osio {
      * Luo osion ohjeet
      */
     private void luoOsionOhjeet() {
-        try {
-			this.ohjeet = new Ohjeet(this.osioId);
-		} catch (SailoException exception) {
-			System.err.println(exception.getMessage()); // TODO
-		}
+		this.ohjeet = new Ohjeet(this.osioId);
     }
     
     

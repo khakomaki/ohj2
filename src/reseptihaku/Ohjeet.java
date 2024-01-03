@@ -57,7 +57,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
     
     /**
      * Hallitsee Ohje-oliota
-     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
@@ -70,8 +69,8 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * ohjeet.toString() === "ohjeet|-1|0";
      * </pre>
      */
-    public Ohjeet() throws SailoException {
-        alustaTietokanta();
+    public Ohjeet() {
+        //
     }
     
     
@@ -79,11 +78,9 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * Hallitsee tietokannassa sijaitsevia Ohje-olioita
      * 
      * @param osioId osion tunnus
-     * @throws SailoException jos tulee ongelmia
      */
-    public Ohjeet(int osioId) throws SailoException {
+    public Ohjeet(int osioId) {
         this.osioId = osioId;
-        alustaTietokanta();
     }
     
     
@@ -93,13 +90,11 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @param osioId osion tunnus
      * @param tiedostopolku tiedostopolku
      * @param tiedostonimi tiedon nimi
-     * @throws SailoException jos tulee ongelmia
      */
-    public Ohjeet(int osioId, String tiedostopolku, String tiedostonimi) throws SailoException {
+    public Ohjeet(int osioId, String tiedostopolku, String tiedostonimi) {
     	this.osioId = osioId;
     	setTiedostoPolku(tiedostopolku);
     	setTiedostoNimi(tiedostonimi);
-        alustaTietokanta();
     }
     
     
@@ -111,7 +106,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      */
     private void alustaTietokanta() throws SailoException {
     	Tietokanta.luoHakemisto(this.tiedostopolku);
-        this.tietokanta = Tietokanta.alustaTietokanta(this.tiedostopolku + tiedostonimi);
+        this.tietokanta = Tietokanta.alustaTietokanta(this.tiedostopolku + this.tiedostonimi);
         
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys() ) {
             // haetaan tietokannan metadatasta omaa tietokantaa, luodaan jos ei ole
@@ -194,24 +189,11 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @param ohje lisättävä ohje
      * 
      * @throws SailoException jos lisäämisen kanssa tulee ongelmia
-     * 
-     * @example
-     * <pre name="test">
-     * #THROWS SailoException
-     * 
-     * Collection<Ohje> loytyneetOhjeet = kaikkiOhjeet.get();
-     * loytyneetOhjeet.size() === 0;
-     * 
-     * Ohje ohje1 = new Ohje("Lisää suola");
-     * Ohje ohje2 = new Ohje("Lisää sokeri");
-     * 
-     * kaikkiOhjeet.lisaaOhje(ohje1);
-     * kaikkiOhjeet.lisaaOhje(ohje2);
-     * loytyneetOhjeet = kaikkiOhjeet.get();
-     * loytyneetOhjeet.size() === 2;
-     * </pre>
      */
-    public void lisaaOhje(Ohje ohje) throws SailoException {
+    public void lisaaTietokantaan(Ohje ohje) throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         // asetetaan lisättävälle ohjeelle sama osiotunnus
         ohje.setOsioId(this.osioId);
         ohje.setVaihe(this.ohjeet.size() + 1);
@@ -235,6 +217,9 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @throws SailoException jos hakemisessa tulee ongelmia
      */
     public Collection<Ohje> get() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Ohjeet WHERE osio_id = ?") ) {
             ArrayList<Ohje> loydetytOhjeet = new ArrayList<Ohje>();
             sql.setInt(1, this.osioId);
@@ -260,7 +245,10 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @param ohje poistettava ohje
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
-    public void poistaOhje(Ohje ohje) throws SailoException {
+    public void poistaTietokannasta(Ohje ohje) throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         // muodostaa yhteyden tietokantaan, pyytää ohjeelta poistolausekkeen ja suorittaa
         try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = ohje.getPoistolauseke(yhteys) ) {
             
@@ -292,6 +280,9 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
     public void poistaTietokannasta() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Ohjeet WHERE osio_id = ?")) {
             sql.setInt(1, this.osioId);
             sql.executeUpdate();
@@ -308,7 +299,9 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @throws SailoException jos tulee ongelmia tallentamisessa
      */
     public void tallenna() throws SailoException {
-    	
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
     	try (Connection yhteys = this.tietokanta.annaTietokantaYhteys()) {
         	// poistetaan nykyiset osion ohjeet
             try (PreparedStatement sqlPoisto = yhteys.prepareStatement("DELETE FROM Ohjeet WHERE osio_id = ?")) {
@@ -335,6 +328,9 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * @throws SailoException jos tulee ongelmia lukemisessa
      */
     public void lueTiedostosta() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Ohjeet WHERE osio_id = ?") ) {
             sql.setInt(1, this.osioId);
             
@@ -508,12 +504,10 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * Ei tee mitään jos yritetään asettaa null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin polkuun tiedosto tallennetaan
-     * @throws SailoException jos jotain menee pieleen
      */
-    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
+    public void setTiedostoPolku(String tiedostopolku) {
         if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
         this.tiedostopolku = tiedostopolku;
-        alustaTietokanta();
     }
     
     
@@ -614,19 +608,13 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * </pre>
      */
     public Ohjeet clone() {
-    	Ohjeet kopio = null;
-    	try {
-			kopio = new Ohjeet();
-	        kopio.osioId = this.osioId;
-	        kopio.tiedostopolku = this.tiedostopolku;
-	        
-	        for (Ohje ohje : this.ohjeet) {
-	            kopio.ohjeet.add(ohje.clone());
-	        }
-	        
-		} catch (SailoException exception) {
-			System.err.println(exception.getMessage());
-		}
+		Ohjeet kopio = new Ohjeet();
+        kopio.osioId = this.osioId;
+        kopio.tiedostopolku = this.tiedostopolku;
+        
+        for (Ohje ohje : this.ohjeet) {
+            kopio.ohjeet.add(ohje.clone());
+        }
         
         return kopio;
     }
@@ -742,6 +730,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
     public static void main(String[] args) {
         try {
             Ohjeet ohjeet = new Ohjeet(1);
+            ohjeet.setTiedostoPolku("esimerkkiOhjeet/");
             
             Ohje ohje1 = new Ohje("Lisää kananmunat");
             Ohje ohje2 = new Ohje("Lisää sokeri");
@@ -770,6 +759,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
             System.out.println();
             
             Ohjeet ohjeetTiedostosta = new Ohjeet(1);
+            ohjeetTiedostosta.setTiedostoPolku("esimerkkiOhjeet/");
             System.out.println(ohjeetTiedostosta.anna());
             System.out.println(ohjeetTiedostosta.get());
             System.out.println();
