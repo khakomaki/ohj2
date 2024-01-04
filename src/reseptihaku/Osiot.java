@@ -68,11 +68,9 @@ public class Osiot implements Hallitsija<Osio> {
      * Luo osiot
      * 
      * @param reseptinTunnus mille reseptille osiot luodaan
-     * @throws SailoException jos jotain menee pieleen
      */
-    public Osiot(int reseptinTunnus) throws SailoException {
+    public Osiot(int reseptinTunnus) {
         this.reseptiId = reseptinTunnus;
-        alustaTietokanta();
     }
     
     
@@ -492,7 +490,7 @@ public class Osiot implements Hallitsija<Osio> {
     	
     	for (Osio osio : this.osiot) {
     		// lisää tai päivittää osion
-    		if (osio.getID() < 0) { // TODO lisää myös jos vaihdettu tietokantaa
+    		if (osio.getID() < 0) {
     			lisaaTietokantaan(osio);
     		} else {
     			paivitaTietokannassa(osio);
@@ -571,17 +569,12 @@ public class Osiot implements Hallitsija<Osio> {
      */
     @Override
     public Osiot clone() {
-        Osiot kopio = null;
-        try {
-            kopio = new Osiot();
-            kopio.reseptiId = this.reseptiId;
-            kopio.tiedostonimi = this.tiedostonimi;
-            
-            for (Osio osio : this.osiot) {
-                kopio.osiot.add(osio.clone());
-            }
-        } catch (Exception exception) {
-        	System.err.println(exception.getMessage());
+        Osiot kopio = new Osiot();
+        kopio.reseptiId = this.reseptiId;
+        kopio.tiedostonimi = this.tiedostonimi;
+        
+        for (Osio osio : this.osiot) {
+            kopio.osiot.add(osio.clone());
         }
         
         return kopio;
@@ -724,7 +717,7 @@ public class Osiot implements Hallitsija<Osio> {
 	    	System.out.println(osiot2.get());
 	    	
 		} catch (SailoException exception) {
-			System.err.println(exception.getMessage());
+			System.err.print(exception.getMessage());
 		}
     }
 }

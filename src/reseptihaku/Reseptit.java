@@ -373,13 +373,6 @@ public class Reseptit implements Hallitsija<Resepti> {
         if (poistettavanIndeksi < 0) return;
         
         this.reseptit.remove(poistettavanIndeksi);
-        
-        // poistetaan tietokannasta
-        try {
-        	resepti.poistaTietokannasta();
-        } catch (SailoException exception) {
-        	System.err.println(exception.getMessage());
-        }
     }
     
     

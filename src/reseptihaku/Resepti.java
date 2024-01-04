@@ -124,11 +124,7 @@ public class Resepti {
      * Luo reseptin osiot
      */
     private void luoOsiot() {
-    	try {
-    		this.osiot = new Osiot(this.reseptiId);
-    	} catch (SailoException exception) {
-    		System.err.println(exception.getMessage());
-    	}
+		this.osiot = new Osiot(this.reseptiId);
     }
     
     
