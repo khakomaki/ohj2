@@ -203,6 +203,31 @@ public class Reseptit implements Hallitsija<Resepti> {
     
     
     /**
+     * Antaa tietokannasta olevien reseptien tunnukset
+     * 
+     * @return lista reseptitunnuksista
+     * @throws SailoException jos tulee ongelmia tietokannan kanssa
+     */
+    private List<Integer> getReseptiTunnukset() throws SailoException {
+        List<Integer> tunnukset = new ArrayList<>();
+        
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT resepti_id FROM Reseptit")) {
+            
+            try (ResultSet tulokset = sql.executeQuery()) {
+                while (tulokset.next()) {
+                    tunnukset.add(tulokset.getInt("resepti_id"));
+                }
+            }
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia osiotunnuksien hakemisessa tietokannan kanssa:\n" + exception.getMessage());
+        }
+        
+        return tunnukset;
+    }
+    
+    
+    /**
      * Luo reseptin.
      * Ei vielä lisää resepteihin.
      */
@@ -557,9 +582,28 @@ public class Reseptit implements Hallitsija<Resepti> {
      * @throws SailoException jos tallentamisessa ilmenee ongelmia
      */
     public void tallenna() throws SailoException {
-    	for (Resepti resepti : this.reseptit) {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
+        List<Integer> reseptiTunnukset = new ArrayList<Integer>();
+        
+        for (Resepti resepti : this.reseptit) {
     		resepti.tallenna();
+    		reseptiTunnukset.add(resepti.getID());
     	}
+        
+        // poistaa tietokannasta listasta puuttuvat reseptit
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Reseptit WHERE resepti_id = ?")) {
+            for (Integer reseptiID : getReseptiTunnukset()) {
+                if (!reseptiTunnukset.contains(reseptiID)) {
+                    sql.setInt(1, reseptiID);
+                    sql.executeUpdate();
+                }
+            }
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia osion poistossa tietokannan kanssa:\n" + exception.getMessage());
+        }
     }
     
     
