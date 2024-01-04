@@ -171,9 +171,8 @@ public class Osio {
      * Asettaa tiedostopolun
      * 
      * @param tiedostopolku mihin tallennetaan ja luetaan
-     * @throws SailoException jos jotain menee pieleen
      */
-    public void setTiedostopolku(String tiedostopolku) throws SailoException {
+    public void setTiedostopolku(String tiedostopolku) {
         this.ohjeet.setTiedostoPolku(tiedostopolku);
         this.osionAinesosat.setTiedostoPolku(tiedostopolku);
     }

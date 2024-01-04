@@ -58,10 +58,9 @@ public class Osiot implements Hallitsija<Osio> {
     
     /**
      * Luo osiot
-     * @throws SailoException jos jotain menee pieleen
      */
-    public Osiot() throws SailoException {
-    	alustaTietokanta();
+    public Osiot() {
+    	//
     }
     
     
@@ -83,13 +82,11 @@ public class Osiot implements Hallitsija<Osio> {
      * @param reseptiID reseptin tunnus
      * @param tiedostopolku missä polussa sijaitsee
      * @param tiedostonimi tiedoston nimi
-     * @throws SailoException jos tulee ongelmia
      */
-    public Osiot(int reseptiID, String tiedostopolku, String tiedostonimi) throws SailoException {
+    public Osiot(int reseptiID, String tiedostopolku, String tiedostonimi) {
         this.reseptiId = reseptiID;
         setTiedostoPolku(tiedostopolku);
         setTiedostoNimi(tiedostonimi);
-        alustaTietokanta();
     }
     
     
@@ -130,7 +127,6 @@ public class Osiot implements Hallitsija<Osio> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Osiot osiot = new Osiot();
      * osiot.toString() === "0|osiot";
      * </pre>
@@ -148,16 +144,13 @@ public class Osiot implements Hallitsija<Osio> {
      * Ei tee mitään jos null tai sama kuin oli
      * 
      * @param tiedostopolku mihin osion tiedot tallennetaan
-     * @throws SailoException jos jotain menee pieleen
      */
-    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
+    public void setTiedostoPolku(String tiedostopolku) {
         if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
         this.tiedostopolku = tiedostopolku;
         for (Osio osio : this.osiot) {
             osio.setTiedostopolku(this.tiedostopolku);
         }
-        
-        alustaTietokanta();
     }
     
     
@@ -193,7 +186,6 @@ public class Osiot implements Hallitsija<Osio> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Osiot osiot = new Osiot();
      * osiot.toString() === "0|osiot";
      * Osio pizzapohja = osiot.lisaa("Pizzapohja");
@@ -218,12 +210,8 @@ public class Osiot implements Hallitsija<Osio> {
     public Osio lisaa(String nimi) {
         Osio osio = new Osio(nimi);
         osio.setReseptiID(this.reseptiId);
+        osio.setTiedostopolku(this.tiedostopolku);
         osiot.add(osio);
-        try {
-			osio.setTiedostopolku(this.tiedostopolku);
-		} catch (SailoException exception) {
-			System.err.println(exception.getMessage());
-		}
         return osio;
     }
     
@@ -236,7 +224,6 @@ public class Osiot implements Hallitsija<Osio> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Osiot osiot = new Osiot();
      * osiot.toString() === "0|osiot";
      * 
@@ -250,12 +237,8 @@ public class Osiot implements Hallitsija<Osio> {
         if (osio == null) return;
         Osio lisattavaOsio = osio;
         osio.setReseptiID(this.reseptiId);
+        osio.setTiedostopolku(this.tiedostopolku);
         this.osiot.add(lisattavaOsio);
-        try {
-			osio.setTiedostopolku(this.tiedostopolku);
-		} catch (SailoException exception) {
-			System.err.println(exception.getMessage());
-		}
     }
     
     
@@ -279,17 +262,20 @@ public class Osiot implements Hallitsija<Osio> {
      * Osio osio1 = new Osio("Muropohja");
      * Osio osio2 = new Osio("Täyte");
      * 
-     * kaikkiOsiot.lisaaOsio(osio1);
-     * kaikkiOsiot.lisaaOsio(osio2);
+     * kaikkiOsiot.lisaaTietokantaan(osio1);
+     * kaikkiOsiot.lisaaTietokantaan(osio2);
      * loytyneetOsiot = kaikkiOsiot.get();
      * loytyneetOsiot.size() === 2;
      * 
-     * kaikkiOsiot.poistaOsio(osio1);
+     * kaikkiOsiot.poistaTietokannasta(osio1);
      * loytyneetOsiot = kaikkiOsiot.get();
      * loytyneetOsiot.size() === 1;
      * </pre>
      */
-    public void lisaaOsio(Osio osio) throws SailoException {
+    public void lisaaTietokantaan(Osio osio) throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         // asetetaan lisättävälle osiolle sama reseptitunnus
         osio.setReseptiID(this.reseptiId);
         osio.setTiedostopolku(this.tiedostopolku);
@@ -316,6 +302,9 @@ public class Osiot implements Hallitsija<Osio> {
      * @throws SailoException jos hakemisessa tulee ongelmia
      */
     public Collection<Osio> get() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Osiot WHERE resepti_id = ?") ) {
             ArrayList<Osio> loydetytOsiot = new ArrayList<Osio>();
             sql.setInt(1, this.reseptiId);
@@ -340,7 +329,10 @@ public class Osiot implements Hallitsija<Osio> {
      * @param osio poistettava osio
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
-    public void poistaOsio(Osio osio) throws SailoException {
+    public void poistaTietokannasta(Osio osio) throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         // muodostaa yhteyden tietokantaan, pyytää osiolta poistolausekkeen ja suorittaa
         try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = osio.getPoistolauseke(yhteys) ) {
             sql.executeUpdate();
@@ -357,7 +349,10 @@ public class Osiot implements Hallitsija<Osio> {
      * @param osio päivitettävä osio
      * @throws SailoException jos osion päivittämisessä ilmenee ongelmia
      */
-    private void paivitaOsio(Osio osio) throws SailoException {
+    private void paivitaTietokannassa(Osio osio) throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
     	osio.setTiedostopolku(this.tiedostopolku);
     	
     	// muodostaa yhteyden tietokantaan, pyytää osiolta päivityslausekkeen ja suorittaa
@@ -376,6 +371,9 @@ public class Osiot implements Hallitsija<Osio> {
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
     public void poistaTietokannasta() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
     	// käskee ohjeita ja ainesosia poistamaan tietonsa
     	for (Osio osio : this.osiot) {
     		osio.poistaTietokannasta();
@@ -486,15 +484,18 @@ public class Osiot implements Hallitsija<Osio> {
      * @throws SailoException jos tallentamisessa tulee ongelmia
      */
     public void tallenna() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
     	String virhe = voidaankoTallentaa();
     	if (virhe != null) throw new SailoException("Ongelmia osioiden tallentamisessa: " + virhe);
     	
     	for (Osio osio : this.osiot) {
     		// lisää tai päivittää osion
     		if (osio.getID() < 0) { // TODO lisää myös jos vaihdettu tietokantaa
-    			lisaaOsio(osio);
+    			lisaaTietokantaan(osio);
     		} else {
-    			paivitaOsio(osio);
+    			paivitaTietokannassa(osio);
     		}
     		// tallentaa osion omat tiedot
     		osio.tallenna();
@@ -508,6 +509,9 @@ public class Osiot implements Hallitsija<Osio> {
      * @throws SailoException jos tietojen lukemisessa tulee ongelmia
      */
     public void lueTiedostosta() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Osiot WHERE resepti_id = ?") ) {
             sql.setInt(1, this.reseptiId);
             
@@ -547,7 +551,6 @@ public class Osiot implements Hallitsija<Osio> {
     /**
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Osiot osiot = new Osiot();
      * osiot.setTiedostoNimi("pizza_osiot.txt");
      * osiot.lisaa(new Osio("Pizzapohja"));
@@ -588,7 +591,6 @@ public class Osiot implements Hallitsija<Osio> {
     /**
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Osiot osiot1 = new Osiot();
      * Osiot osiot2 = new Osiot();
      * osiot1.equals(osiot2) === true;
@@ -628,7 +630,6 @@ public class Osiot implements Hallitsija<Osio> {
     /**
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Osiot osiot1 = new Osiot();
      * Osiot osiot2 = new Osiot();
      * osiot1.hashCode() == osiot2.hashCode() === true;
@@ -666,7 +667,6 @@ public class Osiot implements Hallitsija<Osio> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Osiot osiot = new Osiot();
      * osiot.toString() === "0|osiot";
      * </pre>
@@ -690,6 +690,7 @@ public class Osiot implements Hallitsija<Osio> {
     	Osiot osiot;
 		try {
 			osiot = new Osiot(1);
+			osiot.setTiedostoPolku("esimerkkiOsiot/");
 	    	Osio osio1 = osiot.lisaa("Pizzapohja");
 	    	osio1.lisaaAinesosa("pizzajauhoha", "450g");
 	    	osio1.lisaaAinesosa("vettä", "3dl");
@@ -713,6 +714,7 @@ public class Osiot implements Hallitsija<Osio> {
 	    	System.out.println();
 	    	
 	    	Osiot osiot2 = new Osiot(1);
+	    	osiot2.setTiedostoPolku("esimerkkiOsiot/");
 	    	System.out.println(osiot2.anna());
 	    	System.out.println(osiot2.get());
 	    	System.out.println();
