@@ -26,6 +26,7 @@ public class Osiot implements Hallitsija<Osio> {
     private String tiedostonimi     = "osiot";
     private int reseptiId           = -1;
     private List<Osio> osiot        = new ArrayList<Osio>();
+    private List<Osio> poistetut    = new ArrayList<Osio>();
     private Tietokanta tietokanta 	= null;
     
     private static Osio esimerkkiOsio = new Osio();
@@ -331,6 +332,9 @@ public class Osiot implements Hallitsija<Osio> {
         // varmistetaan että tietokanta on alustettu
         if (this.tietokanta == null) alustaTietokanta();
         
+        // poistaa osion sisällön (ainesosat ja ohjeet)
+        osio.poistaTietokannasta();
+        
         // muodostaa yhteyden tietokantaan, pyytää osiolta poistolausekkeen ja suorittaa
         try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = osio.getPoistolauseke(yhteys) ) {
             sql.executeUpdate();
@@ -387,27 +391,6 @@ public class Osiot implements Hallitsija<Osio> {
     }
     
     
-    private List<Integer> getOsioTunnukset() throws SailoException {
-        List<Integer> tunnukset = new ArrayList<>();
-        
-        // hakee omaa reseptitunnusta vastaavien osioiden osiotunnukset
-        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT osio_id FROM Osiot WHERE resepti_id = ?")) {
-            sql.setInt(1, this.reseptiId);
-            
-            try (ResultSet tulokset = sql.executeQuery()) {
-                while (tulokset.next()) {
-                    tunnukset.add(tulokset.getInt("osio_id"));
-                }
-            }
-            
-        } catch (SQLException exception) {
-            throw new SailoException("Ongelmia osiotunnuksien hakemisessa tietokannan kanssa:\n" + exception.getMessage());
-        }
-        
-        return tunnukset;
-    }
-    
-    
     /**
      * Luo osion.
      * Ei vielä lisää osioihin.
@@ -443,6 +426,7 @@ public class Osiot implements Hallitsija<Osio> {
     @Override
     public void poista(Osio osio) {
         this.osiot.remove(osio);
+        this.poistetut.add(osio);
     }
     
     
@@ -509,9 +493,6 @@ public class Osiot implements Hallitsija<Osio> {
     	String virhe = voidaankoTallentaa();
     	if (virhe != null) throw new SailoException("Ongelmia osioiden tallentamisessa: " + virhe);
     	
-    	// idt poistamista muiden varten
-    	List<Integer> idLista = new ArrayList<Integer>();
-    	
     	for (Osio osio : this.osiot) {
     		// lisää tai päivittää osion
     		if (osio.getID() < 0) {
@@ -521,22 +502,13 @@ public class Osiot implements Hallitsija<Osio> {
     		}
     		// tallentaa osion omat tiedot
     		osio.tallenna();
-    		
-    		idLista.add(osio.getID());
     	}
     	
-    	// poistaa tietokannasta kaikki joiden osiotunnusta ei löydy listasta
-    	try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Osiot WHERE osio_id = ?")) {
-    	    for (Integer osioID : getOsioTunnukset()) {
-    	        if (!idLista.contains(osioID)) {
-    	            sql.setInt(1, osioID);
-    	            sql.executeUpdate();
-    	        }
-    	    }
-    	    
-    	} catch (SQLException exception) {
-    	    throw new SailoException("Ongelmia osion poistossa tietokannan kanssa:\n" + exception.getMessage());
+    	// poistaa tietokannasta kaikki poistetut
+    	for (Osio osio: this.poistetut) {
+    	    poistaTietokannasta(osio);
     	}
+    	this.poistetut.clear();
     }
     
     
