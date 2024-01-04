@@ -60,7 +60,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * #import java.io.*;
      * #import java.util.*;
      * #import kanta.SailoException;
@@ -148,7 +147,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet = new Ohjeet(15);
      * ohjeet.toString() === "ohjeet|15|0";
      * 
@@ -367,7 +365,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet = new Ohjeet(2);
      * ohjeet.toString() === "ohjeet|2|0";
      * 
@@ -408,7 +405,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet = new Ohjeet();
      * Ohje ohje1 = new Ohje("ohje 1"); ohjeet.lisaa(ohje1);
      * Ohje ohje2 = new Ohje("ohje 2"); ohjeet.lisaa(ohje2);
@@ -454,7 +450,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet = new Ohjeet(1);
      * ohjeet.anna(0) === null;
      * 
@@ -536,7 +531,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet = new Ohjeet();
      * 
      * ohjeet.getLkm() === 0;
@@ -561,7 +555,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet = new Ohjeet();
      * ohjeet.lisaa(new Ohje());
      * ohjeet.lisaa(new Ohje());
@@ -586,7 +579,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
     /**
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet = new Ohjeet(2);
      * ohjeet.lisaa(new Ohje("Sekoita sokeri ja vehnäjauhot"));
      * ohjeet.lisaa(new Ohje("Lisää kananmuna"));
@@ -624,7 +616,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
     /**
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet1 = new Ohjeet();
      * Ohjeet ohjeet2 = new Ohjeet();
      * ohjeet1.equals(ohjeet2) === true;
@@ -666,7 +657,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
     /**
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet1 = new Ohjeet();
      * Ohjeet ohjeet2 = new Ohjeet();
      * ohjeet1.hashCode() == ohjeet2.hashCode() === true;
@@ -706,7 +696,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Ohjeet ohjeet = new Ohjeet(1);
      * ohjeet.toString() === "ohjeet|1|0";
      * </pre>
