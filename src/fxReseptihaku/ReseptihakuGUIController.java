@@ -405,10 +405,10 @@ public class ReseptihakuGUIController implements Initializable {
         try {
             // this.reseptit.lueTiedostosta();
             // TODO testidata pois kuin ei enää tarvita
-            this.reseptit.setTiedostoPolku("testidata/");
+            //this.reseptit.setTiedostoPolku("testidata/");
             this.reseptit.lueTiedostosta();
-            this.reseptit.setTiedostoPolku("reseptidata/");
-            this.reseptit.tallenna();
+            //this.reseptit.setTiedostoPolku("reseptidata/");
+            //this.reseptit.tallenna();
             
             
         } catch (SailoException exception) {

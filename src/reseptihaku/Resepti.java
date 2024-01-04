@@ -88,42 +88,35 @@ public class Resepti {
      * Reseptin tunnus alustuu -1.
      * 
      * @param nimi reseptin nimi
-     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
-     * #import kanta.SailoException;
      * 
      * Resepti makaronilaatikko = new Resepti("Makaronilaatikko");
      * makaronilaatikko.toString() === "-1|Makaronilaatikko|-1|-1|-1|-1";
      * </pre>
      */
-    public Resepti(String nimi) throws SailoException {
+    public Resepti(String nimi) {
         setNimi(nimi);
         luoOsiot();
         luoVaihtoehtoAttribuutit();
-        alustaTietokanta();
     }
     
     
     /**
      * Luo Reseptin.
      * Nimi alustuu oletusnimeksi ja reseptin tunnus -1.
-     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.toString() === "-1|Reseptin nimi|-1|-1|-1|-1";
      * </pre>
      */
-    public Resepti() throws SailoException {
+    public Resepti() {
         setNimi(null);
         luoOsiot();
         luoVaihtoehtoAttribuutit();
-        alustaTietokanta();
     }
     
     
@@ -141,6 +134,7 @@ public class Resepti {
     
     /**
      * Alustaa reseptien tietokannan
+     * #import kanta.SailoException;
      * 
      * @throws SailoException jos tietokannan alustamisessa ilmenee ongelmia
      */
@@ -251,7 +245,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti pizza = new Resepti("Pizza");
      * pizza.toString() === "-1|Pizza|-1|-1|-1|-1";
      * 
@@ -284,7 +277,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti pizza = new Resepti("Pizza");
      * pizza.toString() === "-1|Pizza|-1|-1|-1|-1";
      * 
@@ -312,7 +304,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti pizza = new Resepti("Margarita pizza");
      * pizza.getNimi().equals("Margarita pizza") === true;
      * </pre>
@@ -330,7 +321,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti sampyla = new Resepti();
      * sampyla.getKuvaus() === "";
      * 
@@ -358,7 +348,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti sampyla = new Resepti();
      * sampyla.getKuvaus() === "";
      * 
@@ -381,7 +370,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.getTunnus() === -1;
      * </pre>
@@ -496,8 +484,8 @@ public class Resepti {
      * @throws SailoException jos lisäämisessä ilmenee ongelmia
      */
     public void lisaaTietokantaan() throws SailoException {
-    	// varmistaa että tietokanta on asetettu
-    	if (this.tietokanta == null) throw new SailoException("Reseptille ei ole vielä asetettu tietokantaa!");
+    	// varmistaa että tietokanta on alustettu
+    	if (this.tietokanta == null) alustaTietokanta();
     	
         // muodostaa yhteyden tietokantaan, muodostaa lisäyslausekkeen ja suorittaa
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = getLisayslauseke(yhteys) ) {
@@ -520,8 +508,8 @@ public class Resepti {
      * @throws SailoException jos päivittämisessä ilmenee ongelmia
      */
     public void paivitaTietokannassa() throws SailoException {
-    	// varmistaa että tietokanta on asetettu
-    	if (this.tietokanta == null) throw new SailoException("Reseptille ei ole vielä asetettu tietokantaa!");
+        // varmistaa että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
     	
         // muodostaa yhteyden tietokantaan, muodostaa päivityslausekkeen ja suorittaa
         try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = getPaivityslauseke(yhteys) ) {
@@ -539,11 +527,11 @@ public class Resepti {
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
     public void poistaTietokannasta() throws SailoException {
-    	// käskee reseptin osioita poistamaan tietonsa
+        // varmistaa että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
+    	// poistetaan ensin osioiden tiedot, jäävät muuten tietokantaan jos omassa poistamisessa ongelmia
     	this.osiot.poistaTietokannasta();
-    	
-    	// varmistaa että tietokanta on asetettu
-    	if (this.tietokanta == null) throw new SailoException("Reseptille ei ole vielä asetettu tietokantaa!");
     	
         // muodostaa yhteyden tietokantaan, muodostaa poistolausekkeen ja suorittaa
         try (Connection yhteys = this.tietokanta.annaTietokantaYhteys()) {
@@ -566,14 +554,11 @@ public class Resepti {
      * Ei tee mitään jos annetaan null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin polkuun tietoja tallennetaan ja luetaan
-     * @throws SailoException jos polun vaihtamisessa tulee ongelmia
      */
-    public void setTiedostopolku(String tiedostopolku) throws SailoException {
+    public void setTiedostopolku(String tiedostopolku) {
         if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
         this.tiedostopolku = tiedostopolku;
         this.osiot.setTiedostoPolku(this.tiedostopolku);
-        
-        alustaTietokanta();
     }
     
     
@@ -584,7 +569,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.getOsiot().equals(new Osiot()) === true;
      * 
@@ -608,7 +592,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.getOsiot().equals(new Osiot()) === true;
      * 
@@ -791,7 +774,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti resepti = new Resepti("Kakku");
      * resepti.getTaulukkoMuodossa() === "Kakku||||";
      * </pre>
@@ -821,7 +803,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti resepti = new Resepti("Juustokakku");
      * resepti.onkoNimessa("kakku") === true;
      * resepti.onkoNimessa("KAKKU") === true;
@@ -853,7 +834,7 @@ public class Resepti {
      */
     public void tallenna() throws SailoException {
     	// lisää reseptin tietokantaan tai päivittää sitä tietokannassa
-    	if (this.reseptiId < 0) { // TODO lisää myös jos vaihdettu tietokantaa
+    	if (this.reseptiId < 0) {
     		lisaaTietokantaan();
     	} else {
     		paivitaTietokannassa();
@@ -904,7 +885,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti resepti = new Resepti();
      * resepti.parse("1|Mustikkapiirakka|halpa ja maukas.|2|2|3|1");
      * resepti.toString().endsWith("|Mustikkapiirakka|2|2|3|1") === true;
@@ -943,7 +923,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti pizza = new Resepti("Pizza");
      * pizza.setKuvaus("Itsetehdyllä tomaattikastikkeella.");
      * pizza.setHinta(3);
@@ -970,21 +949,16 @@ public class Resepti {
      */
     @Override
     public Resepti clone() {
-    	Resepti kopio = null;
-    	try {
-    		kopio = new Resepti();
-            kopio.reseptiId = this.reseptiId;
-            kopio.setUusiNimi(getNimi());
-            kopio.setHinta(getHinta());
-            kopio.setValmistusaika(getValmistusaika());
-            kopio.setTahdet(getTahdet());
-            kopio.setVaativuus(getVaativuus());
-            kopio.setKuvaus(getKuvaus());
-            kopio.osiot = this.osiot.clone();
+    	Resepti kopio = new Resepti();
+        kopio.reseptiId = this.reseptiId;
+        kopio.setUusiNimi(getNimi());
+        kopio.setHinta(getHinta());
+        kopio.setValmistusaika(getValmistusaika());
+        kopio.setTahdet(getTahdet());
+        kopio.setVaativuus(getVaativuus());
+        kopio.setKuvaus(getKuvaus());
+        kopio.osiot = this.osiot.clone();
             
-    	} catch (SailoException exception) {
-    		System.err.println(exception.getMessage());
-    	}
         return kopio;
     }
     
@@ -997,7 +971,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti pizza1 = new Resepti("Pizza");
      * pizza1.setKuvaus("Pizzaa.");
      * pizza1.setHinta(1);
@@ -1058,7 +1031,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti mustikkapiirakka = new Resepti("Mustikkapiirakka");
      * Resepti piirakka = new Resepti("Piirakka");
      * mustikkapiirakka.hashCode() == piirakka.hashCode() === false;
@@ -1104,7 +1076,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti mustikkapiirakka = new Resepti("");
      * mustikkapiirakka.luoMustikkapiirakka();
      * mustikkapiirakka.toString() === "-1|Mustikkapiirakka|2|2|3|1";
@@ -1139,7 +1110,6 @@ public class Resepti {
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * Resepti lihapiirakka = new Resepti("Lihapiirakka");
      * lihapiirakka.toString() === "-1|Lihapiirakka|-1|-1|-1|-1";
      * </pre>
@@ -1167,13 +1137,8 @@ public class Resepti {
      * @param args ei käytössä
      */
     public static void main(String[] args) {
-    	try {
-    		Resepti lihapiirakka = new Resepti("Lihapiirakka");
-            lihapiirakka.setTahdet(2);
-            lihapiirakka.setKuvaus("Helppo ja hyvä");
-            
-    	} catch (SailoException exception) {
-    		System.err.println(exception.getMessage());
-    	}
+		Resepti lihapiirakka = new Resepti("Lihapiirakka");
+        lihapiirakka.setTahdet(2);
+        lihapiirakka.setKuvaus("Helppo ja hyvä");
     }
 }

@@ -2,7 +2,6 @@ package fxReseptihaku;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import kanta.SailoException;
 import reseptihaku.Reseptit;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -36,9 +35,6 @@ public class ReseptihakuMain extends Application {
             reseptihakuCtrl.lueTiedostosta();
             reseptihakuCtrl.haeReseptit();
             
-        } catch (SailoException sailoException) {
-        	System.err.println(sailoException.getMessage());
-        	
         } catch(Exception exception) {
             exception.printStackTrace();
         }
