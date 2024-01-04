@@ -41,7 +41,7 @@ public class Osiot implements Hallitsija<Osio> {
      * private File tiedosto;
      * 
      * @Before
-     * public void alusta() throws SailoException {
+     * public void alusta() {
      *     tiedPolku = "testidata/";
      *     tiedNimi = "testiOsiot";
      *     tiedosto = new File(tiedPolku + tiedNimi + ".db");
