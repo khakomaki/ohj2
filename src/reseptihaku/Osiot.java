@@ -387,6 +387,27 @@ public class Osiot implements Hallitsija<Osio> {
     }
     
     
+    private List<Integer> getOsioTunnukset() throws SailoException {
+        List<Integer> tunnukset = new ArrayList<>();
+        
+        // hakee omaa reseptitunnusta vastaavien osioiden osiotunnukset
+        try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT osio_id FROM Osiot WHERE resepti_id = ?")) {
+            sql.setInt(1, this.reseptiId);
+            
+            try (ResultSet tulokset = sql.executeQuery()) {
+                while (tulokset.next()) {
+                    tunnukset.add(tulokset.getInt("osio_id"));
+                }
+            }
+            
+        } catch (SQLException exception) {
+            throw new SailoException("Ongelmia osiotunnuksien hakemisessa tietokannan kanssa:\n" + exception.getMessage());
+        }
+        
+        return tunnukset;
+    }
+    
+    
     /**
      * Luo osion.
      * Ei vielä lisää osioihin.
@@ -488,6 +509,9 @@ public class Osiot implements Hallitsija<Osio> {
     	String virhe = voidaankoTallentaa();
     	if (virhe != null) throw new SailoException("Ongelmia osioiden tallentamisessa: " + virhe);
     	
+    	// idt poistamista muiden varten
+    	List<Integer> idLista = new ArrayList<Integer>();
+    	
     	for (Osio osio : this.osiot) {
     		// lisää tai päivittää osion
     		if (osio.getID() < 0) {
@@ -497,6 +521,21 @@ public class Osiot implements Hallitsija<Osio> {
     		}
     		// tallentaa osion omat tiedot
     		osio.tallenna();
+    		
+    		idLista.add(osio.getID());
+    	}
+    	
+    	// poistaa tietokannasta kaikki joiden osiotunnusta ei löydy listasta
+    	try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Osiot WHERE osio_id = ?")) {
+    	    for (Integer osioID : getOsioTunnukset()) {
+    	        if (!idLista.contains(osioID)) {
+    	            sql.setInt(1, osioID);
+    	            sql.executeUpdate();
+    	        }
+    	    }
+    	    
+    	} catch (SQLException exception) {
+    	    throw new SailoException("Ongelmia osion poistossa tietokannan kanssa:\n" + exception.getMessage());
     	}
     }
     
@@ -705,6 +744,12 @@ public class Osiot implements Hallitsija<Osio> {
 	    	System.out.println(osiot.anna());
 	    	System.out.println(osiot.get());
 	    	System.out.println();
+	    	
+	    	osiot.tallenna();
+	    	System.out.println(osiot.anna());
+            System.out.println(osiot.get());
+            System.out.println();
+            
 	    	
 	    	Osiot osiot2 = new Osiot(1);
 	    	osiot2.setTiedostoPolku("esimerkkiOsiot/");
