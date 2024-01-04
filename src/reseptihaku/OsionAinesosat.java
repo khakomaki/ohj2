@@ -43,7 +43,7 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * private File tiedosto;
      * 
      * @Before
-     * public void alusta() throws SailoException {
+     * public void alusta() {
      *     tiedPolku = "testidata/";
      *     tiedNimi = "testiAinesosat";
      *     tiedosto = new File(tiedPolku + tiedNimi + ".db");
@@ -61,18 +61,15 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     /**
      * Hallitsee osion ainesosia ja määriä.
      * Alustuu oletuksena osio id:llä -1.
-     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * OsionAinesosat oletus = new OsionAinesosat();
      * oletus.toString() === "-1|ainesosat|0";
      * </pre>
      */
-    public OsionAinesosat() throws SailoException {
+    public OsionAinesosat() {
         super(2.0, 0);
-        alustaTietokanta();
     }
     
     
@@ -80,19 +77,16 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * Hallitsee osion ainesosia ja määriä
      * 
      * @param osioId mihin osioon ainesosat ja määrät luodaan
-     * @throws SailoException jos jotain menee pieleen
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * OsionAinesosat muropohjaAinesosat = new OsionAinesosat(2);
      * muropohjaAinesosat.toString() === "2|ainesosat|0";
      * </pre>
      */
-    public OsionAinesosat(int osioId) throws SailoException {
+    public OsionAinesosat(int osioId) {
         super(2.0, 0);
         this.osioId = osioId;
-        alustaTietokanta();
     }
     
     
@@ -102,14 +96,12 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @param osioId osion tunnus
      * @param tiedostopolku missä sijaitsee
      * @param tiedostonimi minkä niminen tiedosto
-     * @throws SailoException jos tulee ongelmia
      */
-    public OsionAinesosat(int osioId, String tiedostopolku, String tiedostonimi) throws SailoException {
+    public OsionAinesosat(int osioId, String tiedostopolku, String tiedostonimi) {
         super(2.0, 0);
     	this.osioId = osioId;
     	setTiedostoPolku(tiedostopolku);
     	setTiedostoNimi(tiedostonimi);
-    	alustaTietokanta();
     }
     
     
@@ -175,12 +167,10 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * Ei tee mitään jos yritetään asettaa null tai sama kuin aiemmin.
      * 
      * @param tiedostopolku mihin polkuun tiedosto tallennetaan ja mistä sitä luetaan
-     * @throws SailoException jos jotain menee pieleen
      */
-    public void setTiedostoPolku(String tiedostopolku) throws SailoException {
+    public void setTiedostoPolku(String tiedostopolku) {
         if (tiedostopolku == null || this.tiedostopolku.equals(tiedostopolku)) return;
         this.tiedostopolku = tiedostopolku;
-        alustaTietokanta();
     }
     
     
@@ -192,7 +182,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * OsionAinesosat muropohjaAinesosat = new OsionAinesosat(2);
      * muropohjaAinesosat.toString() === "2|ainesosat|0";
      * 
@@ -231,17 +220,20 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * OsionAinesosa ainesosa1 = new OsionAinesosa("Mansikka", "5dl");
      * OsionAinesosa ainesosa2 = new OsionAinesosa("Mustikka", "2dl");
      * 
-     * kaikkiAinesosat.lisaaAinesosa(ainesosa1);
-     * kaikkiAinesosat.lisaaAinesosa(ainesosa2);
+     * kaikkiAinesosat.lisaaTietokantaan(ainesosa1);
+     * kaikkiAinesosat.lisaaTietokantaan(ainesosa2);
      * loytyneetAinesosat = kaikkiAinesosat.get();
      * loytyneetAinesosat.size() === 2;
      * 
-     * kaikkiAinesosat.poistaAinesosa(ainesosa1);
+     * kaikkiAinesosat.poistaTietokannasta(ainesosa1);
      * loytyneetAinesosat = kaikkiAinesosat.get();
      * loytyneetAinesosat.size() === 1;
      * </pre>
      */
-    public void lisaaAinesosa(OsionAinesosa ainesosa) throws SailoException {
+    public void lisaaTietokantaan(OsionAinesosa ainesosa) throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         // asetetaan lisättävälle ainesosalle sama osiotunnus
     	ainesosa.setOsioId(this.osioId);
         
@@ -262,6 +254,9 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @throws SailoException jos hakemisessa tulee ongelmia
      */
     public Collection<OsionAinesosa> get() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Ainesosat WHERE osio_id = ?") ) {
             ArrayList<OsionAinesosa> loydetytAinesosat = new ArrayList<OsionAinesosa>();
             sql.setInt(1, this.osioId);
@@ -286,7 +281,10 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @param ainesosa poistettava ainesosa
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
-    public void poistaAinesosa(OsionAinesosa ainesosa) throws SailoException {
+    public void poistaTietokannasta(OsionAinesosa ainesosa) throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         // muodostaa yhteyden tietokantaan, pyytää ohjeelta poistolausekkeen ja suorittaa
         try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = ainesosa.getPoistolauseke(yhteys) ) {
             sql.executeUpdate();
@@ -303,6 +301,9 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @throws SailoException jos poistamisessa ilmenee ongelmia
      */
     public void poistaTietokannasta() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         try (Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("DELETE FROM Ainesosat WHERE osio_id = ?")) {
             sql.setInt(1, this.osioId);
             sql.executeUpdate();
@@ -319,6 +320,9 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @throws SailoException jos tallentamisessa ilmenee ongelmia
      */
     public void tallenna() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
     	// varmistetaan ettei ole samaa ainesosaa useampaan kertaan
     	List<String> ainesosaNimet = new ArrayList<String>();
     	for (OsionAinesosa ainesosa : this) {
@@ -352,6 +356,9 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * @throws SailoException jos tietokannasta lukemisessa ilmenee ongelmia
      */
     public void lueTiedostosta() throws SailoException {
+        // varmistetaan että tietokanta on alustettu
+        if (this.tietokanta == null) alustaTietokanta();
+        
         try ( Connection yhteys = this.tietokanta.annaTietokantaYhteys(); PreparedStatement sql = yhteys.prepareStatement("SELECT * FROM Ainesosat WHERE osio_id = ?") ) {
             sql.setInt(1, this.osioId);
             
@@ -397,7 +404,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * OsionAinesosat oat = new OsionAinesosat();
      * oat.anna(-5) == null === true;
      * oat.anna(0) == null === true;
@@ -457,7 +463,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     /**
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * OsionAinesosat oat = new OsionAinesosat(55);
      * oat.lisaa(new OsionAinesosa("riisi", "5dl"));
      * oat.lisaa(new OsionAinesosa("soijakastike", "2rkl"));
@@ -474,19 +479,13 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * </pre>
      */
     public OsionAinesosat clone() {
-    	OsionAinesosat kopio = null;
-    	try {
-            kopio = new OsionAinesosat();
-            kopio.osioId = this.osioId;
-            kopio.tiedostonimi = this.tiedostonimi;
-            
-            for (OsionAinesosa oa : this) {
-                kopio.lisaa(oa);
-            }
-            
-    	} catch (SailoException exception) {
-    		System.err.println(exception.getMessage());
-    	}
+    	OsionAinesosat kopio = new OsionAinesosat();
+        kopio.osioId = this.osioId;
+        kopio.tiedostonimi = this.tiedostonimi;
+        
+        for (OsionAinesosa oa : this) {
+            kopio.lisaa(oa);
+        }
 
         return kopio;
     }
@@ -495,7 +494,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     /**
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * OsionAinesosat oa1 = new OsionAinesosat(1);
      * OsionAinesosat oa2 = new OsionAinesosat(1);
      * oa1.equals(oa2) === true;
@@ -537,7 +535,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * OsionAinesosat oa1 = new OsionAinesosat(1);
      * OsionAinesosat oa2 = new OsionAinesosat(1);
      * oa1.hashCode() == oa2.hashCode() === true;
@@ -576,7 +573,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
      * 
      * @example
      * <pre name="test">
-     * #THROWS SailoException
      * OsionAinesosat oa = new OsionAinesosat(1);
      * oa.toString() === "1|ainesosat|0";
      * </pre>
