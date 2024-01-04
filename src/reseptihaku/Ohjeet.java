@@ -40,7 +40,7 @@ public class Ohjeet implements Hallitsija<Ohje> {
      * private File tiedosto;
      * 
      * @Before
-     * public void alusta() throws SailoException {
+     * public void alusta() {
      * 	   tiedPolku = "testidata/";
      *     tiedNimi = "testiOhjeet";
      *     tiedosto = new File(tiedPolku + tiedNimi + ".db");
