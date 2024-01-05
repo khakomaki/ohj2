@@ -449,16 +449,6 @@ public class Osiot implements Hallitsija<Osio> {
     
     
     /**
-     * Kertoo onko osioissa tallentamattomia muutoksia
-     * 
-     * @return onko tallentamattomia muutoksia
-     */
-    public boolean onkoTallentamattomiaMuutoksia() {
-        return true; // TODO poista kun ei käytetä enää missään
-    }
-    
-    
-    /**
      * Kertoo voidaanko osiot tallentaa
      * 
      * @return virheteksti tai null jos voidaan tallentaa

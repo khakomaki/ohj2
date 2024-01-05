@@ -449,16 +449,6 @@ public class OsionAinesosat extends TietueHallitsija<OsionAinesosa> implements H
     }
     
     
-    /**
-     * Kertoo onko ohjeisiin tullut tallentamattomia muutoksia
-     * 
-     * @return onko tallentamattomia muutoksia
-     */
-    public boolean onkoTallentamattomiaMuutoksia() {
-        return true; // TODO poista kun ei käytetä muualla
-    }
-    
-    
     @Override
     /**
      * @example

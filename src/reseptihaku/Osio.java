@@ -395,16 +395,6 @@ public class Osio {
     
     
     /**
-     * Kertoo onko osioon tullut muutoksia
-     * 
-     * @return onko osioon tullut muutoksia
-     */
-    public boolean onkoTallentamattomiaMuutoksia() {
-        return true; // TODO poista kun ei käytetä enää muualla
-    }
-    
-    
-    /**
      * Koittaa parsia osion tiedot annetusta rivistä
      * 
      * @param rivi mistä koitetaan lukea osion tiedot

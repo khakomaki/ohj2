@@ -517,16 +517,6 @@ public class Ohjeet implements Hallitsija<Ohje> {
     
     
     /**
-     * Kertoo onko ohjeisiin tullut tallentamattomia muutoksia
-     * 
-     * @return onko tallentamattomia muutoksia
-     */
-    public boolean onkoTallentamattomiaMuutoksia() {
-        return true; // TODO poista kun ei käytetä muualla
-    }
-    
-    
-    /**
      * @return ohjeiden lukumäärä
      * 
      * @example
