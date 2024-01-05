@@ -403,6 +403,7 @@ public class ReseptihakuGUIController implements Initializable {
      */
     public void lueTiedostosta() {
         try {
+            this.reseptit.setTiedostoPolku("testidata/");
             this.reseptit.lueTiedostosta();
             
         } catch (SailoException exception) {

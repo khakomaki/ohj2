@@ -453,6 +453,7 @@ public class Reseptit implements Hallitsija<Resepti> {
     			try (ResultSet hakuTulokset = sql.executeQuery()) {
     				while (hakuTulokset.next()) {
     					Resepti resepti = new Resepti();
+    					resepti.setTiedostopolku(this.tiedostopolku);
     					resepti.parse(hakuTulokset);
     					resepti.lueTiedostosta();
     					loydetytReseptit.add(resepti);
