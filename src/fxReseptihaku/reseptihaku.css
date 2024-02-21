@@ -3,65 +3,65 @@
  * #FAFAFA
  * #EDE7E1
  * #E5D7C8
- * #DDC6AF
- * #D4B596
- * #BF956B
+ * #CED4DA
+ * #ADB5BD
+ * #6C757D
  */
  
 
 /* ---------- root ---------- */
 .root {
-	-fx-background-color: linear-gradient(to bottom, #FAFAFA, #E5D7C8);
+	-fx-background-color: #E9ECEF;
 }
 
 
 /* ---------- TextField  ---------- */
 .text-field {
-	-fx-border-color: #DDC6AF;
-	-fx-background-color: #DDC6AF;
+	-fx-border-color: #CED4DA;
+	-fx-background-color: #CED4DA;
 }
 
 .text-field:hover {
-	-fx-border-color: #D4B596;
-	-fx-background-color: #D4B596;
+	-fx-border-color: #ADB5BD;
+	-fx-background-color: #ADB5BD;
 }
 
 .text-field:focused {
-	-fx-border-color: #BF956B;
-	-fx-background-color: #BF956B;
+	-fx-border-color: #6C757D;
+	-fx-background-color: #6C757D;
 }
 
 
 /* ---------- TextArea  ---------- */
 .text-area {
-	-fx-border-color: #DDC6AF;
-	-fx-control-inner-background: #DDC6AF;
+	-fx-border-color: #CED4DA;
+	-fx-control-inner-background: #CED4DA;
 }
 
 .text-area:hover {
-	-fx-border-color: #D4B596;
-	-fx-control-inner-background: #D4B596;
+	-fx-border-color: #ADB5BD;
+	-fx-control-inner-background: #ADB5BD;
 }
 
 .text-area:focused {
-	-fx-border-color: #BF956B;
-	-fx-control-inner-background: #BF956B;
+	-fx-border-color: #6C757D;
+	-fx-control-inner-background: #6C757D;
 }
 
 
 /* ---------- ComboBox ---------- */
 .combo-box, .list-cell:selected, .arrow-button {
-	-fx-background-color: #DDC6AF;
+	-fx-background-color: #CED4DA;
 }
 
 .combo-box .list-cell:hover {
-	-fx-background-color: #D4B596;
+	-fx-background-color: #ADB5BD;
 }
 
 
 /* ---------- Table ---------- */
 .table-view, .table-view .column-header {
-	-fx-background-color: #D4A373;
+	-fx-background-color: #CED4DA;
 }
 
 .table-view .table-cell {
@@ -69,25 +69,25 @@
 }
 
 .table-row-cell:selected {
-	-fx-background-color: #D4B596;
+	-fx-background-color: #ADB5BD;
 }
 
 
 /* ---------- Button & CheckBox ---------- */
 .button, .check-box .box {
-	-fx-background-color: #DDC6AF;
+	-fx-background-color: #CED4DA;
 }
 
 .button:hover, .check-box .box:hover {
-	-fx-background-color: #D4B596;
+	-fx-background-color: #ADB5BD;
 }
 
 .button:pressed, .check-box:selected .box {
-	-fx-background-color: #BF956B;
+	-fx-background-color: #6C757D;
 }
 
 
 /* ---------- ominaisuudet GridPane ---------- */
 #ominaisuudetGridPane {
-	-fx-background-color: #DDC6AF;
+	-fx-background-color: #CED4DA;
 }
