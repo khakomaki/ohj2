@@ -53,7 +53,7 @@ Ohjelma näyttää tulokset kaikista resepteistä, joissa hakusana ilmenee miss�
 
 Jos hakukenttään ei syötä mitään, ohjelma hakee kaikista resepteistä valituilla suodatusasetuksilla. Mahdollistaa reseptien selaamisen pelkkien suodattimien avulla.
 
-Hakua vastanneet reseptit lajitellaan valitun sarakkeen perusteella (oletus: reseptin nimi). Hakusana näytetään kohdassa 'tulokset hakusanalle "{hakusana}": '.
+Hakua vastanneet reseptit lajitellaan valitun sarakkeen perusteella (oletus: reseptin nimi). Hakusana näytetään kohdassa 'tulokset hakusanalle "{hakusana}"'.
 
 Jos haku ei täsmännyt mitään, ei tehdä kuitenkaan ilmoitusta.
 
@@ -182,6 +182,10 @@ Jossa
 2        |3     |Lisää vanilliinisokeri
 2        |4     |Kaada kermaviiliseos piirakkapohjan päälle
 ```
+
+## Testit
+
+Ohjelman osille on kirjoitettu runsaasti testejä helpottamaan kehitystä. Testien generoimiseen käytetty pääosin ComTest-pluginia, testit toimivat myös osana dokumentointia.
 
 ## Lisätiedot
 
