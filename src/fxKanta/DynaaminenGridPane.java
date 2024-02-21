@@ -25,9 +25,10 @@ public class DynaaminenGridPane<T> extends GridPane {
     private NodeLuonti<T> nodeluonti;
     private List<Label> otsikot;
     
-    private RowConstraints riviRajoitteet   = new RowConstraints();
-    private int leveimmanRivinLeveys        = 0;
-    private boolean muokattava              = true;
+    private RowConstraints riviRajoitteet           = new RowConstraints();
+    private RowConstraints riviOtsikkoRajoitteet    = new RowConstraints();
+    private int leveimmanRivinLeveys                = 0;
+    private boolean muokattava                      = true;
     
     /**
      * Luo dynaamisen GridPanen.
@@ -75,11 +76,14 @@ public class DynaaminenGridPane<T> extends GridPane {
      */
     public void paivita() {
         this.getChildren().clear(); // tyhjentää GridPanen
+        this.getRowConstraints().clear(); // tyhjentää rivirajoitteet
         
         int rivi = 0;
         
         // otsikot
         if (0 < this.otsikot.size()) {
+            this.getRowConstraints().add(this.riviOtsikkoRajoitteet);
+            
             for (int i = 0; i < this.otsikot.size(); i++) {
                 this.add(this.otsikot.get(i), i, 0);
             }
@@ -108,7 +112,9 @@ public class DynaaminenGridPane<T> extends GridPane {
      * @param sarakeOtsikot lista lisättävistä otsikoista (järjestyksessä vasemmalta oikealle, 0 -> n)
      */
     public void lisaaOtsikot(List<Label> sarakeOtsikot) {
-        if (this.leveimmanRivinLeveys < sarakeOtsikot.size()) this.leveimmanRivinLeveys = sarakeOtsikot.size();
+        if (this.leveimmanRivinLeveys < sarakeOtsikot.size()) {
+            this.leveimmanRivinLeveys = sarakeOtsikot.size();
+        }
         
         this.otsikot = sarakeOtsikot;
     }
@@ -125,6 +131,16 @@ public class DynaaminenGridPane<T> extends GridPane {
     
     
     /**
+     * Asettaa rivirajoitteet otsikkoriville
+     * 
+     * @param rajoitteet asetettavat rajoitteet
+     */
+    public void asetaOtsikkoRajoitteet(RowConstraints rajoitteet) {
+        this.riviOtsikkoRajoitteet = rajoitteet;
+    }
+    
+    
+    /**
      * Lisää olion riville
      * 
      * @param olio lisättävän rivin olio
@@ -132,6 +148,8 @@ public class DynaaminenGridPane<T> extends GridPane {
      */
     private void lisaaRiviGridPaneen(T olio, int rivi) {
         int sarake = 0;
+        
+        // lisätään rivirajoitteet
         this.getRowConstraints().add(this.riviRajoitteet);
         
         // luo rivin nodet

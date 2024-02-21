@@ -275,6 +275,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ColumnConstraints painikeConstraints = NodeKasittely.luoSarakeRajoitteet(30, Priority.NEVER, HPos.CENTER);
         ColumnConstraints vaiheConstraints = NodeKasittely.luoSarakeRajoitteet(50, Priority.NEVER, HPos.CENTER);
         ColumnConstraints ohjeConstraints = NodeKasittely.luoSarakeRajoitteet(250, Priority.ALWAYS, HPos.LEFT);
+        RowConstraints otsikkoRiviConstraints = NodeKasittely.luoRiviRajoitteet(30, Priority.SOMETIMES, VPos.CENTER);
         RowConstraints ainesosaRiviConstraints = NodeKasittely.luoRiviRajoitteet(30, Priority.SOMETIMES, VPos.CENTER);
         RowConstraints ohjeRiviConstraints = NodeKasittely.luoRiviRajoitteet(50, Priority.SOMETIMES, VPos.CENTER);
         
@@ -288,6 +289,7 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         // luo ainesosien otsikon
         Label ainesosatLabel = new Label("Ainesosat");
         ainesosatLabel.setFont(this.kirjasin14);
+        ainesosatLabel.setPadding(this.PEHMUSTE_ISO);
         
         // luodaan GridPane ja otsikot
         DynaaminenGridPane<OsionAinesosa> ainesosatGridPane = new DynaaminenGridPane<OsionAinesosa>(osionAinesosat, ainesosa -> luoAinesosaNodet(ainesosa), true);
@@ -295,9 +297,15 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ainesosatGridPane.getColumnConstraints().add(ainesosaConstraints);
         ainesosatGridPane.getColumnConstraints().add(painikeConstraints);
         ainesosatGridPane.asetaRiviRajoitteet(ainesosaRiviConstraints);
+        ainesosatGridPane.asetaOtsikkoRajoitteet(otsikkoRiviConstraints);
         ainesosatGridPane.setHgap(this.VALI_PIENI);
-        Label maara = new Label("määrä"); maara.setPadding(this.PEHMUSTE_PIENI);
-        Label ainesosa = new Label("ainesosa"); ainesosa.setPadding(this.PEHMUSTE_PIENI);
+        
+        Label maara = new Label("määrä");
+        maara.setPadding(this.PEHMUSTE_PIENI);
+        
+        Label ainesosa = new Label("ainesosa");
+        ainesosa.setPadding(this.PEHMUSTE_PIENI);
+        
         List<Label> ainesosaOtsikot = List.of(maara, ainesosa);
         ainesosatGridPane.lisaaOtsikot(ainesosaOtsikot);
         ainesosatGridPane.paivita();
@@ -327,21 +335,27 @@ public class MuokkausGUIController implements ModalControllerInterface<Resepti> 
         ohjeetGridPane.getColumnConstraints().add(ohjeConstraints);
         ohjeetGridPane.getColumnConstraints().add(painikeConstraints);
         ohjeetGridPane.asetaRiviRajoitteet(ohjeRiviConstraints);
-        ohjeetGridPane.setVgap(this.VALI_PIENI);
-        Label vaihe = new Label("vaihe"); vaihe.setPadding(this.PEHMUSTE_PIENI);
-        Label ohjeistus = new Label("ohjeistus"); ohjeistus.setPadding(this.PEHMUSTE_PIENI);
+        ohjeetGridPane.asetaOtsikkoRajoitteet(otsikkoRiviConstraints);
+        ohjeetGridPane.setHgap(this.VALI_PIENI);
+        
+        Label vaihe = new Label("vaihe");
+        vaihe.setPadding(this.PEHMUSTE_PIENI);
+        
+        Label ohjeistus = new Label("ohjeistus");
+        ohjeistus.setPadding(this.PEHMUSTE_PIENI);
+        
         List<Label> ohjeOtsikot = List.of(vaihe, ohjeistus);
         ohjeetGridPane.lisaaOtsikot(ohjeOtsikot);
         ohjeetGridPane.paivita();
         
-        // lisätään otsikko ja GridPane ohjeiden VBox-elementtiin
+        // lisätään otsikko ja GridPane ohjeisiin
         ohjeetVBox.getChildren().add(ohjeetLabel);
         ohjeetVBox.getChildren().add(ohjeetGridPane);
         
-        // lisätään ohjeetVBox osion sisältöön
+        // lisätään ohjeet osion sisältöön
         osionSisaltoHBox.getChildren().add(ohjeetVBox);
         
-        // lisätään HBox-elementit VBox elementtiin
+        // lisätään osion otsikko ja sisältö sivulle
         osioVBox.getChildren().add(osioOstikkoHBox);
         osioVBox.getChildren().add(osionSisaltoHBox);
         
